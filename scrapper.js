@@ -12,17 +12,12 @@ const common = require('./common')
 module.exports.getPageMetrics = async (url,callback)=>{
     const browser = await puppeteer.launch(); // add in launch { headless: false } => show browser 
     const page = await browser.newPage();
-    //await page.setRequestInterception(true)
 
     var measures = {
         "size":0,
         "nbRequest": 0,
         "domSize":0
     }
-    /*
-    await page.on('request', (request) => {
-        request.continue()
-    })*/
 
     // No await here because we want to divide the size after ...
     await page.on('response', (response) => {

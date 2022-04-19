@@ -2,9 +2,11 @@ const common = require("./common")
 // optional : var lodash = require('lodash');
 const scrapper = require('./scrapper')
 const ecoScore = require('./ecoScore')
-const fuzzy = require('./funzy')
+const fuzzy = require('./fuzzy')
 
 async function main(){
+
+    console.log("Site web testé : ",common.baseUrl)
 
     const data = await scrapper.getPageMetrics(common.baseUrl,async (data,response)=>{
         if(response){
