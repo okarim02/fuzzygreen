@@ -12,18 +12,17 @@ const common = require('./common')
 module.exports.getPageMetrics = async (url,callback)=>{
     const browser = await puppeteer.launch(); // add in launch { headless: false } => show browser 
     const page = await browser.newPage();
-    await page.setRequestInterception(true)
+    //await page.setRequestInterception(true)
 
     var measures = {
         "size":0,
         "nbRequest": 0,
         "domSize":0
     }
-
+    /*
     await page.on('request', (request) => {
-        measures.nbRequest+=1
         request.continue()
-    })
+    })*/
 
     // No await here because we want to divide the size after ...
     await page.on('response', (response) => {
@@ -40,8 +39,7 @@ module.exports.getPageMetrics = async (url,callback)=>{
             );
         }
     })
-
-    await page.goto(url,{waitUntil:'domcontentloaded'});
+    await page.goto(url,{waitUntil:'domcontentloaded'&&'networkidle0',});
 
     measures.domSize = await page.$$eval('*',array => array.length);
 
