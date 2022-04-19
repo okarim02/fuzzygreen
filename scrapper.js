@@ -25,7 +25,6 @@ module.exports.getPageMetrics = async (url,callback)=>{
         request.continue()
     })
 
-    // No await here because we want to divide the size after ...
     await page.on('response', (response) => {
         // We only want non-data requests 
         measures.nbRequest+=1
