@@ -21,7 +21,8 @@ module.exports.getPageMetrics = async (url,callback)=>{
         "size":0,
         "nbRequest": 0,
         "domSize":0,
-        "loadTime": gitMetrics.TaskDuration
+        "loadTime": gitMetrics.TaskDuration,
+        "filesNotMin": []
     }
 
     page.on('request',(response)=>{
@@ -45,19 +46,22 @@ module.exports.getPageMetrics = async (url,callback)=>{
         }
 
         // For more info : https://stackoverflow.com/questions/57524945/how-to-intercept-a-download-request-on-puppeteer-and-read-the-file-being-interce
-        if(await response.url().includes('.js')){
+        if(await response.url().includes('.js') || await response.url().includes('.css')){
             const content = await response.text();
             const totalSize = await content.length;
             const result = await tools.isMinified(content);
             const poid = await (await response.buffer()).length;
             
-            console.log(`${response.url()} \t taille : ${totalSize} , poid : ${poid} \t => ${result ? "Contenu optimiser":"Contenu non minimiser"} `)
+            if(!result){
+                measures.filesNotMin.push(response.url())
+                console.log(`${response.url()} \t taille : ${totalSize} , poid : ${poid} \t => Contenu non minimiser `)
+            }
 
         }
 
     })
 
-    await page.goto(url,{waitUntil:'domcontentloaded' || 'networkidle0'});
+    await page.goto(url,{waitUntil:'domcontentloaded' && 'networkidle0'});
 
     measures.domSize = await page.$$eval('*',array => array.length);
 
