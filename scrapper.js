@@ -1,7 +1,7 @@
 // Content logic
 // doc api : https://pptr.dev/#?product=Puppeteer&version=v13.5.2&show=outline
 const puppeteer = require("puppeteer"); // npm i puppeteer 
-const common = require('./common')
+const tools = require('./tools')
 
 /* Uses: 
     - Get page size
@@ -10,25 +10,30 @@ const common = require('./common')
 // read : https://deviceatlas.com/blog/measuring-page-weight
 // also https://www.checklyhq.com/learn/headless/request-interception/
 module.exports.getPageMetrics = async (url,callback)=>{
-    const browser = await puppeteer.launch(); // add in launch { headless: false } => show browser 
+    const browser = await puppeteer.launch(); // add in launch : { headless: false } => show browser 
     const page = await browser.newPage();
-    await page.setRequestInterception(true)
+    const gitMetrics = await page.metrics();
+
+    // Use to do more things with the requests made by the website (check the doc)
+    await page.setRequestInterception(true);
 
     var measures = {
         "size":0,
         "nbRequest": 0,
-        "domSize":0
+        "domSize":0,
+        "loadTime": gitMetrics.TaskDuration
     }
 
-    await page.on('request', (request) => {
-        measures.nbRequest+=1
-        request.continue()
+    page.on('request',(response)=>{
+        response.continue();
     })
 
-    await page.on('response', (response) => {
-        // We only want non-data requests 
+    page.on('response', async (response) => {
         measures.nbRequest+=1
-        if (!response.url().startsWith('data:') && response.ok) {
+
+        if(!response.ok) response.continue();
+        // We only want non-data requests for the size  
+        if (!response.url().startsWith('data:')) {
             response.buffer().then(
                 buffer => {
                     measures.size+=buffer.length
@@ -38,9 +43,21 @@ module.exports.getPageMetrics = async (url,callback)=>{
                 }
             );
         }
+
+        // For more info : https://stackoverflow.com/questions/57524945/how-to-intercept-a-download-request-on-puppeteer-and-read-the-file-being-interce
+        if(await response.url().includes('.js')){
+            const content = await response.text();
+            const totalSize = await content.length;
+            const result = await tools.isMinified(content);
+            const poid = await (await response.buffer()).length;
+            
+            console.log(`${response.url()} \t taille : ${totalSize} , poid : ${poid} \t => ${result ? "Contenu optimiser":"Contenu non minimiser"} `)
+
+        }
+
     })
 
-    await page.goto(url,{waitUntil:'domcontentloaded'});
+    await page.goto(url,{waitUntil:'domcontentloaded' || 'networkidle0'});
 
     measures.domSize = await page.$$eval('*',array => array.length);
 
