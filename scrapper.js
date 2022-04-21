@@ -33,7 +33,19 @@ module.exports.getPageMetrics = async (url,callback)=>{
         measures.nbRequest+=1
 
         if(!response.ok) response.continue();
-        // We only want non-data requests for the size  
+
+        /*
+        if(response.request().resourceType() == "document"){
+            response.headers().forEach(e=>{
+                if(e.name.toLowerCase()==="etags"){
+                    console.log("ETAGS! !! ")
+                }
+            })
+        }else{
+            console.log(response.request().resourceType())
+        }*/
+
+        // We only want non-data requests 
         if (!response.url().startsWith('data:')) {
             response.buffer().then(
                 buffer => {
@@ -54,16 +66,25 @@ module.exports.getPageMetrics = async (url,callback)=>{
             
             if(!result){
                 measures.filesNotMin.push(response.url())
-                console.log(`${response.url()} \t taille : ${totalSize} , poid : ${poid} \t => Contenu non minimiser `)
+                //console.log(`${response.url()} \t taille : ${totalSize} , poid : ${poid} \t => Contenu non minimiser `)
             }
 
         }
 
     })
 
-    await page.goto(url,{waitUntil:'domcontentloaded' && 'networkidle0'});
+    await page.goto(url,{waitUntil:('domcontentloaded' && 'networkidle0')});
 
     measures.domSize = await page.$$eval('*',array => array.length);
+
+    const hrefs = await page.evaluate(
+        () => Array.from(
+          document.querySelectorAll('a[href]'),
+          a => a.getAttribute('etags')
+        )
+    );
+
+    console.log("Href : " , hrefs)
 
     await page.close();
     await browser.close();

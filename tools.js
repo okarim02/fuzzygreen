@@ -1,5 +1,5 @@
 
-module.exports.isMinified= async (content) => {
+module.exports.isMinified = async (content) => {
     
     if (!content) return true;
     if (content.length === 0) return true;
@@ -13,3 +13,5 @@ module.exports.isMinified= async (content) => {
 
     return (semicolons / linebreaks > 1 && linebreaks / total < 0.01);
 }
+
+
