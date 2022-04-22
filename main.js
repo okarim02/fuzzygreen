@@ -5,7 +5,7 @@ const ecoScore = require('./ecoScore')
 const greenhost = require('./green-host')
 
 async function main(){
-    const baseUrl = common.urls[2];
+    const baseUrl = common.urls[1];
     
     console.log("Site web testé : ",baseUrl)
 
@@ -15,7 +15,8 @@ async function main(){
 
     const data = await scrapper.getPageMetrics(baseUrl,async (data,response)=>{
         if(response){
-            data.size = Math.round(data.size/1000) 
+            data.size = Math.round(data.size/1000)
+            console.log("Ratio etags : ",(data.etagsNb/data.nbRequest)*100,"%") 
             console.log("Data",data)
             console.log()
             // todo : Fixer le calcule du 'size' dans scrapper.js 

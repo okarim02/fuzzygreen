@@ -22,7 +22,8 @@ module.exports.getPageMetrics = async (url,callback)=>{
         "nbRequest": 0,
         "domSize":0,
         "loadTime": gitMetrics.TaskDuration,
-        "filesNotMin": []
+        "filesNotMin": [],
+        "etagsNb":0
     }
 
     page.on('request',(response)=>{
@@ -46,6 +47,19 @@ module.exports.getPageMetrics = async (url,callback)=>{
             );
         }
 
+        if(response.headers().hasOwnProperty('etag')){
+            measures.etagsNb+=1
+        }
+
+        // https://stackoverflow.com/questions/43617227/check-size-of-uploaded-file-in-mb
+        if(response.headers()['content-type'] == 'image/png'){
+            const poidImage = response.headers()['content-length']
+            console.log(`IMAGE ${response.url()} , poid : ${ poidImage }`)
+            if((poidImage / 1048576.0)>10){
+                console.log("l'Image ci-dessus est trop grande ! ")
+            }
+        }
+
         // For more info : https://stackoverflow.com/questions/57524945/how-to-intercept-a-download-request-on-puppeteer-and-read-the-file-being-interce
         if(await response.url().includes('.js') || await response.url().includes('.css')){
             const content = await response.text();
@@ -63,17 +77,9 @@ module.exports.getPageMetrics = async (url,callback)=>{
     })
 
     await page.goto(url,{waitUntil:('domcontentloaded' && 'networkidle0')});
+    
 
     measures.domSize = await page.$$eval('*',array => array.length);
-
-    const hrefs = await page.evaluate(
-        () => Array.from(
-          document.querySelectorAll('a[href]'),
-          a => a.getAttribute('etags')
-        )
-    );
-
-    console.log("Href : " , hrefs)
 
     await page.close();
     await browser.close();
