@@ -34,17 +34,6 @@ module.exports.getPageMetrics = async (url,callback)=>{
 
         if(!response.ok) response.continue();
 
-        /*
-        if(response.request().resourceType() == "document"){
-            response.headers().forEach(e=>{
-                if(e.name.toLowerCase()==="etags"){
-                    console.log("ETAGS! !! ")
-                }
-            })
-        }else{
-            console.log(response.request().resourceType())
-        }*/
-
         // We only want non-data requests 
         if (!response.url().startsWith('data:')) {
             response.buffer().then(
