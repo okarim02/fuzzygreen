@@ -4,8 +4,8 @@ const scrapper = require('./scrapper')
 const ecoScore = require('./ecoScore')
 const greenhost = require('./green-host')
 
-async function main(){
-    const baseUrl = common.urls[1];
+async function main(url){
+    const baseUrl = url ? url : common.urls[1] ;
     
     console.log("Site web testé : ",baseUrl)
 
