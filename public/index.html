@@ -5,14 +5,33 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eco outil</title>
-    <link rel="stylesheet" href="script.js">
+    <script src="script.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
 </head>
-<body>
-    <h1>Eco outil</h1>
-    <div>
-        <input id="url-enter" type="text" placeholder="URL :">
-        <button id="submit" onclick="exec()"> search </button>
+<body onload="test()">
+    <div class="main">
+        <header>
+            <div class="center">
+                <h1>Eco-outil</h1>
+            </div>
+        </header>
+        <section>
+            <article>
+                <div class="center">
+                    <input id="url-enter" type="text" placeholder="URL :">
+                    <div>
+                        <button id="submit" onclick="exec()"> Is it green ? </button>
+                    </div>
+                </div>
+
+                <div>
+                    <p id="result"></p>
+                </div>
+            </article>
+        </section>
+        
     </div>
+    
     
 </body>
 </html>

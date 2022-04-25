@@ -1,39 +1,44 @@
 const common = require("./common")
 // optional : var lodash = require('lodash');
 const scrapper = require('./scrapper')
-const ecoScore = require('./ecoScore')
+const ecoScore = require('./ecoIndex')
 const greenhost = require('./green-host')
+const tools = require("./tools")
+const { response } = require("express")
 
-async function main(url){
-    const baseUrl = url ? url : common.urls[1] ;
+module.exports.start = async function main(url){
+    const baseUrl = url ;
+
+    if(!tools.isUrl(baseUrl)){
+        console.error("This is note an url : ",baseUrl);
+        return ;
+    }
     
     console.log("Site web testé : ",baseUrl)
 
     const domainName = baseUrl.replace('http://','').replace('https://','').replace('www.','').split(/[/?#]/)[0];
 
-    greenhost.isGreen(domainName)
+    const resultGreen = await greenhost.isGreen(domainName);
 
-    const data = await scrapper.getPageMetrics(baseUrl,async (data,response)=>{
+    var result = {};
+    await scrapper.getPageMetrics(baseUrl,(data,response)=>{
         if(response){
-            data.size = Math.round(data.size/1000)
-            console.log("Ratio etags : ",(data.etagsNb/data.nbRequest)*100,"%") 
-            console.log("Data",data)
-            console.log()
-            // todo : Fixer le calcule du 'size' dans scrapper.js 
-            await ecoScore.getEcoIndex(data.domSize,data.size,data.nbRequest).then((score)=>{console.log(score)})
-            return data
+            data.size = Math.round(data.size/1000);
+            result = data
+            result.ratio_etags = `${(data.etagsNb/data.nbRequest)*100} %`
         }
-    }).then(await function(data){
-        // wtf ??? todo : fixer ca 
-        console.log("Data",data)
-        return data
-    })
-    /*
-    const ecoGrade = await ecoScore.getEcoIndex(data.domSize,data.size,data.nbRequest).then((score)=>{return score})
+    });
+    const ecoIndex = await ecoScore.getEcoIndex(result.domSize,result.size,result.nbRequest);
 
-    console.log(data)
-    console.log(ecoScore)
-    */
+    result.host={ 
+        "isGreen":resultGreen.green,
+        "energy": result.moreData ? resultGreen.moreData[0].model : ""
+    };
+
+    result.ecoIndex = ecoIndex.grade;
+
+    console.log("Result:",result);
+    return result;
 }
 
-main()
+//this.start("https://seo-elp.fr/#/");
