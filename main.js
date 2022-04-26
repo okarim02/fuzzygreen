@@ -26,6 +26,7 @@ module.exports.start = async function main(url){
             data.size = Math.round(data.size/1000);
             result = data
             result.ratio_etags = `${(data.etagsNb/data.nbRequest)*100} %`
+            result.ratioLazyLoad = `${result.ratioLazyLoad}%`
         }
     });
     const ecoIndex = await ecoScore.getEcoIndex(result.domSize,result.size,result.nbRequest);
@@ -38,7 +39,8 @@ module.exports.start = async function main(url){
     result.ecoIndex = ecoIndex.grade;
 
     console.log("Result:",result);
-    return result;
+    //return result;
 }
 
-//this.start("https://seo-elp.fr/#/");
+// TEST 
+this.start(common.urls[2]);

@@ -1,4 +1,10 @@
 var tools = module.exports = {
+    image : [
+      'image/png',
+      'image/jpeg',
+      'image/png',
+      'image/tiff'
+    ],
     isMinified : async function isMinified(content){    
         if (!content) return true;
         if (content.length === 0) return true;

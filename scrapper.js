@@ -10,7 +10,9 @@ const tools = require('./tools')
 // read : https://deviceatlas.com/blog/measuring-page-weight
 // also https://www.checklyhq.com/learn/headless/request-interception/
 module.exports.getPageMetrics = async (url,callback)=>{
-    const browser = await puppeteer.launch(); // add in launch : { headless: false } => show browser 
+    const browser = await puppeteer.launch(
+        ignoreHTTPSErrors = true
+    ); // add in launch : { headless: false } => show browser 
     const page = await browser.newPage();
     const gitMetrics = await page.metrics();
 
@@ -23,7 +25,8 @@ module.exports.getPageMetrics = async (url,callback)=>{
         "domSize":0,
         "loadTime": gitMetrics.TaskDuration,
         "filesNotMin": [],
-        "etagsNb":0
+        "etagsNb":0,
+        "imagesWithoutLazyLoading":0
     }
 
     page.on('request',(response)=>{
@@ -52,9 +55,9 @@ module.exports.getPageMetrics = async (url,callback)=>{
         }
 
         // https://stackoverflow.com/questions/43617227/check-size-of-uploaded-file-in-mb
-        if(response.headers()['content-type'] == 'image/png'){
+        if(response.request().resourceType()==='image'){
             const poidImage = response.headers()['content-length']
-            console.log(`IMAGE ${response.url()} , poid : ${ poidImage }`)
+            //console.log(`IMAGE ${response.url()} , poid : ${ poidImage }`)
             if((poidImage / 1048576.0)>10){
                 console.log("l'Image ci-dessus est trop grande ! ")
             }
@@ -76,14 +79,35 @@ module.exports.getPageMetrics = async (url,callback)=>{
 
     })
 
-    await page.goto(url,{waitUntil:('domcontentloaded' && 'networkidle0')});
+    await page.goto(url,{waitUntil:('networkidle0')});
     
+    measures.ratioLazyLoad = await getRatioLazyImages(page);
 
     measures.domSize = await page.$$eval('*',array => array.length);
-
+    
     await page.close();
     await browser.close();
 
     callback(measures,true);
+}
+
+
+async function getRatioLazyImages(page){
+    
+    const result = await page.evaluate(()=>{
+        let imgs = document.querySelectorAll('img');
+        let totalImages = imgs.length;
+        let lazyImages = 0;
+        for (let img of imgs){
+            const attr = img.getAttribute("loading");
+            if(attr!=null){
+                lazyImages+=1;
+            }
+        }
+
+        return {totalImages,lazyImages};
+    })
+
+    return (result.lazyImages/result.totalImages) * 100;
 }
 
