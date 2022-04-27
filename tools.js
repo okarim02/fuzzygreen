@@ -1,3 +1,6 @@
+sqlSyntax: [
+  
+].map(e=>e.toUpperCase)
 var tools = module.exports = {
     image : [
       'image/png',
@@ -5,6 +8,7 @@ var tools = module.exports = {
       'image/png',
       'image/tiff'
     ],
+    
     isMinified : async function isMinified(content){    
         if (!content) return true;
         if (content.length === 0) return true;
@@ -18,6 +22,17 @@ var tools = module.exports = {
     
         return (semicolons / linebreaks > 1 && linebreaks / total < 0.01);
     },
+    hasSQLinsideLoop: async function hasSQLinsideLoop(content){
+      var result,indices=[];
+      for(let i = 0 ; i < sqlSyntax.length;i++){
+        const find = content.search(sqlSyntax[i]);
+        if(find!=-1){
+          // Search the next neighboor ?
+          
+        }
+      }
+
+    },
     isUrl : function isUrl(string){
         let url_string; 
         try {
@@ -29,4 +44,6 @@ var tools = module.exports = {
     }
 
 }
+
+
 
