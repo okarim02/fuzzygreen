@@ -4,7 +4,6 @@ const scrapper = require('./scrapper')
 const ecoScore = require('./ecoIndex')
 const greenhost = require('./green-host')
 const tools = require("./tools")
-const { response } = require("express")
 
 module.exports.start = async function main(url){
     const baseUrl = url ;
@@ -27,6 +26,8 @@ module.exports.start = async function main(url){
             result = data
             result.ratio_etags = `${(data.etagsNb/data.nbRequest)*100} %`
             result.ratioLazyLoad = `${result.ratioLazyLoad}%`
+            // todo : classer les polices (sont ils dans la base) + comparer le nombre à la norme
+            // wappalyzer
         }
     });
     const ecoIndex = await ecoScore.getEcoIndex(result.domSize,result.size,result.nbRequest);
@@ -43,4 +44,4 @@ module.exports.start = async function main(url){
 }
 
 // TEST 
-this.start(common.urls[2]);
+this.start(common.urls[1]);
