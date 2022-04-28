@@ -1,11 +1,8 @@
 // Content logic
 // doc api : https://pptr.dev/#?product=Puppeteer&version=v13.5.2&show=outline
-const { param } = require("express/lib/request");
 const puppeteer = require("puppeteer"); // npm i puppeteer 
 const tools = require('./tools');
-const lighthouse = require("lighthouse")
-const fetch = (...args) => import('node-fetch')
-              .then(({default: fetch}) => fetch(...args));
+
 /* Uses: 
     - Get page size
     - Get numbers of request 
@@ -37,7 +34,6 @@ module.exports.getPageMetrics = async (url,callback)=>{
         "cssFiles":0,
         "cssOrJsNotExt":0
     }
-    measures.isMobileFriendly = await isMobileFriendly(url);
 
     page.on('request',(request)=>{
         request.continue();
@@ -126,7 +122,7 @@ module.exports.getPageMetrics = async (url,callback)=>{
     //const client = await page.target().createCDPSession();
 
     let bodyHTML = await page.evaluate(()=>document.body.innerHTML);
-    const isNotExt = await tools.notExternCSSaJSInHtml(bodyHTML);
+    const isNotExt = await countNumberOfInlineStyleSheet(page);
     measures.cssOrJsNotExt += isNotExt;
 
     const res = await getRatioLazyImages(page);
@@ -135,32 +131,29 @@ module.exports.getPageMetrics = async (url,callback)=>{
     measures.imagesWithoutLazyLoading = res.imagesNoLazy;
 
     measures.domSize = await page.$$eval('*',array => array.length);
-    
+
     await page.close();
     await browser.close();
 
     callback(measures,true);
 }
 
-// todo : A terminer ...
-// https://developers.google.com/webmaster-tools/search-console-api/reference/rest/v1/urlTestingTools.mobileFriendlyTest/run
-async function isMobileFriendly(urlTo){
-    var params = {
-        "url": urlTo,
-        "requestScreenshot": false
-    }
-
-    const data = await fetch(`https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run?key=${process.env.MOBILE_FRIENDLY_API}`, 
-        {
-            method: 'POST',
-            body: JSON.stringify(params),
-            headers: { 'Content-Type': 'application/json' }
+async function countNumberOfInlineStyleSheet(page){
+    
+    const result =await page.evaluate(()=>{
+        let stylesheets = document.styleSheets;
+        var count = 0;
+        for (let i of stylesheets){
+            if(!i.href){
+                count+=1;
+            }
         }
-    ).then(res => res.json());
+        return count;
+    })
 
-    return data.mobileFriendliness == 'MOBILE_FRIENDLY';
+    return result;
+    
 }
-
 async function getRatioLazyImages(page){
     
     const result = await page.evaluate(()=>{

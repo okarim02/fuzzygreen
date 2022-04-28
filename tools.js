@@ -1,9 +1,22 @@
 const fs = require('fs');
 
 var tools = module.exports = {
-    notExternCSSaJSInHtml : async function isCssInHtml(content){
-      return (content.match(/script||style/) || []).length;
+    standard_font : [
+      "Courier New",
+      "Georgia",
+      "Arial",
+      "Comic",
+      "Impact",
+      "Tahoma",
+      "Trebuchet MS",
+      "Times New Roman",
+      "Verdana",
+      "Segoe UI"
+    ],
+    powerByWho : async function powerByWho(content){
+      // 
     },
+    //numbersOfErrors: async function numbersOfErrors(content){}
     isMinified : async function isMinified(content){    
         if (!content) return true;
         if (content.length === 0) return true;
@@ -47,6 +60,5 @@ var tools = module.exports = {
 
 
 }
-
 
 
