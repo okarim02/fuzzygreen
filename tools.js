@@ -1,14 +1,9 @@
-sqlSyntax: [
-  
-].map(e=>e.toUpperCase)
+const fs = require('fs');
+
 var tools = module.exports = {
-    image : [
-      'image/png',
-      'image/jpeg',
-      'image/png',
-      'image/tiff'
-    ],
-    
+    notExternCSSaJSInHtml : async function isCssInHtml(content){
+      return (content.match(/script||style/) || []).length;
+    },
     isMinified : async function isMinified(content){    
         if (!content) return true;
         if (content.length === 0) return true;
@@ -41,7 +36,15 @@ var tools = module.exports = {
           return false;  
         }
         return url_string.protocol === "http:" || url_string.protocol === "https:" ;
+    },
+    // Think about the sync way
+    writeToFile : function writeToFile(name,json_toWrite) {
+        fs.appendFile(name, "\n\n"+json_toWrite, function (err) {
+          if (err) throw err;
+          console.log('Saved!');
+        });
     }
+
 
 }
 

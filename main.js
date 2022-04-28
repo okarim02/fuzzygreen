@@ -20,12 +20,14 @@ module.exports.start = async function main(url){
     const resultGreen = await greenhost.isGreen(domainName);
 
     var result = {};
+    result.url = url;
     await scrapper.getPageMetrics(baseUrl,(data,response)=>{
         if(response){
             data.size = Math.round(data.size/1000);
-            result = data
-            result.ratio_etags = `${(data.etagsNb/data.nbRequest)*100} %`
-            result.ratioLazyLoad = `${result.ratioLazyLoad}%`
+            result = data;
+            result.ratio_etags = `${(data.etagsNb/data.nbRequest)*100} %`;
+            result.ratioLazyLoad = `${result.ratioLazyLoad}%`;
+            result.JSHeapUsedSize = `${result.JSHeapUsedSize / 1000} mo`;
             // todo : classer les polices (sont ils dans la base) + comparer le nombre à la norme
             // wappalyzer
         }
@@ -38,10 +40,16 @@ module.exports.start = async function main(url){
     };
 
     result.ecoIndex = ecoIndex.grade;
-
-    console.log("Result:",result);
-    //return result;
+    // test
+    //tools.writeToFile("result.json",JSON.stringify(result));
+    console.log(result)
+    return result;
 }
 
 // TEST 
-this.start(common.urls[1]);
+/*
+for(let i of common.page_to_analyze){
+    this.start(i);
+}*/
+//this.start(common.page_to_analyze[6]);
+this.start(common.urls[0])

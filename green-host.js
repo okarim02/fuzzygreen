@@ -30,5 +30,3 @@ module.exports.isGreen = async function isGreen(domain){
     return retour;
     
 }
-
-//this.isGreen("seo-elp.fr")

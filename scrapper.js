@@ -1,12 +1,11 @@
 // Content logic
 // doc api : https://pptr.dev/#?product=Puppeteer&version=v13.5.2&show=outline
+const { param } = require("express/lib/request");
 const puppeteer = require("puppeteer"); // npm i puppeteer 
 const tools = require('./tools');
+const lighthouse = require("lighthouse")
 const fetch = (...args) => import('node-fetch')
               .then(({default: fetch}) => fetch(...args));
-
-require("dotenv").config();
-
 /* Uses: 
     - Get page size
     - Get numbers of request 
@@ -14,9 +13,11 @@ require("dotenv").config();
 // read : https://deviceatlas.com/blog/measuring-page-weight
 // also https://www.checklyhq.com/learn/headless/request-interception/
 module.exports.getPageMetrics = async (url,callback)=>{
-    const browser = await puppeteer.launch(
-        ignoreHTTPSErrors = true
-    ); // add in launch : { headless: false } => show browser 
+    const browser = await puppeteer.launch({
+        devtools: true,
+        headless: true,
+        ignoreHTTPSErrors : true
+    });
     const page = await browser.newPage();
     const gitMetrics = await page.metrics();
 
@@ -28,17 +29,18 @@ module.exports.getPageMetrics = async (url,callback)=>{
         "nbRequest": 0,
         "domSize":0,
         "loadTime": gitMetrics.TaskDuration,
+        "JSHeapUsedSize":gitMetrics.JSHeapUsedSize,
         "filesNotMin": [],
         "policesUtilise":[],
         "etagsNb":0,
         "imagesWithoutLazyLoading":0,
-        "cssFiles":0
+        "cssFiles":0,
+        "cssOrJsNotExt":0
     }
-
     measures.isMobileFriendly = await isMobileFriendly(url);
 
-    page.on('request',(response)=>{
-        response.continue();
+    page.on('request',(request)=>{
+        request.continue();
     });
 
     page.on('response', async (response) => {
@@ -74,19 +76,23 @@ module.exports.getPageMetrics = async (url,callback)=>{
         // For more info : https://stackoverflow.com/questions/57524945/how-to-intercept-a-download-request-on-puppeteer-and-read-the-file-being-interce
         if(await response.url().includes('.js') || await response.url().includes('.css')){
             const content = await response.text();
+            const totalSize = await content.length;
+            const isMin = await tools.isMinified(content);
+
+
+            const poid = await (await response.buffer()).length;
+
             if(await response.url().includes('.js')){
                 // Check if there is sql inside a loop
                 // todo 
                 // const result = await tools.hasLoopInsideSql(content);
             }
-            const totalSize = await content.length;
-            const result = await tools.isMinified(content);
-            const poid = await (await response.buffer()).length;
             
-            if(!result){
+            if(!isMin){
                 measures.filesNotMin.push(response.url())
                 //console.log(`${response.url()} \t taille : ${totalSize} , poid : ${poid} \t => Contenu non minimiser `)
             }
+
         }
 
         if( response.request().resourceType() == "font"){
@@ -113,12 +119,20 @@ module.exports.getPageMetrics = async (url,callback)=>{
     measures.protocolHTTP = url_object.protocol;
 
     await page.goto(url,{waitUntil:('networkidle0')});
-    
+    // Todo : utiliser la méthode ci-dessous pour trouver le protocole utilisé.
+    // Goal : Get the protocol using for each request/response
+    // https://jsoverson.medium.com/using-chrome-devtools-protocol-with-puppeteer-737a1300bac0
+    // Create a cdp session, for chrome devtool 
+    //const client = await page.target().createCDPSession();
+
+    let bodyHTML = await page.evaluate(()=>document.body.innerHTML);
+    const isNotExt = await tools.notExternCSSaJSInHtml(bodyHTML);
+    measures.cssOrJsNotExt += isNotExt;
+
     const res = await getRatioLazyImages(page);
 
     measures.ratioLazyLoad = res.ratio;
     measures.imagesWithoutLazyLoading = res.imagesNoLazy;
-
 
     measures.domSize = await page.$$eval('*',array => array.length);
     
@@ -132,13 +146,11 @@ module.exports.getPageMetrics = async (url,callback)=>{
 // https://developers.google.com/webmaster-tools/search-console-api/reference/rest/v1/urlTestingTools.mobileFriendlyTest/run
 async function isMobileFriendly(urlTo){
     var params = {
-        'url': urlTo,
-        'requestScreenshot': false,
-        'key':process.env.MOBILE_FRIENDLY_API
+        "url": urlTo,
+        "requestScreenshot": false
     }
-    console.log("KEY:",process.env.MOBILE_FRIENDLY_API);
 
-    const data = await fetch('https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run', 
+    const data = await fetch(`https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run?key=${process.env.MOBILE_FRIENDLY_API}`, 
         {
             method: 'POST',
             body: JSON.stringify(params),
@@ -146,7 +158,7 @@ async function isMobileFriendly(urlTo){
         }
     ).then(res => res.json());
 
-    console.log(data);
+    return data.mobileFriendliness == 'MOBILE_FRIENDLY';
 }
 
 async function getRatioLazyImages(page){
