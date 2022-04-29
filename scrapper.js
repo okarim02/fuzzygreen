@@ -1,5 +1,6 @@
 // Content logic
 // doc api : https://pptr.dev/#?product=Puppeteer&version=v13.5.2&show=outline
+const { response } = require("express");
 const puppeteer = require("puppeteer"); // npm i puppeteer 
 const tools = require('./tools');
 
@@ -17,6 +18,12 @@ module.exports.getPageMetrics = async (url,callback)=>{
     });
     const page = await browser.newPage();
     const gitMetrics = await page.metrics();
+
+    // IN error cases
+    process.on('unhandledRejection', (reason, p) => {
+        console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
+        browser.close();
+    });
 
     // Use to do more things with the requests made by the website (check the doc)
     await page.setRequestInterception(true);
@@ -90,16 +97,9 @@ module.exports.getPageMetrics = async (url,callback)=>{
             }
 
         }
-
         if( response.request().resourceType() == "font"){
             measures.policesUtilise.push(response.url());
         }
-
-        if(response.request().resourceType() == "stylesheet"){
-            measures.cssFiles+=1;
-        }
-        
-
     })
     // Obtenir le protocol http 
     // Sol 1 marche pas ...
@@ -127,10 +127,28 @@ module.exports.getPageMetrics = async (url,callback)=>{
 
     const res = await getRatioLazyImages(page);
 
+    measures.cssFiles = await page.evaluate(()=>{
+        return document.styleSheets.length;
+    });
     measures.ratioLazyLoad = res.ratio;
     measures.imagesWithoutLazyLoading = res.imagesNoLazy;
 
+    const res2 = await getImagesResized(page);
+    measures.imagesResizedInPage = `${res2.ratio} (${res2.imgsResized.length} images redimensionné)`;
+
     measures.domSize = await page.$$eval('*',array => array.length);
+
+    /*
+    const pdfs = await getAllpdf(page);
+    // check if a pdf's size is higher than normal
+    for(var i= 0 ; i < pdfs.length ;i++){
+        const el = pdfs[i];
+        const href = await page.evaluate(e => e.href,el);
+        const poid = await getPDFsize(href,browser);
+        if(poid > 1024){
+            measures.heavyPdf.push(href);
+        }
+    }*/
 
     await page.close();
     await browser.close();
@@ -138,8 +156,38 @@ module.exports.getPageMetrics = async (url,callback)=>{
     callback(measures,true);
 }
 
-async function countNumberOfInlineStyleSheet(page){
+async function getPDFsize(url,browser){
+    const page = await browser.newPage();
+
+    page.on('request',(request)=>{
+        console.log("heyo ",request.url());
+        request.continue();
+    });
+
+    page.goto(url,{
+        waitUntil: 'domcontentloaded'
+    });
+
+    return 0;
+}
+
+
+async function getAllpdf(page){
+    const a_elements = await page.$$('a');
+    var pdfs = [];
+    for(var i = 0 ; i < a_elements.length;i++){
+        const el = a_elements[i];
+        const href = await page.evaluate(e => e.href,el);
+        if(href.endsWith('.pdf')){
+            pdfs.push(a_elements[i]);
+            console.log("PDF : ",href);
+        }
+    }
     
+    return pdfs;
+}
+
+async function countNumberOfInlineStyleSheet(page){
     const result =await page.evaluate(()=>{
         let stylesheets = document.styleSheets;
         var count = 0;
@@ -154,6 +202,28 @@ async function countNumberOfInlineStyleSheet(page){
     return result;
     
 }
+
+async function getImagesResized(page){
+    const result = await page.evaluate(()=>{
+        let imgs = document.querySelectorAll('img');
+        let totalImages = imgs.length;
+        let imgsResized = [];
+        for (let img of imgs){
+            const attr1 = img.getAttribute("width");
+            const attr2 = img.getAttribute("height");
+
+            if(attr1 !=null || attr2 != null){
+                imgsResized.push(img)
+            }
+        }
+        return {totalImages,imgsResized};
+    })
+    
+    const ratio = ((result.imgsResized.length/result.totalImages) * 100);
+    const imgsResized = result.imgsResized;
+    return {ratio,imgsResized};
+}
+
 async function getRatioLazyImages(page){
     
     const result = await page.evaluate(()=>{

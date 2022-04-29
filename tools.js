@@ -13,6 +13,9 @@ var tools = module.exports = {
       "Verdana",
       "Segoe UI"
     ],
+    getDomain : async function getDomain(baseUrl){
+      return baseUrl.replace('http://','').replace('https://','').replace('www.','').split(/[/?#]/)[0];
+    },
     powerByWho : async function powerByWho(content){
       // 
     },

@@ -1,6 +1,9 @@
 const fetch = (...args) => import('node-fetch')
               .then(({default: fetch}) => fetch(...args));
 const lighthouse = require("lighthouse");
+const tools = require('./tools');
+require('dotenv').config();
+
 
 async function askForHost(domain){
     const api_url = `https://admin.thegreenwebfoundation.org/api/v3/greencheck/${domain}`
@@ -8,9 +11,6 @@ async function askForHost(domain){
     const data = await response.json();
     return data
 }
-
-
-
 module.exports = { 
     // API : https://admin.thegreenwebfoundation.org/api-docs/
     isGreen : async function isGreen(domain){
@@ -51,20 +51,15 @@ module.exports = {
 
         return data.mobileFriendliness == 'MOBILE_FRIENDLY';
     },
-
+    // https://api.builtwith.com/
     infoAboutPluginAndTemplate : async function info(url){
-        var params = {
-            "url": url,
+        const data = await fetch(`https://api.builtwith.com/v19/api.json?KEY=${process.env.BUILDWITH_API}&LOOKUP=${url}`).then(res => res.json());
+        const response = data.Results[0];
+        if(!response.Technologies){
+            // No plugins found
+            return {}
         }
-        const data = await fetch(`https://api.wappalyzer.com/v2/lookup/?urls=https://www.wappalyzer.com&sets=all?key=${process.env.MOBILE_FRIENDLY_API}`, 
-            {
-                method: 'POTS',
-                body: JSON.stringify(params),
-                headers: { 'Content-Type': 'application/json' }
-            }
-        ).then(res => res.json());
+        return response.Technologies;
+        
     }
-
-
-    
 }

@@ -15,12 +15,13 @@ module.exports.start = async function main(url){
     
     console.log("Site web testé : ",baseUrl)
 
-    const domainName = baseUrl.replace('http://','').replace('https://','').replace('www.','').split(/[/?#]/)[0];
+    const domainName = tools.getDomain(baseUrl);
     const resultGreen = await api.isGreen(domainName)
-
+    
     var result = {};
 
-    result.isMobileFriendly = await api.isMobileFriendly(url);
+    //result.plugins = await api.infoAboutPluginAndTemplate(url);
+    //result.isMobileFriendly = await api.isMobileFriendly(url);
 
     await scrapper.getPageMetrics(baseUrl,(data,response)=>{
         if(response){
@@ -57,6 +58,6 @@ module.exports.start = async function main(url){
 }
 
 
-this.start(common.concurrents[3]);
+this.start("http://usainbolt.com/");
 //this.start(common.page_to_analyze[6]);
 //this.start(common.urls[0])
