@@ -34,7 +34,9 @@ module.exports.getPageMetrics = async (url,callback)=>{
         "imagesWithoutLazyLoading":0,
         "cssFiles":0,
         "cssOrJsNotExt":0,
-        "filesWithError":[]
+        "filesWithError":[],
+        "socialButtonsFound":[],
+        "nbOfImagesWithSrcEmpty":0
     }
 
     page.on('request',(request)=>{
@@ -48,6 +50,10 @@ module.exports.getPageMetrics = async (url,callback)=>{
 
         // We only want non-data requests 
         if (!response.url().startsWith('data:')) {
+            const btSocial = await tools.checkIfSocialButton(response.url())
+            if( btSocial != ""){
+                measures.socialButtonsFind.push(response.url());
+            }
             response.buffer().then(
                 buffer => {
                     measures.size+=buffer.length
@@ -138,6 +144,18 @@ module.exports.getPageMetrics = async (url,callback)=>{
     measures.imagesResizedInPage = `${res2.ratio} (${res2.imgsResized.length} images redimensionné)`;
 
     measures.domSize = await page.$$eval('*',array => array.length);
+
+    measures.nbOfImagesWithSrcEmpty = await page.evaluate(()=>{
+        let imgs = document.getElementsByTagName('img');
+        let cpt = 0;
+        for (let img of imgs){
+            const attr = img.getAttribute("src");
+            if(attr==""){
+                cpt+=1;
+            }
+        }
+        return cpt;
+    })
     
     const pdfs = await getAllpdf(page); // todo
 
@@ -198,7 +216,6 @@ async function getImagesResized(page){
     const imgsResized = result.imgsResized;
     return {ratio,imgsResized};
 }
-
 async function getRatioLazyImages(page){
     
     const result = await page.evaluate(()=>{

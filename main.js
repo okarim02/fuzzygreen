@@ -37,7 +37,7 @@ module.exports.start = async function main(url){
                 console.log("Veuillez vous limiter à 3 polices customisé");
             } 
             result.cssFiles = `${result.cssFiles} ${ result.cssFiles > 3 ? "(>3 veuillez limiter les feuilles css)" : ""}`;
-            // wappalyzer pour 
+
         }
     });
 
@@ -58,5 +58,5 @@ module.exports.start = async function main(url){
 }
 
 
-this.start("https://www.lisi-automotive.com/en/products/clipped-solutions/fasteners-for-panels/");
+this.start("http://usainbolt.com/");
 //this.start(common.urls[0])

@@ -56,7 +56,7 @@ module.exports = {
     },
     // https://api.builtwith.com/
     // Abandon ... Need money to work ...
-    // maybe check the node package 
+    // Alternative : Use chrome then download plugin to test it :) 
     infoAboutPluginAndTemplate : async function info(url){
         console.log("Test infoAboutPlugins : ",url);
         const data = await fetch(`https://api.builtwith.com/v19/api.json?KEY=${process.env.BUILDWITH_API}&LOOKUP=${url}`).then(res => {

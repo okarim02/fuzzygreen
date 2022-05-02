@@ -27,6 +27,13 @@ var tools = module.exports = {
       "Drupal" ,
       "Blogger"
     ],
+    checkIfSocialButton : async(url)=>{
+      if (url.includes("platform.twitter.com/widgets.js")) return "tweeter";
+      if (url.includes("platform.linkedin.com/in.js")) return "linkedin"; 
+      if (url.includes("assets.pinterest.com/js/pinit.js")) return "pinterest";
+      if (url.includes("connect.facebook.net") && url.includes("sdk.js")) return "facebook";
+      return "";
+    },
     checkSyntax: async (content)=>{
       try{
         const script = new vm.Script(content);
