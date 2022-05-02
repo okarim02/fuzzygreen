@@ -1,6 +1,7 @@
 const common = require("./common")
 // optional : var lodash = require('lodash');
 const scrapper = require('./scrapper')
+const { Cluster } = require('puppeteer-cluster');
 const ecoScore = require('./ecoIndex')
 const api = require('./api')
 const tools = require("./tools")
@@ -23,6 +24,7 @@ module.exports.start = async function main(url){
     //result.isMobileFriendly = await api.isMobileFriendly(url);
 
 
+    await cluster.task(async ({page,data:url}))
     await scrapper.getPageMetrics(baseUrl,(data,response)=>{
         if(response){
             data.size = Math.round(data.size/1000);
