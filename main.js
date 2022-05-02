@@ -6,22 +6,22 @@ const api = require('./api')
 const tools = require("./tools")
 
 module.exports.start = async function main(url){
-    const baseUrl = url ;
-
-    if(!tools.isUrl(baseUrl)){
-        console.error("This is note an url : ",baseUrl);
+    if(!tools.isUrl(url)){
+        console.error("This is note an url : ",url);
         return ;
     }
-    
+    const baseUrl = url ;
     console.log("Site web testé : ",baseUrl)
+    
+    var result = {};
+    result.url = url;
 
     const domainName = tools.getDomain(baseUrl);
     const resultGreen = await api.isGreen(domainName)
     
-    var result = {};
-
     //result.plugins = await api.infoAboutPluginAndTemplate(url);
     //result.isMobileFriendly = await api.isMobileFriendly(url);
+
 
     await scrapper.getPageMetrics(baseUrl,(data,response)=>{
         if(response){
@@ -36,6 +36,7 @@ module.exports.start = async function main(url){
                 console.log("Nombre de police customisé utiliser : ",result.policesUtilise.length);
                 console.log("Veuillez vous limiter à 3 polices customisé");
             } 
+            result.cssFiles = `${result.cssFiles} ${ result.cssFiles > 3 ? "(>3 veuillez limiter les feuilles css)" : ""}`;
             // wappalyzer pour 
         }
     });
@@ -49,7 +50,6 @@ module.exports.start = async function main(url){
 
     result.ecoIndex = ecoIndex.grade;
 
-    result.url = url;
 
     // test
     //tools.writeToFile("result.json",JSON.stringify(result));
@@ -58,6 +58,5 @@ module.exports.start = async function main(url){
 }
 
 
-this.start("http://usainbolt.com/");
-//this.start(common.page_to_analyze[6]);
+this.start("https://www.lisi-automotive.com/en/products/clipped-solutions/fasteners-for-panels/");
 //this.start(common.urls[0])

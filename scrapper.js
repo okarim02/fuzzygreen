@@ -19,12 +19,6 @@ module.exports.getPageMetrics = async (url,callback)=>{
     const page = await browser.newPage();
     const gitMetrics = await page.metrics();
 
-    // IN error cases
-    process.on('unhandledRejection', (reason, p) => {
-        console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
-        browser.close();
-    });
-
     // Use to do more things with the requests made by the website (check the doc)
     await page.setRequestInterception(true);
 
@@ -39,7 +33,8 @@ module.exports.getPageMetrics = async (url,callback)=>{
         "etagsNb":0,
         "imagesWithoutLazyLoading":0,
         "cssFiles":0,
-        "cssOrJsNotExt":0
+        "cssOrJsNotExt":0,
+        "filesWithError":[]
     }
 
     page.on('request',(request)=>{
@@ -77,15 +72,21 @@ module.exports.getPageMetrics = async (url,callback)=>{
         }
 
         // For more info : https://stackoverflow.com/questions/57524945/how-to-intercept-a-download-request-on-puppeteer-and-read-the-file-being-interce
-        if(await response.url().includes('.js') || await response.url().includes('.css')){
+        if(response.url().includes('.js') || response.url().includes('.css')){
             const content = await response.text();
             const totalSize = await content.length;
             const isMin = await tools.isMinified(content);
 
-
             const poid = await (await response.buffer()).length;
 
             if(await response.url().includes('.js')){
+                // check syntax
+                console.log("Fichier testé : ", response.url());
+                const resultCheck = await tools.checkSyntax(content);
+                if(resultCheck!=""){
+                    console.log(resultCheck);
+                    measures.filesWithError.push(response.url());
+                }
                 // Check if there is sql inside a loop
                 // todo 
                 // const result = await tools.hasLoopInsideSql(content);
@@ -97,6 +98,7 @@ module.exports.getPageMetrics = async (url,callback)=>{
             }
 
         }
+        
         if( response.request().resourceType() == "font"){
             measures.policesUtilise.push(response.url());
         }
@@ -112,7 +114,7 @@ module.exports.getPageMetrics = async (url,callback)=>{
     // sol 2
     // https://developer.mozilla.org/en-US/docs/Web/API/URL
     const url_object = new URL(url);
-    measures.protocolHTTP = url_object.protocol;
+    measures.protocolHTTP = url_object.protocol; // http2 => good | http1 => bad 
 
     await page.goto(url,{waitUntil:('networkidle0')});
     // Todo : utiliser la méthode ci-dessous pour trouver le protocole utilisé.
@@ -121,7 +123,6 @@ module.exports.getPageMetrics = async (url,callback)=>{
     // Create a cdp session, for chrome devtool 
     //const client = await page.target().createCDPSession();
 
-    let bodyHTML = await page.evaluate(()=>document.body.innerHTML);
     const isNotExt = await countNumberOfInlineStyleSheet(page);
     measures.cssOrJsNotExt += isNotExt;
 
@@ -137,18 +138,8 @@ module.exports.getPageMetrics = async (url,callback)=>{
     measures.imagesResizedInPage = `${res2.ratio} (${res2.imgsResized.length} images redimensionné)`;
 
     measures.domSize = await page.$$eval('*',array => array.length);
-
-    /*
-    const pdfs = await getAllpdf(page);
-    // check if a pdf's size is higher than normal
-    for(var i= 0 ; i < pdfs.length ;i++){
-        const el = pdfs[i];
-        const href = await page.evaluate(e => e.href,el);
-        const poid = await getPDFsize(href,browser);
-        if(poid > 1024){
-            measures.heavyPdf.push(href);
-        }
-    }*/
+    
+    const pdfs = await getAllpdf(page); // todo
 
     await page.close();
     await browser.close();
@@ -156,37 +147,21 @@ module.exports.getPageMetrics = async (url,callback)=>{
     callback(measures,true);
 }
 
-async function getPDFsize(url,browser){
-    const page = await browser.newPage();
-
-    page.on('request',(request)=>{
-        console.log("heyo ",request.url());
-        request.continue();
-    });
-
-    page.goto(url,{
-        waitUntil: 'domcontentloaded'
-    });
-
-    return 0;
-}
-
-
 async function getAllpdf(page){
     const a_elements = await page.$$('a');
     var pdfs = [];
     for(var i = 0 ; i < a_elements.length;i++){
         const el = a_elements[i];
         const href = await page.evaluate(e => e.href,el);
+
         if(href.endsWith('.pdf')){
             pdfs.push(a_elements[i]);
             console.log("PDF : ",href);
         }
     }
-    
     return pdfs;
 }
-
+// If a html stylesheet doesn't have a href that mean he was not written in a specific file but directly in the html 
 async function countNumberOfInlineStyleSheet(page){
     const result =await page.evaluate(()=>{
         let stylesheets = document.styleSheets;

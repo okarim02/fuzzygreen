@@ -1,18 +1,40 @@
 const fs = require('fs');
+const vm = require('vm'); // Correct syntax error 
+
+standard_font : [
+  "Courier New",
+  "Georgia",
+  "Arial",
+  "Comic",
+  "Impact",
+  "Tahoma",
+  "Trebuchet MS",
+  "Times New Roman",
+  "Verdana",
+  "Segoe UI"
+]
 
 var tools = module.exports = {
-    standard_font : [
-      "Courier New",
-      "Georgia",
-      "Arial",
-      "Comic",
-      "Impact",
-      "Tahoma",
-      "Trebuchet MS",
-      "Times New Roman",
-      "Verdana",
-      "Segoe UI"
+    CMS_LIST : [
+      "WordPress",
+      "Wix" ,
+      "Squarespace" ,
+      "Joomla!",
+      "Shopify",
+      "Progress",
+      "GoDaddy Website Builder",
+      "Weebly" ,
+      "Drupal" ,
+      "Blogger"
     ],
+    checkSyntax: async (content)=>{
+      try{
+        const script = new vm.Script(content);
+      }catch(e){
+        return e;
+      }
+      return "";
+    },
     getDomain : async function getDomain(baseUrl){
       return baseUrl.replace('http://','').replace('https://','').replace('www.','').split(/[/?#]/)[0];
     },
@@ -59,9 +81,10 @@ var tools = module.exports = {
           if (err) throw err;
           console.log('Saved!');
         });
+    },
+    getFileSize : async (url)=>{
+      let file_size = await file_size_url(url).then(console.log).catch(console.error);
     }
-
-
 }
 
 

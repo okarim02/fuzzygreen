@@ -47,19 +47,39 @@ module.exports = {
                 body: JSON.stringify(params),
                 headers: { 'Content-Type': 'application/json' }
             }
-        ).then(res => res.json());
+        ).then(res => res.json()).catch((err)=>{
+            return null;
+        }
+        )
 
         return data.mobileFriendliness == 'MOBILE_FRIENDLY';
     },
     // https://api.builtwith.com/
+    // Abandon ... Need money to work ...
+    // maybe check the node package 
     infoAboutPluginAndTemplate : async function info(url){
-        const data = await fetch(`https://api.builtwith.com/v19/api.json?KEY=${process.env.BUILDWITH_API}&LOOKUP=${url}`).then(res => res.json());
-        const response = data.Results[0];
+        console.log("Test infoAboutPlugins : ",url);
+        const data = await fetch(`https://api.builtwith.com/v19/api.json?KEY=${process.env.BUILDWITH_API}&LOOKUP=${url}`).then(res => {
+            console.log("API send success !");
+            return res.json();
+        }).catch((err)=>{
+            console.error("Erreur fetch :",err);
+        });
+        const response = data.Results;
+        console.log(response);
         if(!response.Technologies){
             // No plugins found
             return {}
         }
         return response.Technologies;
-        
+    },
+
+    findTechnologies : async (content) => {
+        const data = content.split('\n').split(';');
+        for(let i in data){
+            if(i in tools.CMS_LIST){
+
+            }
+        }
     }
 }
