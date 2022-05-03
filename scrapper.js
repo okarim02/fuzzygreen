@@ -1,6 +1,5 @@
 // Content logic
 // doc api : https://pptr.dev/#?product=Puppeteer&version=v13.5.2&show=outline
-const { response } = require("express");
 const puppeteer = require("puppeteer"); // npm i puppeteer 
 const tools = require('./tools');
 
@@ -38,12 +37,26 @@ module.exports.getPageMetrics = async (url,callback)=>{
     const page = await browser.newPage();
     const gitMetrics = await page.metrics();
 
-    measures.JSHeapUsedSize = gitMetrics.JSHeapUsedSize;
-    
     // Use to do more things with the requests made by the website (check the doc)
     await page.setRequestInterception(true);
 
-    // Listen for client request 
+    // CONST
+
+
+    var measures = {
+        "size":0,
+        "nbRequest": 0,
+        "domSize":0,
+        "loadTime": gitMetrics.TaskDuration,
+        "JSHeapUsedSize":gitMetrics.JSHeapUsedSize,
+        "filesNotMin": [],
+        "policesUtilise":[],
+        "etagsNb":0,
+        "imagesWithoutLazyLoading":0,
+        "cssFiles":0,
+        "cssOrJsNotExt":0
+    }
+
     page.on('request',(request)=>{
         
         request.continue();
@@ -51,7 +64,7 @@ module.exports.getPageMetrics = async (url,callback)=>{
     // listen for the server's responses
     page.on('response', async (response) => {
         measures.nbRequest+=1
-
+        
         if(!response.ok) response.continue();
 
         if(response.url() == url){ // Its the html document
@@ -90,6 +103,8 @@ module.exports.getPageMetrics = async (url,callback)=>{
                 }
             }
         }
+
+        
 
         // For more info : https://stackoverflow.com/questions/57524945/how-to-intercept-a-download-request-on-puppeteer-and-read-the-file-being-interce
         if(response.url().includes('.js') || response.url().includes('.css')){
@@ -132,6 +147,7 @@ module.exports.getPageMetrics = async (url,callback)=>{
     */
     // sol 2
     // https://developer.mozilla.org/en-US/docs/Web/API/URL
+    
     const url_object = new URL(url);
     measures.protocolHTTP = url_object.protocol; // http2 => good | http1 => bad 
 
@@ -157,29 +173,23 @@ module.exports.getPageMetrics = async (url,callback)=>{
     });
     measures.ratioLazyLoad = res.ratio;
     measures.imagesWithoutLazyLoading = res.imagesNoLazy;
+    
 
-    const res2 = await getImagesResized(page);
-    measures.imagesResizedInPage = `${res2.ratio} (${res2.imgsResized.length} images redimensionné)`;
+    measures.ratioimagesResizedInPage = await getImagesResized(page).then(e=>e.ratio);
 
     measures.domSize = await page.$$eval('*',array => array.length);
-
-    const pluginsResult = await getPlugins(page);
-    measures.plugins = pluginsResult!=undefined ? pluginsResult.length : 0 ;
-    console.log("PLUGIN RESULT : ",pluginsResult);
-
-    measures.nbOfImagesWithSrcEmpty = await page.evaluate(()=>{
-        let imgs = document.getElementsByTagName('img');
-        let cpt = 0;
-        for (let img of imgs){
-            const attr = img.getAttribute("src");
-            if(attr==""){
-                cpt+=1;
-            }
+   /*
+    const pdfs = await getAllpdf(page);
+    // check if a pdf's size is higher than normal
+    for(var i= 0 ; i < pdfs.length ;i++){
+        const el = pdfs[i];
+        const href = await page.evaluate(e => e.href,el);
+        const poid = await getPDFsize(href,browser);
+        if(poid > 1024){
+            measures.heavyPdf.push(href);
         }
-        return cpt;
-    })
-    
-    const pdfs = await getAllpdf(page); // todo
+    }
+    */
 
     await page.close();
     await browser.close();
@@ -262,24 +272,28 @@ async function countNumberOfInlineStyleSheet(page){
 }
 
 async function getImagesResized(page){
-    const result = await page.evaluate(()=>{
-        let imgs = document.querySelectorAll('img');
-        let totalImages = imgs.length;
-        let imgsResized = [];
-        for (let img of imgs){
-            const attr1 = img.getAttribute("width");
-            const attr2 = img.getAttribute("height");
 
-            if(attr1 !=null || attr2 != null){
-                imgsResized.push(img)
+    const res = await page.evaluate(()=>{
+        let imgs = document.querySelectorAll('img');
+        var data = [];
+        for(let i = 0 ; i < imgs.length;i++){
+            const img = imgs[i];
+            if (img.clientWidth < img.naturalWidth || img.clientHeight < img.naturalHeight) {
+                // Images of one pixel are some times used ... , we exclude them
+                const isVisible = (img.clientWidth != 0);
+                const isASvg = img.src.includes(".svg?") || img.src.endsWith(".svg");
+                if (isVisible && img.naturalWidth > 1 && !isASvg) {
+                    data.push(img.src);
+                }
             }
         }
-        return {totalImages,imgsResized};
-    })
+        return {"imagesResized":data,"ratio":data.length/imgs.length*100};
+    });
+
+    console.log(res.imagesResized);
+
+    return res;
     
-    const ratio = ((result.imgsResized.length/result.totalImages) * 100);
-    const imgsResized = result.imgsResized;
-    return {ratio,imgsResized};
 }
 async function getRatioLazyImages(page){
     
