@@ -57,6 +57,4 @@ module.exports.start = async function main(url){
     return result;
 }
 
-
-this.start("http://usainbolt.com/");
-//this.start(common.urls[0])
+this.start("http://usainbolt.com/")

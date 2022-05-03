@@ -7,16 +7,19 @@ require('dotenv').config();
 
 async function askForHost(domain){
     const api_url = `https://admin.thegreenwebfoundation.org/api/v3/greencheck/${domain}`
+
     const response = await fetch(api_url);
     const data = await response.json();
+
     return data
 }
+
 module.exports = { 
     // API : https://admin.thegreenwebfoundation.org/api-docs/
     isGreen : async function isGreen(domain){
         let retour = {}
 
-        const result = await askForHost(domain)
+        const result = await askForHost(await domain);
 
         retour = result;
         

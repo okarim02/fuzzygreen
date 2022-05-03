@@ -1,7 +1,7 @@
 // static content data
 
 module.exports = {
-    urls : ["https://seo-elp.fr/#/","https://www.lisi-automotive.com/fr/","http://usainbolt.com/","https://www.araymond.com/en"],
+    urls : ["https://seo-elp.fr/#/","https://www.lisi-automotive.com/fr/","http://usainbolt.com/","http://www.iut-bm.univ-fcomte.fr/pages/fr/a-votre-service-13757.html"],
     lisi_pages : [
         "https://www.lisi-automotive.com/en/products/clipped-solutions/", // eco index : D / green it : D 
         "https://www.lisi-automotive.com/en/multi-material-assembly-solutions/", // E / F 

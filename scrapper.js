@@ -10,6 +10,25 @@ const tools = require('./tools');
 */ 
 // read : https://deviceatlas.com/blog/measuring-page-weight
 // also https://www.checklyhq.com/learn/headless/request-interception/
+
+var measures = {
+    "size":0,
+    "nbRequest": 0,
+    "domSize":0,
+    "JSHeapUsedSize":0,
+    "filesNotMin": [],
+    "policesUtilise":[],
+    "etagsNb":0,
+    "imagesWithoutLazyLoading":0,
+    "cssFiles":0,
+    "cssOrJsNotExt":0,
+    "filesWithError":[],
+    "socialButtonsFound":[],
+    "nbOfImagesWithSrcEmpty":0,
+    "isStatic": 0, // a static webpage give the same content for each user, its hard to identify them but we can check some factors 
+    "poweredBy": [],
+}
+
 module.exports.getPageMetrics = async (url,callback)=>{
     const browser = await puppeteer.launch({
         devtools: true,
@@ -19,34 +38,29 @@ module.exports.getPageMetrics = async (url,callback)=>{
     const page = await browser.newPage();
     const gitMetrics = await page.metrics();
 
+    measures.JSHeapUsedSize = gitMetrics.JSHeapUsedSize;
+    
     // Use to do more things with the requests made by the website (check the doc)
     await page.setRequestInterception(true);
 
-    var measures = {
-        "size":0,
-        "nbRequest": 0,
-        "domSize":0,
-        "loadTime": gitMetrics.TaskDuration,
-        "JSHeapUsedSize":gitMetrics.JSHeapUsedSize,
-        "filesNotMin": [],
-        "policesUtilise":[],
-        "etagsNb":0,
-        "imagesWithoutLazyLoading":0,
-        "cssFiles":0,
-        "cssOrJsNotExt":0,
-        "filesWithError":[],
-        "socialButtonsFound":[],
-        "nbOfImagesWithSrcEmpty":0
-    }
-
+    // Listen for client request 
     page.on('request',(request)=>{
+        
         request.continue();
     });
-
+    // listen for the server's responses
     page.on('response', async (response) => {
         measures.nbRequest+=1
 
         if(!response.ok) response.continue();
+
+        if(response.url() == url){ // Its the html document
+            let poweredBy = response.headers()['x-powered-by'];
+            if(poweredBy!=undefined){
+                poweredBy = poweredBy.split('\n');
+                measures.poweredBy = poweredBy;   
+            }
+        }
 
         // We only want non-data requests 
         if (!response.url().startsWith('data:')) {
@@ -62,18 +76,18 @@ module.exports.getPageMetrics = async (url,callback)=>{
                   console.error(`${response.status()} ${response.url()} Erreur: ${error}`);
                 }
             );
-        }
 
-        if(response.headers().hasOwnProperty('etag')){
-            measures.etagsNb+=1
-        }
-
-        // https://stackoverflow.com/questions/43617227/check-size-of-uploaded-file-in-mb
-        if(response.request().resourceType()==='image'){
-            const poidImage = response.headers()['content-length']
-            //console.log(`IMAGE ${response.url()} , poid : ${ poidImage }`)
-            if((poidImage / 1048576.0)>10){
-                console.log("l'Image ci-dessus est trop grande ! ")
+            if(response.headers().hasOwnProperty('etag')){
+                measures.etagsNb+=1
+            }
+    
+            // https://stackoverflow.com/questions/43617227/check-size-of-uploaded-file-in-mb
+            if(response.request().resourceType()==='image'){
+                const poidImage = response.headers()['content-length']
+                //console.log(`IMAGE ${response.url()} , poid : ${ poidImage }`)
+                if((poidImage / 1048576.0)>10){
+                    console.log("l'Image ci-dessus est trop grande ! ")
+                }
             }
         }
 
@@ -102,7 +116,6 @@ module.exports.getPageMetrics = async (url,callback)=>{
                 measures.filesNotMin.push(response.url())
                 //console.log(`${response.url()} \t taille : ${totalSize} , poid : ${poid} \t => Contenu non minimiser `)
             }
-
         }
         
         if( response.request().resourceType() == "font"){
@@ -122,7 +135,12 @@ module.exports.getPageMetrics = async (url,callback)=>{
     const url_object = new URL(url);
     measures.protocolHTTP = url_object.protocol; // http2 => good | http1 => bad 
 
+
+    // GO TO THE PAGE 
     await page.goto(url,{waitUntil:('networkidle0')});
+
+    measures.isStatic = await isStatic(page);
+
     // Todo : utiliser la méthode ci-dessous pour trouver le protocole utilisé.
     // Goal : Get the protocol using for each request/response
     // https://jsoverson.medium.com/using-chrome-devtools-protocol-with-puppeteer-737a1300bac0
@@ -145,6 +163,10 @@ module.exports.getPageMetrics = async (url,callback)=>{
 
     measures.domSize = await page.$$eval('*',array => array.length);
 
+    const pluginsResult = await getPlugins(page);
+    measures.plugins = pluginsResult!=undefined ? pluginsResult.length : 0 ;
+    console.log("PLUGIN RESULT : ",pluginsResult);
+
     measures.nbOfImagesWithSrcEmpty = await page.evaluate(()=>{
         let imgs = document.getElementsByTagName('img');
         let cpt = 0;
@@ -164,6 +186,49 @@ module.exports.getPageMetrics = async (url,callback)=>{
 
     callback(measures,true);
 }
+
+async function isStatic(page){
+     /*
+            1. Check if URLs end with .html, .htm, .shtml and doesn't contain '?'.
+            2. Static websites rarely set cookies/sessions.
+            3. Static webpage use HTML,JS and CSS contrary to a dynamic page who use php,cgi,ajax,asp,asp.net ...  
+            4. Can we login ? If yes then its not a static page because he don't use database.
+
+            => This function is not 100% true, a dynamic webpage may use the same tools as static page so don't 
+
+            More info : https://iconicdigitalworld.com/how-to-check-if-a-website-is-dynamic-or-or-static/#:~:text=To%20find%20out%20how%20to,JSP%2C%20the%20page%20is%20dynamic.
+        */
+    if(measures.poweredBy != []){ // rule 3.
+        return false;
+    }
+    if(url.includes('?')){
+        return false;
+    }
+
+    const url = page.url();
+    const staticUrls = [".html",".htm",".shtml"]
+    
+    for(let i = 0 ; i < staticUrls.length;i++){
+        if(url.includes(staticUrls[i])){
+            return true;
+        }   
+    }
+    // A static webpage take a few milliseconds to responds 
+    const perf = await page.evaluate(_=>{
+        const {loadEventEnd,navigationStart} = performance.timing
+        return ({
+            loadTime: loadEventEnd - navigationStart
+        })
+    })
+
+    const timeTook = perf.loadTime;
+
+    console.log(`Temps écoulé : ${timeTook}ms ${timeTook>1000 ? `soit ${timeTook/1000}s` : ""}`);
+    if(timeTook/1000>1){
+        return false;
+    }
+
+} 
 
 async function getAllpdf(page){
     const a_elements = await page.$$('a');
@@ -238,4 +303,10 @@ async function getRatioLazyImages(page){
     const ratio = ((result.lazyImages/result.totalImages) * 100);
     const imagesNoLazy = result.notLazy;
     return {ratio,imagesNoLazy};
+}
+async function getPlugins(page){
+    const plugins = page.evaluate(()=>{
+        return Navigator.plugins;
+    })
+    return plugins;
 }
