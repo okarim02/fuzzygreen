@@ -10,13 +10,17 @@ const tools = require('./tools');
 */ 
 // read : https://deviceatlas.com/blog/measuring-page-weight
 // also https://www.checklyhq.com/learn/headless/request-interception/
-module.exports.getPageMetrics = async (url,callback)=>{
+module.exports.getPageMetrics = async (url,page,callback)=>{
+    /*
+    // Inutile pour le cluster vue qu'il va crée ces propres instances
+
     const browser = await puppeteer.launch({
         devtools: true,
         headless: true,
         ignoreHTTPSErrors : true
     });
     const page = await browser.newPage();
+    */
     const gitMetrics = await page.metrics();
 
     // Use to do more things with the requests made by the website (check the doc)
@@ -87,7 +91,6 @@ module.exports.getPageMetrics = async (url,callback)=>{
 
             if(await response.url().includes('.js')){
                 // check syntax
-                console.log("Fichier testé : ", response.url());
                 const resultCheck = await tools.checkSyntax(content);
                 if(resultCheck!=""){
                     console.log(resultCheck);
@@ -159,9 +162,10 @@ module.exports.getPageMetrics = async (url,callback)=>{
     
     const pdfs = await getAllpdf(page); // todo
 
+    /*
     await page.close();
     await browser.close();
-
+    */ 
     callback(measures,true);
 }
 

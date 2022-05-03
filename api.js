@@ -16,7 +16,7 @@ module.exports = {
     isGreen : async function isGreen(domain){
         let retour = {}
 
-        const result = await askForHost(domain)
+        const result = await askForHost(await domain)
 
         retour = result;
         
