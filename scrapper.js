@@ -40,8 +40,9 @@ module.exports.getPageMetrics = async (url, callback) => {
     // Use to do more things with the requests made by the website (check the doc)
     await page.setRequestInterception(true);
 
-    // CONST
-
+    // var & const
+    var counter_http1 = 0 ;
+    var counter_http2 = 0 ;
 
     var measures = {
         "size": 0,
@@ -64,6 +65,12 @@ module.exports.getPageMetrics = async (url, callback) => {
     // listen for the server's responses
     page.on('response', async (response) => {
         measures.nbRequest += 1
+
+        if(response.url().startsWith("http:")){
+            counter_http1+=1;
+        }else{
+            counter_http2+=1;
+        }
 
         if (!response.ok) response.continue();
 
@@ -171,10 +178,13 @@ module.exports.getPageMetrics = async (url, callback) => {
         return document.styleSheets.length;
     });
     measures.ratioLazyLoad = res.ratio;
+
     measures.imagesWithoutLazyLoading = res.imagesNoLazy;
 
 
     measures.ratioimagesResizedInPage = await getImagesResized(page).then(e => e.ratio);
+    
+    measures.ratioHttp1 = await (counter_http1/measures.nbRequest)*100;
 
     measures.domSize = await page.$$eval('*', array => array.length);
     /*
