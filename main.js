@@ -34,7 +34,7 @@ module.exports.start = async function main(url){
         }else{
             
         }
-    }).then(()=>{
+    }).then(async ()=>{
         console.log("Wooo that work");
         const ecoIndex = await ecoScore.getEcoIndex(result.domSize,result.size,result.nbRequest);
         const domainName = tools.getDomain(baseUrl);
@@ -48,7 +48,7 @@ module.exports.start = async function main(url){
         // test
         //tools.writeToFile("result.json",JSON.stringify(result));
 
-    }).catch(e=>{ // todo , gérer l'erreur : faux url.
+    }).catch(async e=>{ // todo , gérer l'erreur : faux url.
         console.log("oops something went wrong");
         result = new Error("Oops something went wrong");
     });

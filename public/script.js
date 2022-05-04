@@ -42,6 +42,8 @@ function display_data(data) {
                     conteneur.appendChild(li);
                 });
                 conteneur.style.background = 'white';
+            } else if(prop == "host"){
+                newEl.innerText = `${data[prop].isGreen ? "Hébergeur green !" :"Hébergeur non green !"} \n >>> Energie utilisé : ${data[prop].energy == "" ? '...' : data[prop].energy}`;
             } else {
                 newEl.innerText = `${prop} : ${data[prop]}`;
             }

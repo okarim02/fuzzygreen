@@ -48,7 +48,7 @@ module.exports.getPageMetrics = async (url, callback) => {
         "size": 0,
         "nbRequest": 0,
         "domSize": 0,
-        "loadTime": gitMetrics.TaskDuration,
+        "loadTime": 0,
         "JSHeapUsedSize": gitMetrics.JSHeapUsedSize,
         "filesNotMin": [],
         "policesUtilise": [],
@@ -162,6 +162,7 @@ module.exports.getPageMetrics = async (url, callback) => {
     await page.goto(url, { waitUntil: ('networkidle0') });
 
     measures.isStatic = await isStatic(page);
+    measures.loadTime = await getLoadTime(page);
 
     // Todo : utiliser la méthode ci-dessous pour trouver le protocole utilisé.
     // Goal : Get the protocol using for each request/response
@@ -213,6 +214,7 @@ async function getLoadTime(page){
             loadTime: loadEventEnd - navigationStart
         })
     })
+    return perf.loadTime;
 }
 
 async function isStatic(page) {
@@ -246,7 +248,7 @@ async function isStatic(page) {
     // A static webpage take a few milliseconds to responds contrary to a dynamic webpage because he make some request to a database before loading fully.
     
 
-    const timeTook = getLoadTime(page).loadTime;
+    const timeTook = getLoadTime(page);
 
     console.log(`Temps écoulé : ${timeTook}ms ${timeTook > 1000 ? `soit ${timeTook / 1000}s` : ""}`);
     if (timeTook / 1000 > 2) {
