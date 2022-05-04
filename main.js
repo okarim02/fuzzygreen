@@ -6,22 +6,15 @@ const api = require('./api')
 const tools = require("./tools")
 
 module.exports.start = async function main(url){
-    if(!tools.isUrl(url)){
-        console.error("This is note an url : ",url);
-        return ;
-    }
+    
     const baseUrl = url ;
     console.log("Site web testé : ",baseUrl)
     
     var result = {};
     result.url = url;
-
-    const domainName = tools.getDomain(baseUrl);
-    const resultGreen = await api.isGreen(domainName)
     
     //result.plugins = await api.infoAboutPluginAndTemplate(url);
     //result.isMobileFriendly = await api.isMobileFriendly(url);
-
 
     await scrapper.getPageMetrics(baseUrl,(data,response)=>{
         if(response){
@@ -38,24 +31,30 @@ module.exports.start = async function main(url){
                 console.log("Veuillez vous limiter à 3 polices customisé");
             } 
             result.cssFiles = `${result.cssFiles} ${ result.cssFiles > 3 ? "(>3 veuillez limiter les feuilles css)" : ""}`;
-
+        }else{
+            
         }
+    }).then(()=>{
+        console.log("Wooo that work");
+        const ecoIndex = await ecoScore.getEcoIndex(result.domSize,result.size,result.nbRequest);
+        const domainName = tools.getDomain(baseUrl);
+        const resultGreen = await api.isGreen(domainName)
+        result.host={ 
+            "isGreen":resultGreen.green,
+            "energy": result.moreData ? resultGreen.moreData[0].model : ""
+        };
+
+        result.ecoIndex = ecoIndex.grade;
+        // test
+        //tools.writeToFile("result.json",JSON.stringify(result));
+
+    }).catch(e=>{ // todo , gérer l'erreur : faux url.
+        console.log("oops something went wrong");
+        result = new Error("Oops something went wrong");
     });
 
-    const ecoIndex = await ecoScore.getEcoIndex(result.domSize,result.size,result.nbRequest);
-
-    result.host={ 
-        "isGreen":resultGreen.green,
-        "energy": result.moreData ? resultGreen.moreData[0].model : ""
-    };
-
-    result.ecoIndex = ecoIndex.grade;
-
-
-    // test
-    //tools.writeToFile("result.json",JSON.stringify(result));
     console.log(result);
     return result;
 }
 
-this.start("http://www.iut-bm.univ-fcomte.fr/pages/fr/a-votre-service-13757.html");
+//this.start("http://www.iut-bm.univ-fcomte.fr/pages/fr/a-votre-service-13757.html");

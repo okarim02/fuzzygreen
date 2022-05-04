@@ -73,15 +73,6 @@ var tools = module.exports = {
       }
 
     },
-    isUrl : function isUrl(string){
-        let url_string; 
-        try {
-          url_string = new URL(string);
-        } catch (_) {
-          return false;  
-        }
-        return url_string.protocol === "http:" || url_string.protocol === "https:" ;
-    },
     // Think about the sync way
     writeToFile : function writeToFile(name,json_toWrite) {
         fs.appendFile(name, "\n\n"+json_toWrite, function (err) {

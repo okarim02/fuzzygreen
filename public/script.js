@@ -1,30 +1,104 @@
-function test(){
+function test() {
     console.log("Hello this is the function test !");
 }
 
-async function exec(){
+function isUrl(string) {
+    let url_string;
+    try {
+        url_string = new URL(string);
+    } catch (_) {
+        return false;
+    }
+    return url_string.protocol === "http:" || url_string.protocol === "https:";
+}
+
+function format_data(data){
+    // todo
+}
+
+function display_data(data) {
+    var depot = document.getElementById('result')
+    console.log(data);
+    for (var prop in data) {
+        if (Object.prototype.hasOwnProperty.call(data, prop)) {
+            let ecoScore = document.createElement('h3');
+            depot.appendChild(ecoScore);
+            let newEl = document.createElement('div');
+            depot.appendChild(newEl);
+
+            if (prop == 'ecoIndex') {
+                ecoScore.style.backgroundColor = 'green';
+                ecoScore.textContent = prop + " => " + data[prop];
+            }else if (prop == 'size') {
+                newEl.style.fontSize = '15px';
+                newEl.style.border = '1px solid black';
+            }else if (["filesNotMin", "policesUtilise", "imagesWithoutLazyLoading"].includes(prop)) {
+                newEl.innerText = prop + "=>";
+                let conteneur = document.createElement('ul');
+                newEl.appendChild(conteneur);
+                data[prop].forEach(element => {
+                    const li = document.createElement('li')
+                    li.textContent = element + "\n"
+                    conteneur.appendChild(li);
+                });
+                conteneur.style.background = 'white';
+            } else {
+                newEl.innerText = `${prop} : ${data[prop]}`;
+            }
+        }
+    }
+}
+
+function display_loading() {
+    let el = document.getElementById('result');
+    el.innerText = "Loading ...";
+}
+
+function hide_loading() {
+    let el = document.getElementById('result');
+    el.innerText = "";
+}
+
+function show_error(message) {
+    let el = document.getElementById('result');
+    el.innerText = message;
+    window.setTimeout(hide_loading, 3500);
+}
+
+async function exec() {
+
     let url = document.getElementById("url-enter").value;
-    console.log("url:",url)
+    console.log("url:", url)
 
-    const data = {url};
+    if (!isUrl(url)) {
+        console.error("This is not an url : ", url);
+        show_error("Url error (example : https://example.com/)");
+        return;
+    }
 
+    display_loading();
+
+    const data = { url };
     // for more info : https://developer.mozilla.org/fr/docs/Web/API/Fetch_API/Using_Fetch
     const options = {
-        method:'POST',
-        headers:{
+        method: 'POST',
+        headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
     }
-
     // endpoint
-    const response = await fetch('/api',options);
+    await fetch('/api', options).then(async (res) => {
+        hide_loading();
+        const x = await res.json();
+        display_data(x.data);
+    }).catch((err) => {
+        console.error(err);
+        show_error(err);
+    });
 
-    const dataJson = await response.json();
 
-    console.log(dataJson.message);
-
-    document.getElementById('result').textContent = JSON.stringify(dataJson.data);
+    //fetch_data(dataJson.data);
 
 
 }
