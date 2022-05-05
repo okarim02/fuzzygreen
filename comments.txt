@@ -1,0 +1,4 @@
+npm init 
+npm i puppeteer
+npm install -g lighthouse
+npm install dotenv --save
