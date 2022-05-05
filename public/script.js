@@ -67,11 +67,13 @@ function show_error(message) {
     window.setTimeout(hide_loading, 3500);
 }
 
+
 async function exec() {
 
-    let url = document.getElementById("url-enter").value;
-    console.log("url:", url)
-
+    const urls = document.getElementById("url-enter").value.split('\n');
+    // Todo ... later 
+    const url = urls[0];
+    
     if (!isUrl(url)) {
         console.error("This is not an url : ", url);
         show_error("Url error (example : https://example.com/)");

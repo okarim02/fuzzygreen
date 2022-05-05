@@ -40,7 +40,7 @@ module.exports.start = async function main(url){
         result.isMobileFriendly = await api.isMobileFriendly(url); // Took so long, fix this !
         result.host={ 
             "isGreen":resultGreen.green,
-            "energy": result.moreData ? resultGreen.moreData[0].model : ""
+            "energy": resultGreen.moreData ? resultGreen.moreData[0].model : ""
         };
 
         result.ecoIndex = ecoIndex.grade;
@@ -56,4 +56,4 @@ module.exports.start = async function main(url){
     return result;
 }
 /* TEST */ 
-this.start("http://www.angrybirds.com/");
+this.start("https://twitch.tv/");

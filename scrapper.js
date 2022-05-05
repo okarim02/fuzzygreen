@@ -41,22 +41,6 @@ module.exports.getPageMetrics = async (url, callback) => {
     // var & const
     var counter_http1 = 0;
 
-    var measures = {
-        "size": 0,
-        "nbRequest": 0,
-        "domSize": 0,
-        "loadTime": 0,
-        "JSHeapUsedSize": gitMetrics.JSHeapUsedSize,
-        "filesNotMin": [],
-        "policesUtilise": [],
-        "etagsNb": 0,
-        "imagesWithoutLazyLoading": 0,
-        "cssFiles": 0,
-        "cssOrJsNotExt": 0,
-        "ratioHttp1": 0,
-        "socialButtonsFind":[]
-    }
-
     page.on('request', (request) => {
         request.continue();
     });
@@ -148,7 +132,7 @@ module.exports.getPageMetrics = async (url, callback) => {
     // GO TO THE PAGE 
     await page.goto(url, { waitUntil: ('networkidle0') });
 
-    measures.cms = getCMS(page,browser).then(e => e ? e : []);
+    measures.cms = await getCMS(page,browser).then(e => e ? e : []);
 
     measures.isStatic = await isStatic(page);
     measures.loadTime = await getLoadTime(page);
@@ -280,18 +264,22 @@ async function getCMS(page,browser) {
             for (let i of srcs) {
                 const s = i.src;
                 if (s.includes("wp-includes") || s.includes("wp-content") || s.includes("wp-emoji")) {
-                    cms.push("wordpress");
+                    if(!cms.includes("wordpress")){
+                        cms.push("wordpress");
+                    }
                     break;
                 }
             }
         }
-
+        
         var refs = document.head.querySelectorAll('head > link[rel="stylesheet"]');
         if (refs.length > 0) {
             for (let i of refs) {
                 const s = i.href;
                 if (s.includes("wp-includes") || s.includes("wp-content") || s.includes("wp-emoji")) {
-                    cms.push("wordpress");
+                    if(!cms.includes("wordpress")){
+                        cms.push("wordpress");
+                    }
                     break;
                 }
             }
