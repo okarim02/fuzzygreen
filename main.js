@@ -49,12 +49,7 @@ module.exports.start = async function main(urls){
                 result.JSHeapUsedSize = `${result.JSHeapUsedSize / 1000} mo`;
                 // todo : classer les polices (sont ils dans la base) + comparer le nombre à la norme
                 // 3 polices max par site web
-                if(result.policesUtilise.length>3){
-                    console.log("Nombre de police customisé utiliser : ",result.policesUtilise.length);
-                    console.log("Veuillez vous limiter à 3 polices customisé");
-                } 
                 result.cssFiles = `${result.cssFiles} ${ result.cssFiles > 3 ? "(>3 veuillez limiter les feuilles css)" : ""}`;
-    
             }
         });
         const ecoIndex = await ecoScore.getEcoIndex(result.domSize,result.size,result.nbRequest);
@@ -67,20 +62,19 @@ module.exports.start = async function main(urls){
         result.ecoIndex = ecoIndex.grade;
         result.url = url;
 
-        // test
-        //tools.writeToFile("result.json",JSON.stringify(result));
-
         return result;
     };
 
     var results = new Map();
 
     for(let i = 0 ; i < urls.length;i++) {
-        results.set(urls[i],await cluster.queue(urls[i],resultats));
+        results.set(urls[i],await cluster.execute(urls[i],resultats));
     }
 
     await cluster.idle();
     await cluster.close();
+
+    console.log(results);
 
 }
 

@@ -1,6 +1,5 @@
-const fetch = (...args) => import('node-fetch')
-              .then(({default: fetch}) => fetch(...args));
-const lighthouse = require("lighthouse");
+const fetch = require("node-fetch");
+//const lighthouse = require("lighthouse");
 const tools = require('./tools');
 require('dotenv').config();
 
