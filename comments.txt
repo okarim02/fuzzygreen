@@ -2,3 +2,4 @@ npm init
 npm i puppeteer
 npm install -g lighthouse
 npm install dotenv --save
+npm i node-fetch  // if something don't work => npm install node-fetch@2

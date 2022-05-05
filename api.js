@@ -1,16 +1,21 @@
-const fetch = (...args) => import('node-fetch')
-              .then(({default: fetch}) => fetch(...args));
-const lighthouse = require("lighthouse");
+const fetch = require('node-fetch');
+
+//const lighthouse = require("lighthouse");
 const tools = require('./tools');
 require('dotenv').config();
 
 
 async function askForHost(domain){
+    console.log("URL:",domain);
     const api_url = `https://admin.thegreenwebfoundation.org/api/v3/greencheck/${domain}`
-
-    const response = await fetch(api_url);
+    const response = await fetch(api_url).catch(e=>{
+        console.error("Something went wrong with the greencheck api...")
+        console.error(e);
+    })
     const data = await response.json();
 
+    console.log("DATA",data);
+    
     return data
 }
 
@@ -18,7 +23,6 @@ module.exports = {
     // API : https://admin.thegreenwebfoundation.org/api-docs/
     isGreen : async function isGreen(domain){
         let retour = {}
-
         const result = await askForHost(await domain);
 
         retour = result;
