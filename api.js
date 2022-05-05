@@ -77,7 +77,7 @@ module.exports = {
         return response.Technologies;
     },
 
-    // todo
+    // todo + move to the tools file .
     findTechnologies : async (content) => {
         const data = content.split('\n').split(';');
         for(let i in data){

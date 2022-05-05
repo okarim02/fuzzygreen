@@ -1,14 +1,12 @@
 // Content logic
-// doc api : https://pptr.dev/#?product=Puppeteer&version=v13.5.2&show=outline
+// @see doc api : {@link https://pptr.dev/#?product=Puppeteer&version=v13.5.2&show=outline}
 const puppeteer = require("puppeteer"); // npm i puppeteer 
 const tools = require('./tools');
 
-/* Uses: 
-    - Get page size
-    - Get numbers of request 
+/*
+ * read : https://deviceatlas.com/blog/measuring-page-weight
+ * also https://www.checklyhq.com/learn/headless/request-interception/
 */
-// read : https://deviceatlas.com/blog/measuring-page-weight
-// also https://www.checklyhq.com/learn/headless/request-interception/
 
 var measures = {
     "size": 0,
@@ -29,11 +27,11 @@ var measures = {
 }
 
 module.exports.getPageMetrics = async (url, callback) => {
-    const browser = await puppeteer.launch({
+    var browser = await puppeteer.launch({
         devtools: true,
         headless: true,
         ignoreHTTPSErrors: true
-    });
+    }); 
     const page = await browser.newPage();
     const gitMetrics = await page.metrics();
 
@@ -41,8 +39,7 @@ module.exports.getPageMetrics = async (url, callback) => {
     await page.setRequestInterception(true);
 
     // var & const
-    var counter_http1 = 0 ;
-    var counter_http2 = 0 ;
+    var counter_http1 = 0;
 
     var measures = {
         "size": 0,
@@ -56,7 +53,8 @@ module.exports.getPageMetrics = async (url, callback) => {
         "imagesWithoutLazyLoading": 0,
         "cssFiles": 0,
         "cssOrJsNotExt": 0,
-        "ratioHttp1":0,
+        "ratioHttp1": 0,
+        "socialButtonsFind":[]
     }
 
     page.on('request', (request) => {
@@ -66,10 +64,8 @@ module.exports.getPageMetrics = async (url, callback) => {
     page.on('response', async (response) => {
         measures.nbRequest += 1
 
-        if(response.url().startsWith("http:")){
-            counter_http1+=1;
-        }else{
-            counter_http2+=1;
+        if (response.url().startsWith("http:")) {
+            counter_http1 += 1;
         }
 
         if (!response.ok) response.continue();
@@ -105,8 +101,10 @@ module.exports.getPageMetrics = async (url, callback) => {
             if (response.request().resourceType() === 'image') {
                 const poidImage = response.headers()['content-length']
                 //console.log(`IMAGE ${response.url()} , poid : ${ poidImage }`)
-                if ((poidImage / 1048576.0) > 10) {
-                    console.log("l'Image ci-dessus est trop grande ! ")
+                //if ((poidImage / 1048576.0) > 10) {
+                
+                if ((poidImage) > 10) {
+                    //console.log("l'Image ci-dessus est trop grande ! ")
                 }
             }
         }
@@ -125,7 +123,6 @@ module.exports.getPageMetrics = async (url, callback) => {
                 // check syntax
                 const resultCheck = await tools.checkSyntax(content);
                 if (resultCheck != "") {
-                    console.log(resultCheck);
                     measures.filesWithError.push(response.url());
                 }
                 // Check if there is sql inside a loop
@@ -143,16 +140,6 @@ module.exports.getPageMetrics = async (url, callback) => {
             measures.policesUtilise.push(response.url());
         }
     })
-    // Obtenir le protocol http 
-    // Sol 1 marche pas ...
-    // https://stackoverflow.com/questions/57196373/how-to-get-the-http-protocol-version-in-puppeteer
-    /*
-    const httpVersion = await page.evaluate(() => performance.getEntries()[0].nextHopProtocol);
-    console.log(httpVersion)
-    measures.protocolHTTP = httpVersion;
-    */
-    // sol 2
-    // https://developer.mozilla.org/en-US/docs/Web/API/URL
 
     const url_object = new URL(url);
     measures.protocolHTTP = url_object.protocol; // http2 => good | http1 => bad 
@@ -161,14 +148,17 @@ module.exports.getPageMetrics = async (url, callback) => {
     // GO TO THE PAGE 
     await page.goto(url, { waitUntil: ('networkidle0') });
 
+    measures.cms = getCMS(page,browser).then(e => e ? e : []);
+
     measures.isStatic = await isStatic(page);
     measures.loadTime = await getLoadTime(page);
 
-    // Todo : utiliser la méthode ci-dessous pour trouver le protocole utilisé.
-    // Goal : Get the protocol using for each request/response
-    // https://jsoverson.medium.com/using-chrome-devtools-protocol-with-puppeteer-737a1300bac0
-    // Create a cdp session, for chrome devtool 
-    //const client = await page.target().createCDPSession();
+    /* Todo : utiliser la méthode ci-dessous pour trouver le protocole utilisé.
+    * Goal : Get the protocol using for each request/response
+    * @see {@link https://jsoverson.medium.com/using-chrome-devtools-protocol-with-puppeteer-737a1300bac0}
+    * Create a cdp session, for chrome devtool 
+    */
+    const client = await page.target().createCDPSession();
 
     const isNotExt = await countNumberOfInlineStyleSheet(page);
     measures.cssOrJsNotExt += isNotExt;
@@ -182,12 +172,13 @@ module.exports.getPageMetrics = async (url, callback) => {
 
     measures.imagesWithoutLazyLoading = res.imagesNoLazy;
 
-
     measures.ratioimagesResizedInPage = await getImagesResized(page).then(e => e.ratio);
-    
-    measures.ratioHttp1 = await (counter_http1/measures.nbRequest)*100;
+
+    measures.ratioHttp1 = await (counter_http1 / measures.nbRequest) * 100;
 
     measures.domSize = await page.$$eval('*', array => array.length);
+
+    measures.plugins = await getPlugins(page).then(e => e ? e.length : "aucun plugin détecté");
     /*
      const pdfs = await getAllpdf(page);
      // check if a pdf's size is higher than normal
@@ -207,7 +198,17 @@ module.exports.getPageMetrics = async (url, callback) => {
     callback(measures, true);
 }
 
-async function getLoadTime(page){
+async function getRobot(br,url){
+    const robot = await br.newPage();
+    await robot.goto(url+"robots.txt");
+    const content = await robot.content();
+    console.log(robot.url());
+    console.log("robot:",content)
+    robot.close();
+    return content;
+}
+
+async function getLoadTime(page) {
     const perf = await page.evaluate(_ => {
         const { loadEventEnd, navigationStart } = performance.timing
         return ({
@@ -229,7 +230,7 @@ async function isStatic(page) {
 
            More info : https://iconicdigitalworld.com/how-to-check-if-a-website-is-dynamic-or-or-static/#:~:text=To%20find%20out%20how%20to,JSP%2C%20the%20page%20is%20dynamic.
        */
-    if (measures.poweredBy.length!=0) { // rule 3.
+    if (measures.poweredBy.length != 0) { // rule 3.
         return false;
     }
     const url = page.url();
@@ -246,15 +247,67 @@ async function isStatic(page) {
         }
     }
     // A static webpage take a few milliseconds to responds contrary to a dynamic webpage because he make some request to a database before loading fully.
-    
 
-    const timeTook = getLoadTime(page);
+    const timeTook = await getLoadTime(page);
 
     console.log(`Temps écoulé : ${timeTook}ms ${timeTook > 1000 ? `soit ${timeTook / 1000}s` : ""}`);
     if (timeTook / 1000 > 2) {
         return false;
     }
 
+    return true;
+}
+/*
+    * @see {@link https://serpstat.com/blog/how-to-detect-which-cms-a-website-is-using-8-easy-ways/#:~:text=The%20name%20of%20the%20CMS,source%20code%20of%20the%20page&text=Go%20to%20the%20website%20you%20want%20to%20examine.&text=Press%20Ctrl%20%2B%20U%20to%20display%20the%20page%20code.&text=Find%20the%20tag%20with%20the,content%3D%20on%20the%20html%20page.}
+    todo : A continuer
+*/
+async function getCMS(page,browser) {
+    const cms_library={ 
+        "wordpress":"wp"
+    }
+    
+    let cms = await page.evaluate(() => {
+        var cms = [];
+
+        const meta = document.head.querySelector('head > meta[name="generator"]');
+
+        if (meta != undefined) {
+            cms.push(meta.getAttribute("content"));
+        }
+
+        const srcs = document.head.querySelectorAll('head > script[type="text/javascript"]')
+        if (srcs.length > 0) {
+            for (let i of srcs) {
+                const s = i.src;
+                if (s.includes("wp-includes") || s.includes("wp-content") || s.includes("wp-emoji")) {
+                    cms.push("wordpress");
+                    break;
+                }
+            }
+        }
+
+        var refs = document.head.querySelectorAll('head > link[rel="stylesheet"]');
+        if (refs.length > 0) {
+            for (let i of refs) {
+                const s = i.href;
+                if (s.includes("wp-includes") || s.includes("wp-content") || s.includes("wp-emoji")) {
+                    cms.push("wordpress");
+                    break;
+                }
+            }
+        }
+
+
+        return cms;
+    })
+    /*
+    const txt = await getRobot(browser,page.url());
+    console.log("TXT : ",txt);
+    if(txt.contains("wp") && cms.includes("wordpress")){
+        cms.push("wordpress");
+    }*/
+
+    return cms;
 }
 
 async function getAllpdf(page) {

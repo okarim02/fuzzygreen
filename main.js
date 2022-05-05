@@ -12,9 +12,6 @@ module.exports.start = async function main(url){
     
     var result = {};
     result.url = url;
-    
-    //result.plugins = await api.infoAboutPluginAndTemplate(url);
-    //result.isMobileFriendly = await api.isMobileFriendly(url);
 
     await scrapper.getPageMetrics(baseUrl,(data,response)=>{
         if(response){
@@ -38,7 +35,9 @@ module.exports.start = async function main(url){
         console.log("Wooo that work");
         const ecoIndex = await ecoScore.getEcoIndex(result.domSize,result.size,result.nbRequest);
         const domainName = tools.getDomain(baseUrl);
-        const resultGreen = await api.isGreen(domainName)
+        const resultGreen = await api.isGreen(domainName);
+        //result.plugins = await api.infoAboutPluginAndTemplate(url);
+        result.isMobileFriendly = await api.isMobileFriendly(url); // Took so long, fix this !
         result.host={ 
             "isGreen":resultGreen.green,
             "energy": result.moreData ? resultGreen.moreData[0].model : ""
@@ -56,5 +55,5 @@ module.exports.start = async function main(url){
     console.log(result);
     return result;
 }
-
-//this.start("http://www.iut-bm.univ-fcomte.fr/pages/fr/a-votre-service-13757.html");
+/* TEST */ 
+this.start("http://www.angrybirds.com/");
