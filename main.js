@@ -5,7 +5,7 @@ const ecoScore = require('./ecoIndex')
 const api = require('./api')
 const tools = require("./tools")
 
-module.exports.start = async function main(url){
+module.exports.start = async function main(url,page){
     
     const baseUrl = url ;
     console.log("Site web testé : ",baseUrl)
@@ -13,7 +13,7 @@ module.exports.start = async function main(url){
     var result = {};
     result.url = url;
 
-    await scrapper.getPageMetrics(baseUrl,(data,response)=>{
+    await scrapper.getPageMetrics(baseUrl,page,(data,response)=>{
         if(response){
             data.size = Math.round(data.size/1000);
             result = data;
@@ -44,9 +44,6 @@ module.exports.start = async function main(url){
         };
 
         result.ecoIndex = ecoIndex.grade;
-        // test
-        //tools.writeToFile("result.json",JSON.stringify(result));
-
     }).catch(async e=>{ // todo , gérer l'erreur : faux url.
         console.log("oops something went wrong");
         result = new Error("Oops something went wrong");
@@ -55,5 +52,3 @@ module.exports.start = async function main(url){
     console.log(result);
     return result;
 }
-/* TEST */ 
-this.start("https://twitch.tv/");

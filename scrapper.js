@@ -26,13 +26,17 @@ var measures = {
     "poweredBy": [],
 }
 
-module.exports.getPageMetrics = async (url, callback) => {
+module.exports.getPageMetrics = async (url,page, callback) => {
+    /*
+    // @see cluster file
     var browser = await puppeteer.launch({
         devtools: true,
         headless: true,
         ignoreHTTPSErrors: true
     }); 
     const page = await browser.newPage();
+    */
+    
     const gitMetrics = await page.metrics();
 
     // Use to do more things with the requests made by the website (check the doc)
@@ -128,11 +132,10 @@ module.exports.getPageMetrics = async (url, callback) => {
     const url_object = new URL(url);
     measures.protocolHTTP = url_object.protocol; // http2 => good | http1 => bad 
 
-
     // GO TO THE PAGE 
     await page.goto(url, { waitUntil: ('networkidle0') });
 
-    measures.cms = await getCMS(page,browser).then(e => e ? e : []);
+    measures.cms = await getCMS(page,browser=undefined).then(e => e ? e : []);
 
     measures.isStatic = await isStatic(page);
     measures.loadTime = await getLoadTime(page);
@@ -177,7 +180,7 @@ module.exports.getPageMetrics = async (url, callback) => {
      */
 
     await page.close();
-    await browser.close();
+    //await browser.close();
 
     callback(measures, true);
 }
@@ -249,7 +252,6 @@ async function getCMS(page,browser) {
     const cms_library={ 
         "wordpress":"wp"
     }
-    
     let cms = await page.evaluate(() => {
         var cms = [];
 
@@ -289,6 +291,7 @@ async function getCMS(page,browser) {
         return cms;
     })
     /*
+    // fix this
     const txt = await getRobot(browser,page.url());
     console.log("TXT : ",txt);
     if(txt.contains("wp") && cms.includes("wordpress")){

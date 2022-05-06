@@ -69,20 +69,23 @@ function show_error(message) {
 
 
 async function exec() {
-
-    const urls = document.getElementById("url-enter").value.split('\n');
-    // Todo ... later 
-    const url = urls[0];
+    let urls = document.getElementById("url-enter").value.split(/[\n\s,"]+/);
     
-    if (!isUrl(url)) {
-        console.error("This is not an url : ", url);
-        show_error("Url error (example : https://example.com/)");
-        return;
-    }
+    urls = urls.filter(function (el) { // Delete empty string
+        console.log("ayo : ",el);
+        if(el == '' || !isUrl(el)){
+            if(el!='')  console.error("Cette url est suspect :",el);
+            return false;
+        }
+        return true;
+    });
+
+
+    if(urls.length)
 
     display_loading();
 
-    const data = { url };
+    const data = { urls };
     // for more info : https://developer.mozilla.org/fr/docs/Web/API/Fetch_API/Using_Fetch
     const options = {
         method: 'POST',
@@ -95,14 +98,11 @@ async function exec() {
     await fetch('/api', options).then(async (res) => {
         hide_loading();
         const x = await res.json();
-        display_data(x.data);
+        //display_data(x.data);
+    
+        console.log(data);
     }).catch((err) => {
         console.error(err);
         show_error(err);
     });
-
-
-    //fetch_data(dataJson.data);
-
-
 }
