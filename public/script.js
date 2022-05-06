@@ -71,8 +71,7 @@ function show_error(message) {
 async function exec() {
     let urls = document.getElementById("url-enter").value.split(/[\n\s,"]+/);
     
-    urls = urls.filter(function (el) { // Delete empty string
-        console.log("ayo : ",el);
+    urls = urls.filter(function (el) { // Delete empty string and sus url.
         if(el == '' || !isUrl(el)){
             if(el!='')  console.error("Cette url est suspect :",el);
             return false;
@@ -80,8 +79,12 @@ async function exec() {
         return true;
     });
 
+    if(urls.length==0){
+        console.log("Aucune url valide entrer...");
+        return;
+    }
 
-    if(urls.length)
+    console.log("Url(s) testé : ",urls);
 
     display_loading();
 
@@ -97,10 +100,15 @@ async function exec() {
     // endpoint
     await fetch('/api', options).then(async (res) => {
         hide_loading();
-        const x = await res.json();
-        //display_data(x.data);
+        if(res.status == "failure"){
+            console.error("Une erreur est survénu ...");
+            show_error(res.message);
+            return ;
+        }
+        const x = await res.data.json();
+        //display_data(x);
     
-        console.log(data);
+        console.log(x);
     }).catch((err) => {
         console.error(err);
         show_error(err);

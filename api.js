@@ -31,7 +31,6 @@ module.exports = {
             console.log("Hébergeur green !")
             const response = await fetch(`https://admin.thegreenwebfoundation.org/data/hostingprovider/${result.hosted_by_id}`)
             const moreData = await response.json();
-
             retour.moreData = moreData;
             
         }else{

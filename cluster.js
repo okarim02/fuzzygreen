@@ -30,6 +30,6 @@ module.exports.clust = async function first(urls){
     await cluster.idle();
     await cluster.close();
 
-    console.log(results);
+    return results;
 
 }

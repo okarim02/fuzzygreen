@@ -27,7 +27,9 @@ app.post('/api',async (request,response)=>{
         });
     })
     .catch((err)=>{
+        console.log("err:",err);
         return res.status(400).send({
+            status:'failure',
             message: err.message
         })
     })
