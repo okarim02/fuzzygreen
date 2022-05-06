@@ -42,6 +42,8 @@ module.exports.getPageMetrics = async (url,page, callback) => {
     // Use to do more things with the requests made by the website (check the doc)
     await page.setRequestInterception(true);
 
+    measures.JSHeapUsedSize = gitMetrics.JSHeapUsedSize;
+
     // var & const
     var counter_http1 = 0;
 

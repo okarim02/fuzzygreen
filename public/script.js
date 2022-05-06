@@ -12,43 +12,118 @@ function isUrl(string) {
     return url_string.protocol === "http:" || url_string.protocol === "https:";
 }
 
-function format_data(data){
-    // todo
+function getHeaders(data){
+    return ["url",...Object.keys(data[Object.keys(data)[0]])];// Loop for each proprieties .
 }
 
 function display_data(data) {
-    var depot = document.getElementById('result')
-    console.log(data);
-    for (var prop in data) {
-        if (Object.prototype.hasOwnProperty.call(data, prop)) {
-            let ecoScore = document.createElement('h3');
-            depot.appendChild(ecoScore);
-            let newEl = document.createElement('div');
-            depot.appendChild(newEl);
 
-            if (prop == 'ecoIndex') {
-                ecoScore.style.backgroundColor = 'green';
-                ecoScore.textContent = prop + " => " + data[prop];
-            }else if (prop == 'size') {
-                newEl.style.fontSize = '15px';
-                newEl.style.border = '1px solid black';
-            }else if (["filesNotMin", "policesUtilise", "imagesWithoutLazyLoading"].includes(prop)) {
-                newEl.innerText = prop + "=>";
-                let conteneur = document.createElement('ul');
-                newEl.appendChild(conteneur);
-                data[prop].forEach(element => {
+    let depot = document.getElementById('result');
+    let tbl = document.createElement('table');
+    
+    tbl.style.width = '100%';
+    tbl.style.border = '3px solid black';
+
+    let headersRow = document.createElement('tr');
+    
+    let headers =  getHeaders(data);
+
+    headers.forEach(text=>{
+        let header = document.createElement('th');
+        let txt = document.createTextNode(text);
+        header.appendChild(txt);
+        headersRow.appendChild(header);
+    })
+
+    tbl.appendChild(headersRow);
+
+    for(let key in data){
+        let row = document.createElement('tr');
+        
+        // Cell for the url analyzed
+        let cell = document.createElement('td');
+        cell.style.border = '3px solid black';
+
+        let txt = document.createTextNode(key);
+        cell.appendChild(txt);
+        row.appendChild(cell);
+
+        // Loop for each values link to the url
+        for(let val in data[key]){
+            let cell = document.createElement('td');
+            cell.style.border = '1px solid black';
+            let txt;
+
+            if(["filesNotMin","policesUtilise","imagesWithoutLazyLoading","cssFiles","filesWithError"].includes(val)){
+                txt = document.createElement('details');
+                const list_urls = data[key][val];
+                let ul = document.createElement('ul');
+                for(let element in list_urls){
                     const li = document.createElement('li')
-                    li.textContent = element + "\n"
-                    conteneur.appendChild(li);
-                });
-                conteneur.style.background = 'white';
-            } else if(prop == "host"){
-                newEl.innerText = `${data[prop].isGreen ? "Hébergeur green !" :"Hébergeur non green !"} \n >>> Energie utilisé : ${data[prop].energy == "" ? '...' : data[prop].energy}`;
-            } else {
-                newEl.innerText = `${prop} : ${data[prop]}`;
+                    li.textContent = list_urls[element] + "\n"
+                    ul.appendChild(li);
+                }
+                ul.style.background = 'white';
+                txt.appendChild(ul);
+            }else{
+                console.log("key analysed : ",key);
+                console.log("Val : ",val);
+                console.log("value of val :", data[key][val]);
+                txt = document.createTextNode(data[key][val])
             }
+            
+            cell.appendChild(txt);
+            row.appendChild(cell);
         }
+
+        tbl.appendChild(row)
     }
+
+    // data.forEach(e => {
+    //     let row = document.createElement('tr');
+
+    //     Object.values(e).forEach(f=>{
+    //         let cell = document.createElement('td');
+    //         let txt = document.createTextNode(f);
+    //         cell.appendChild(txt);
+    //         row.appendChild(cell);
+    //     });
+    //     tbl.appendChild(row)
+    // });
+
+
+    depot.appendChild(tbl);
+
+    // for (var prop in data) {
+    //     if (Object.prototype.hasOwnProperty.call(data, prop)) {
+    //         let ecoScore = document.createElement('h3');
+    //         depot.appendChild(ecoScore);
+    //         let newEl = document.createElement('div');
+    //         depot.appendChild(newEl);
+
+    //         if (prop == 'ecoIndex') {
+    //             ecoScore.style.backgroundColor = 'green';
+    //             ecoScore.textContent = prop + " => " + data[prop];
+    //         }else if (prop == 'size') {
+    //             newEl.style.fontSize = '15px';
+    //             newEl.style.border = '1px solid black';
+    //         }else if (["filesNotMin", "policesUtilise", "imagesWithoutLazyLoading"].includes(prop)) {
+    //             newEl.innerText = prop + "=>";
+    //             let conteneur = document.createElement('ul');
+    //             newEl.appendChild(conteneur);
+    //             data[prop].forEach(element => {
+    //                 const li = document.createElement('li')
+    //                 li.textContent = element + "\n"
+    //                 conteneur.appendChild(li);
+    //             });
+    //             conteneur.style.background = 'white';
+    //         } else if(prop == "host"){
+    //             newEl.innerText = `${data[prop].isGreen ? "Hébergeur green !" :"Hébergeur non green !"} \n >>> Energie utilisé : ${data[prop].energy == "" ? '...' : data[prop].energy}`;
+    //         } else {
+    //             newEl.innerText = `${prop} : ${data[prop]}`;
+    //         }
+    //     }
+    // }
 }
 
 function display_loading() {
@@ -84,7 +159,7 @@ async function exec() {
         return;
     }
 
-    console.log("Url(s) testé : ",urls);
+    console.log("Url(s) : ",urls);
 
     display_loading();
 
@@ -105,12 +180,11 @@ async function exec() {
             show_error(res.message);
             return ;
         }
-        const x = await res.data.json();
-        //display_data(x);
-    
-        console.log(x);
+        console.log("RES:",res);
+        let x = await res.json();
+        display_data(x.data);
     }).catch((err) => {
-        console.error(err);
+        console.error("error ;( : ",err);
         show_error(err);
     });
 }

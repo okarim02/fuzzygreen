@@ -4,7 +4,7 @@ const common = require("./common")
 
 module.exports.clust = async function first(urls){
     // init concurrency
-    const cluster =await Cluster.launch({
+    const cluster = await Cluster.launch({
         concurrency : Cluster.CONCURRENCY_PAGE,
         maxConcurrency:100, // Max pages
         puppeteerOptions:{
@@ -13,18 +13,20 @@ module.exports.clust = async function first(urls){
         },
     });
 
+    var results = {};
+
     cluster.on('taskerror',(err,data)=>{
         console.log(`Error crawling ${data}: ${err.message}`);
     });
 
-    const resultats = async ({page,data: url})=>{
-        return await main.start(url,page);
-    };
-
-    var results = new Map();
+    await cluster.task(async ({page,data: url})=>{
+        const res = await main.start(url,page);
+        return res;
+    });
 
     for(let i = 0 ; i < urls.length;i++) {
-        results.set(urls[i],await cluster.execute(urls[i],resultats));
+        const r = await cluster.execute(urls[i]);
+        results[urls[i]] = r;
     }
 
     await cluster.idle();

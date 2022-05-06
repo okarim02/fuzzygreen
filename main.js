@@ -21,34 +21,27 @@ module.exports.start = async function main(url,page){
             result.ratioLazyLoad = `${result.ratioLazyLoad}%`;
             result.JSHeapUsedSize = `${result.JSHeapUsedSize / 1000} mo`;
             result.ratioHttp1 = `${result.ratioHttp1} %`;
-            // todo : classer les polices (sont ils dans la base) + comparer le nombre à la norme
-            // 3 polices max par site web
-            if(result.policesUtilise.length>3){
-                console.log("Nombre de police customisé utiliser : ",result.policesUtilise.length);
-                console.log("Veuillez vous limiter à 3 polices customisé");
-            } 
             result.cssFiles = `${result.cssFiles} ${ result.cssFiles > 3 ? "(>3 veuillez limiter les feuilles css)" : ""}`;
-        }else{
-            
         }
     }).then(async ()=>{
         console.log("Wooo that work");
         const ecoIndex = await ecoScore.getEcoIndex(result.domSize,result.size,result.nbRequest);
         const domainName = tools.getDomain(baseUrl);
+       
         const resultGreen = await api.isGreen(domainName);
         //result.plugins = await api.infoAboutPluginAndTemplate(url);
-        result.isMobileFriendly = await api.isMobileFriendly(url); // Took so long, fix this !
+
+        // Took so many time that the server response crash
+        // result.isMobileFriendly = await api.isMobileFriendly(url); // Took so long, fix this !
         result.host={ 
             "isGreen":resultGreen.green,
             "energy": resultGreen.moreData ? resultGreen.moreData[0].model : ""
         };
-
         result.ecoIndex = ecoIndex.grade;
     }).catch(async e=>{ // todo , gérer l'erreur : faux url.
         console.log("oops something went wrong");
         result = new Error("Oops something went wrong");
     });
-
-    console.log(result);
+    console.log("HUMPIZZA : ",result)
     return result;
 }

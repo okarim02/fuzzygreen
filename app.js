@@ -14,7 +14,7 @@ app.use(express.json({
     limit: '1mb'
 }));
 
-app.post('/api',async (request,response)=>{
+app.post('/api',async (request,response,next)=>{
     console.log("Requête reçu !");
     
     const data = request.body;
@@ -28,11 +28,13 @@ app.post('/api',async (request,response)=>{
     })
     .catch((err)=>{
         console.log("err:",err);
-        return res.status(400).send({
+        response.json({
             status:'failure',
-            message: err.message
-        })
+            message: 'Traitement interrompue'
+        });
     })
 
     console.log("Done");
+    next();
+
 });
