@@ -67,10 +67,12 @@ function display_data(data) {
                 ul.style.background = 'white';
                 txt.appendChild(ul);
             }else{
-                console.log("key analysed : ",key);
-                console.log("Val : ",val);
-                console.log("value of val :", data[key][val]);
-                txt = document.createTextNode(data[key][val])
+                // In case of the green host data
+                if(val === 'host'){
+                    txt = document.createTextNode(JSON.stringify(data[key][val]));
+                }else{
+                    txt = document.createTextNode(data[key][val]);
+                }
             }
             
             cell.appendChild(txt);
@@ -183,8 +185,7 @@ async function exec() {
         }
         let x = await res.json();
         console.log("Message :",x.message);
-
-        display_data(x.data);
+        display_data(JSON.parse(x.data));
     }).catch((err) => {
         console.error("error ;( : ",err);
         show_error(err);

@@ -14,8 +14,6 @@ async function askForHost(domain){
     })
     const data = await response.json();
 
-    console.log("DATA",data);
-    
     return data
 }
 
