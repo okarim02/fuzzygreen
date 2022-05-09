@@ -37,6 +37,7 @@ module.exports.clust = async function first(urls){
     const cluster = await Cluster.launch({
         concurrency : Cluster.CONCURRENCY_PAGE,
         maxConcurrency:100, // Max pages
+        timeout:60000, // 60s per page
         puppeteerOptions:{
             devtools: true,
             headless: true,
@@ -66,4 +67,3 @@ module.exports.clust = async function first(urls){
     return results;
 
 }
-
