@@ -181,8 +181,9 @@ async function exec() {
             show_error(res.message);
             return ;
         }
-        console.log("RES:",res);
         let x = await res.json();
+        console.log("Message :",x.message);
+
         display_data(x.data);
     }).catch((err) => {
         console.error("error ;( : ",err);

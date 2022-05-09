@@ -4,6 +4,8 @@ const app = express();
 const main = require('./main');
 const cluster = require('./cluster');
 
+var requestTime = Date.now;
+
 app.listen(3000, () => console.log("Listening at 3000 (go to 'localhost:3000')"));
 app.use(express.static(__dirname+'/public'));
 app.set('view engine','ejs')
@@ -22,8 +24,8 @@ app.post('/api',async (request,response,next)=>{
     await cluster.clust(data.urls).then((websiteData)=>{
         response.json({
             status:'success',
-            message: 'Traitement finit',
-            data : websiteData
+            message: `Traitement finit en ${Date.now() - requestTime} ms`,
+            data : JSON.stringify(websiteData)
         });
     })
     .catch((err)=>{
@@ -38,3 +40,4 @@ app.post('/api',async (request,response,next)=>{
     next();
 
 });
+
