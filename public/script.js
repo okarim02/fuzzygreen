@@ -44,8 +44,9 @@ function display_data(data) {
         let cell = document.createElement('td');
         cell.style.border = '3px solid black';
 
-        let txt = document.createTextNode(key);
-        cell.appendChild(txt);
+        let a = document.createElement('a');
+        a.innerText=key;
+        cell.appendChild(a);
         row.appendChild(cell);
 
         // Loop for each values link to the url

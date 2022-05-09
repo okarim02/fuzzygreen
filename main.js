@@ -17,11 +17,6 @@ module.exports.start = async function main(url,page){
         if(response){
             data.size = Math.round(data.size/1000);
             result = data;
-            result.ratio_etags = `${(data.etagsNb/data.nbRequest)*100} %`;
-            result.ratioLazyLoad = `${result.ratioLazyLoad}%`;
-            result.JSHeapUsedSize = `${result.JSHeapUsedSize / 1000} mo`;
-            result.ratioHttp1 = `${result.ratioHttp1} %`;
-            result.cssFiles = `${result.cssFiles} ${ result.cssFiles > 3 ? "(>3 veuillez limiter les feuilles css)" : ""}`;
         }
     }).then(async ()=>{
         console.log("Wooo that work");
@@ -42,6 +37,5 @@ module.exports.start = async function main(url,page){
         console.log("oops something went wrong");
         result = new Error("Oops something went wrong");
     });
-    console.log("HUMPIZZA : ",result)
     return result;
 }

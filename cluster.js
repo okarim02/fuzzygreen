@@ -2,6 +2,36 @@ var main = require("./main");
 const { Cluster } = require('puppeteer-cluster'); 
 const common = require("./common")
 
+function Result(tmp){
+    return {
+        'size':tmp.size,
+        'nbRequest': tmp.nbRequest,
+        'domSize': tmp.domSize,
+        'JSHeapUsedSize': tmp.JSHeapUsedSize,
+        'filesNotMin': tmp.filesNotMin,
+        'policeUtilise': tmp.policeUtilise,
+        'etagsNb':tmp.etagsNb,
+        'imagesWithoutLazyLoading':tmp.imagesWithoutLazyLoading,
+        'cssFiles': tmp.cssFiles,
+        'cssOrJsNotExt': tmp.cssOrJsNotExt,
+        'filesWithError': tmp.filesWithError,
+        'socialButtonsFound': tmp.socialButtonsFound,
+        'nbOfImagesWithSrcEmpty': tmp.nbOfImagesWithSrcEmpty,
+        'isStatic': tmp.isStatic,
+        'poweredBy': tmp.poweredBy,
+        'protocolHTTP': tmp.protocolHTTP,
+        'cms': tmp.cms,
+        'loadTime': tmp.loadTime,
+        'ratioLazyLoad': tmp.ratioLazyLoad,
+        'ratioimagesResizedInPage': tmp.ratioimagesResizedInPage,
+        'ratioHttp1': tmp.ratioHttp1,
+        'plugins': tmp.plugins,
+        'ratio_etags': tmp.ratioHttp1,
+        'host': tmp.host,
+        'ecoIndex': tmp.ecoIndex
+    };
+}
+
 module.exports.clust = async function first(urls){
     // init concurrency
     const cluster = await Cluster.launch({
@@ -25,7 +55,8 @@ module.exports.clust = async function first(urls){
     });
 
     for(let i = 0 ; i < urls.length;i++) {
-        const r = await cluster.execute(urls[i]);
+        const tmp = await cluster.execute(urls[i]);
+        let r = Result(tmp);
         results[urls[i]] = r;
     }
 
@@ -35,3 +66,4 @@ module.exports.clust = async function first(urls){
     return results;
 
 }
+

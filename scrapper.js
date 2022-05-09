@@ -9,21 +9,31 @@ const tools = require('./tools');
 */
 
 var measures = {
-    "size": 0,
-    "nbRequest": 0,
-    "domSize": 0,
-    "JSHeapUsedSize": 0,
-    "filesNotMin": [],
-    "policesUtilise": [],
-    "etagsNb": 0,
-    "imagesWithoutLazyLoading": 0,
-    "cssFiles": 0,
-    "cssOrJsNotExt": 0,
-    "filesWithError": [],
-    "socialButtonsFound": [],
-    "nbOfImagesWithSrcEmpty": 0,
-    "isStatic": 0, // a static webpage give the same content for each user, its hard to identify them but we can check some factors 
-    "poweredBy": [],
+    'size':0,
+    'nbRequest': 0,
+    'domSize': 0,
+    'JSHeapUsedSize': 0,
+    'filesNotMin': [],
+    'policesUtilise': [],
+    'etagsNb':0,
+    'imagesWithoutLazyLoading':[],
+    'cssFiles': 0,
+    'cssOrJsNotExt': 0,
+    'filesWithError': [],
+    'socialButtonsFound': [],
+    'nbOfImagesWithSrcEmpty': 0,
+    'isStatic': false,
+    'poweredBy': [],
+    'protocolHTTP': '',
+    'cms': [],
+    'loadTime': 0,
+    'ratioLazyLoad': '2.0408163265306123%',
+    'ratioimagesResizedInPage': 0,
+    'ratioHttp1': 0,
+    'plugins': 'aucun plugin détecté',
+    'ratio_etags': '3.532608695652174 %',
+    'host': { isGreen: false, energy: '' },
+    'ecoIndex': ''
 }
 
 module.exports.getPageMetrics = async (url,page, callback) => {
@@ -167,7 +177,7 @@ module.exports.getPageMetrics = async (url,page, callback) => {
 
     measures.domSize = await page.$$eval('*', array => array.length);
 
-    measures.plugins = await getPlugins(page).then(e => e ? e.length : "aucun plugin détecté");
+    measures.plugins = await getPlugins(page).then(e => e ? e.length : 0);
     /*
      const pdfs = await getAllpdf(page);
      // check if a pdf's size is higher than normal
