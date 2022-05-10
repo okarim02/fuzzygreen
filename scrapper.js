@@ -9,14 +9,14 @@ const tools = require('./tools');
 */
 
 var measures = {
-    'size':0,
+    'size': 0,
     'nbRequest': 0,
     'domSize': 0,
     'JSHeapUsedSize': 0,
     'filesNotMin': [],
     'policesUtilise': [],
-    'etagsNb':0,
-    'imagesWithoutLazyLoading':[],
+    'etagsNb': 0,
+    'imagesWithoutLazyLoading': [],
     'cssFiles': 0,
     'cssOrJsNotExt': 0,
     'filesWithError': [],
@@ -36,7 +36,7 @@ var measures = {
     'ecoIndex': ''
 }
 
-module.exports.getPageMetrics = async (url,page, callback) => {
+module.exports.getPageMetrics = async (url, page, callback) => {
     /*
     // @see cluster file
     var browser = await puppeteer.launch({
@@ -46,7 +46,7 @@ module.exports.getPageMetrics = async (url,page, callback) => {
     }); 
     const page = await browser.newPage();
     */
-    
+
     const gitMetrics = await page.metrics();
 
     // Use to do more things with the requests made by the website (check the doc)
@@ -102,7 +102,7 @@ module.exports.getPageMetrics = async (url,page, callback) => {
                 const poidImage = response.headers()['content-length']
                 //console.log(`IMAGE ${response.url()} , poid : ${ poidImage }`)
                 //if ((poidImage / 1048576.0) > 10) {
-                
+
                 if ((poidImage) > 10) {
                     //console.log("l'Image ci-dessus est trop grande ! ")
                 }
@@ -147,7 +147,7 @@ module.exports.getPageMetrics = async (url,page, callback) => {
     // GO TO THE PAGE 
     await page.goto(url, { waitUntil: ('networkidle0') });
 
-    measures.cms = await getCMS(page,browser=undefined).then(e => e ? e : []);
+    measures.cms = await getCMS(page, browser = undefined).then(e => e ? e : []);
 
     measures.isStatic = await isStatic(page);
     measures.loadTime = await getLoadTime(page);
@@ -197,12 +197,12 @@ module.exports.getPageMetrics = async (url,page, callback) => {
     callback(measures, true);
 }
 
-async function getRobot(br,url){
+async function getRobot(br, url) {
     const robot = await br.newPage();
-    await robot.goto(url+"robots.txt");
+    await robot.goto(url + "robots.txt");
     const content = await robot.content();
     console.log(robot.url());
-    console.log("robot:",content)
+    console.log("robot:", content)
     robot.close();
     return content;
 }
@@ -260,9 +260,9 @@ async function isStatic(page) {
     * @see {@link https://serpstat.com/blog/how-to-detect-which-cms-a-website-is-using-8-easy-ways/#:~:text=The%20name%20of%20the%20CMS,source%20code%20of%20the%20page&text=Go%20to%20the%20website%20you%20want%20to%20examine.&text=Press%20Ctrl%20%2B%20U%20to%20display%20the%20page%20code.&text=Find%20the%20tag%20with%20the,content%3D%20on%20the%20html%20page.}
     todo : A continuer
 */
-async function getCMS(page,browser) {
-    const cms_library={ 
-        "wordpress":"wp"
+async function getCMS(page, browser) {
+    const cms_library = {
+        "wordpress": "wp"
     }
     let cms = await page.evaluate(() => {
         var cms = [];
@@ -278,20 +278,20 @@ async function getCMS(page,browser) {
             for (let i of srcs) {
                 const s = i.src;
                 if (s.includes("wp-includes") || s.includes("wp-content") || s.includes("wp-emoji")) {
-                    if(!cms.includes("wordpress")){
+                    if (!cms.includes("wordpress")) {
                         cms.push("wordpress");
                     }
                     break;
                 }
             }
         }
-        
+
         var refs = document.head.querySelectorAll('head > link[rel="stylesheet"]');
         if (refs.length > 0) {
             for (let i of refs) {
                 const s = i.href;
                 if (s.includes("wp-includes") || s.includes("wp-content") || s.includes("wp-emoji")) {
-                    if(!cms.includes("wordpress")){
+                    if (!cms.includes("wordpress")) {
                         cms.push("wordpress");
                     }
                     break;

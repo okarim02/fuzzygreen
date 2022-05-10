@@ -12,23 +12,23 @@ function isUrl(string) {
     return url_string.protocol === "http:" || url_string.protocol === "https:";
 }
 
-function getHeaders(data){
-    return ["url",...Object.keys(data[Object.keys(data)[0]])];// Loop for each proprieties .
+function getHeaders(data) {
+    return ["url", ...Object.keys(data[Object.keys(data)[0]])];// Loop for each proprieties .
 }
 
 function display_data(data) {
 
     let depot = document.getElementById('result');
     let tbl = document.createElement('table');
-    
+
     tbl.style.width = '100%';
     tbl.style.border = '3px solid black';
 
     let headersRow = document.createElement('tr');
-    
-    let headers =  getHeaders(data);
 
-    headers.forEach(text=>{
+    let headers = getHeaders(data[0]);
+
+    headers.forEach(text => {
         let header = document.createElement('th');
         let txt = document.createTextNode(text);
         header.appendChild(txt);
@@ -37,50 +37,53 @@ function display_data(data) {
 
     tbl.appendChild(headersRow);
 
-    for(let key in data){
-        let row = document.createElement('tr');
-        
-        // Cell for the url analyzed
-        let cell = document.createElement('td');
-        cell.style.border = '3px solid black';
+    for (let i = 0; i < data.length; i++) {
+        for (let key in data[i]) {
+            let row = document.createElement('tr');
 
-        let a = document.createElement('a');
-        a.innerText=key;
-        cell.appendChild(a);
-        row.appendChild(cell);
-
-        // Loop for each values link to the url
-        for(let val in data[key]){
+            // Cell for the url analyzed
             let cell = document.createElement('td');
-            cell.style.border = '1px solid black';
-            let txt;
+            cell.style.border = '3px solid black';
 
-            if(["filesNotMin","policesUtilise","imagesWithoutLazyLoading","cssFiles","filesWithError"].includes(val)){
-                txt = document.createElement('details');
-                const list_urls = data[key][val];
-                let ul = document.createElement('ul');
-                for(let element in list_urls){
-                    const li = document.createElement('li')
-                    li.textContent = list_urls[element] + "\n"
-                    ul.appendChild(li);
-                }
-                ul.style.background = 'white';
-                txt.appendChild(ul);
-            }else{
-                // In case of the green host data
-                if(val === 'host'){
-                    txt = document.createTextNode(JSON.stringify(data[key][val]));
-                }else{
-                    txt = document.createTextNode(data[key][val]);
-                }
-            }
-            
-            cell.appendChild(txt);
+            let a = document.createElement('a');
+            a.innerText = key;
+            cell.appendChild(a);
             row.appendChild(cell);
-        }
 
-        tbl.appendChild(row)
+            // Loop for each values link to the url
+            for (let val in data[i][key]) {
+                let cell = document.createElement('td');
+                cell.style.border = '1px solid black';
+                let txt;
+
+                if (["filesNotMin", "policesUtilise", "imagesWithoutLazyLoading", "cssFiles", "filesWithError"].includes(val)) {
+                    txt = document.createElement('details');
+                    const list_urls = data[i][key][val];
+                    let ul = document.createElement('ul');
+                    for (let element in list_urls) {
+                        const li = document.createElement('li')
+                        li.textContent = list_urls[element] + "\n"
+                        ul.appendChild(li);
+                    }
+                    ul.style.background = 'white';
+                    txt.appendChild(ul);
+                } else {
+                    // In case of the green host data
+                    if (val === 'host') {
+                        txt = document.createTextNode(JSON.stringify(data[i][key][val]));
+                    } else {
+                        txt = document.createTextNode(data[i][key][val]);
+                    }
+                }
+
+                cell.appendChild(txt);
+                row.appendChild(cell);
+            }
+
+            tbl.appendChild(row)
+        }
     }
+
 
     // data.forEach(e => {
     //     let row = document.createElement('tr');
@@ -148,21 +151,21 @@ function show_error(message) {
 
 async function exec() {
     let urls = document.getElementById("url-enter").value.split(/[\n\s,"]+/);
-    
+
     urls = urls.filter(function (el) { // Delete empty string and sus url.
-        if(el == '' || !isUrl(el)){
-            if(el!='')  console.error("Cette url est suspect :",el);
+        if (el == '' || !isUrl(el)) {
+            if (el != '') console.error("Cette url est suspect :", el);
             return false;
         }
         return true;
     });
 
-    if(urls.length==0){
+    if (urls.length == 0) {
         console.log("Aucune url valide entrer...");
         return;
     }
 
-    console.log("Url(s) : ",urls);
+    console.log("Url(s) : ", urls);
 
     display_loading();
 
@@ -178,16 +181,17 @@ async function exec() {
     // endpoint
     await fetch('/api', options).then(async (res) => {
         hide_loading();
-        if(res.status == "failure"){
+        if (res.status == "failure") {
             console.error("Une erreur est survénu ...");
             show_error(res.message);
-            return ;
+            return;
         }
         let x = await res.json();
-        console.log("Message :",x.message);
+        console.log("Message :", x.message);
+
         display_data(JSON.parse(x.data));
     }).catch((err) => {
-        console.error("error ;( : ",err);
+        console.error("error ;( : ", err);
         show_error(err);
     });
 }

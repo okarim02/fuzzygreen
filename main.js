@@ -23,7 +23,7 @@ module.exports.start = async function main(url,page){
         const ecoIndex = await ecoScore.getEcoIndex(result.domSize,result.size,result.nbRequest);
         const domainName = tools.getDomain(baseUrl);
        
-        const resultGreen = await api.isGreen(domainName);
+        /*const resultGreen = await api.isGreen(domainName);
         //result.plugins = await api.infoAboutPluginAndTemplate(url);
 
         // Took so many time that the server response crash
@@ -31,11 +31,13 @@ module.exports.start = async function main(url,page){
         result.host={ 
             "isGreen":resultGreen.green,
             "energy": resultGreen.moreData ? resultGreen.moreData[0].model : ""
-        };
+        };*/
         result.ecoIndex = ecoIndex.grade;
     }).catch(async e=>{ // todo , gérer l'erreur : faux url.
-        console.log("oops something went wrong");
+        console.error("oops something went wrong");
         result = new Error("Oops something went wrong");
     });
+
+    console.log(result);
     return result;
 }

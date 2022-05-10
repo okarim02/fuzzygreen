@@ -36,7 +36,7 @@ module.exports.clust = async function first(urls){
     // init concurrency
     const cluster = await Cluster.launch({
         concurrency : Cluster.CONCURRENCY_PAGE,
-        maxConcurrency:100, // Max pages
+        maxConcurrency:200, // Max pages
         timeout:60000, // 60s per page
         puppeteerOptions:{
             devtools: true,
@@ -44,7 +44,7 @@ module.exports.clust = async function first(urls){
         },
     });
 
-    var results = {};
+    var results = [];
 
     cluster.on('taskerror',(err,data)=>{
         console.log(`Error crawling ${data}: ${err.message}`);
@@ -58,12 +58,14 @@ module.exports.clust = async function first(urls){
     for(let i = 0 ; i < urls.length;i++) {
         const tmp = await cluster.execute(urls[i]);
         let r = Result(tmp);
-        results[urls[i]] = r;
+        let obj = {};
+        obj[urls[i]] = r;
+        results.push(obj);
     }
 
     await cluster.idle();
     await cluster.close();
 
-    return results;
+    return results; 
 
 }
