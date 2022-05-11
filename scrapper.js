@@ -31,7 +31,6 @@ var measures = {
     'ratioimagesResizedInPage': 0,
     'ratioHttp1': 0,
     'plugins': 'aucun plugin détecté',
-    'ratio_etags': '3.532608695652174 %',
     'host': { isGreen: false, energy: '' },
     'ecoIndex': ''
 }
@@ -112,14 +111,14 @@ module.exports.getPageMetrics = async (url, page, callback) => {
 
 
         // For more info : https://stackoverflow.com/questions/57524945/how-to-intercept-a-download-request-on-puppeteer-and-read-the-file-being-interce
-        if (response.url().includes('.js') || response.url().includes('.css')) {
+        if (response.url().endsWith('.js') || response.url().endsWith('.css')) {
             const content = await response.text();
             const totalSize = await content.length;
             const isMin = await tools.isMinified(content);
 
             const poid = await (await response.buffer()).length;
 
-            if (await response.url().includes('.js')) {
+            if (await response.url().endsWith('.js')) {
                 // check syntax
                 const resultCheck = await tools.checkSyntax(content);
                 if (resultCheck != "") {
