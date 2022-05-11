@@ -72,15 +72,26 @@ function getSpecificData(data,critere){
 
 }
 
-module.exports.launch = async function launch(data){
-    // Test avec c1 : poid de la page .
+module.exports.launch = async function launch(data,url_data=common.exampleScrapperData){
+    // test critère : 
+    let crit_less = ["size","nbRequest","domSize","cssOrJsNotExt","ratioimagesResizedInPage","ratioHttp1",]
+    let crit_more = ["etagsNb"]
+    var fuzzification = {};
+    // Test
     console.log(`Fuzzy logic`);
-    const result = getSpecificData(data,"size");
-    if(result) getFuzzyValue(13569,result);
+    for(let i of crit_less){
+        const result = getSpecificData(data,i);
+        if(!result) continue; 
+        console.log("Data testé : ",url_data[i]);
+        const fuzzyVal = getFuzzyValue(url_data[i],result);    
+        fuzzification[i] = fuzzyVal;
+    }
+
+    assert.ok(rules.and())
 
     // test 2 avec c2 : Nombres d'etags
-    const result2 = getSpecificData(data,"etagsNb")
-    if(result2) getFuzzyValue(45,result2,true);
+    //const result2 = getSpecificData(data,"etagsNb")
+    //if(result2) getFuzzyValue(45,result2,true);
 }
 
 

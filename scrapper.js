@@ -32,10 +32,25 @@ var measures = {
     'ratioHttp1': 0,
     'plugins': 'aucun plugin détecté',
     'host': { isGreen: false, energy: '' },
-    'ecoIndex': ''
+    'ecoIndex': '',
+    'isMobileFriendly':false
+}
+
+var measures_toDo = {}
+
+function setMeasurestoDo(criteria){
+    for(let i of measures){
+        if(criteria.includes(i)){
+            measures_toDo[i]=measures[i];
+        }
+    }
 }
 
 module.exports.getPageMetrics = async (url, page, callback) => {
+    //'use strict';
+    
+    // Todo : continue with the criteria
+
     /*
     // @see cluster file
     var browser = await puppeteer.launch({

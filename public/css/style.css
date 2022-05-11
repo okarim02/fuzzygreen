@@ -14,11 +14,8 @@ body{
 }
 
 #checkbox_area{
-    position: fixed;
-    writing-mode: horizontal-tb;
-    max-block-size: auto;
-    left: 90%;
-    top:10%;
-    transform: translate(-50%,-50%);
+    position: relative;
+    left: 50%;
+    bottom:30%;
     background-color: green;
 }

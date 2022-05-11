@@ -1,9 +1,9 @@
-const common = require("./common")
+const common = require("./common");
 // optional : var lodash = require('lodash');
-const scrapper = require('./scrapper')
-const ecoScore = require('./ecoIndex')
-const api = require('./api')
-const tools = require("./tools")
+const scrapper = require('./scrapper');
+const ecoScore = require('./ecoIndex');
+const api = require('./api');
+const tools = require("./tools");
 
 module.exports.start = async function main(url,page){
     
@@ -38,6 +38,5 @@ module.exports.start = async function main(url,page){
         result = new Error("Oops something went wrong");
     });
 
-    console.log(result);
     return result;
 }

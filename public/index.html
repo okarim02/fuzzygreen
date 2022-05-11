@@ -20,17 +20,18 @@
         <section>
             <article>
                 <div class="center">
-                    <div id="checkbox_area">
-
-                    </div>
+                    <div id="checkbox_area"></div>
                     <textarea  id="url-enter" rows="2" cols="50" placeholder="Entrer un seul url pour un scan unique ou plusieurs pour comparer"></textarea>
                     <div>
-                        <button id="submit" onclick="exec()"> Is it green ? </button>
+                        <button id="submit" onclick="exec()"> Scan </button>
                     </div>
                 </div>
-
+                <div id="choice">
+                    <label> Is it green ?</label>
+                    <input disabled="true" type="search" id="anaylse_url" placeholder="Entrer d'abord une liste d'url à analyser" size="60">*
+                    <button id="submit2" disabled="true"> Submit </button>
+                </div>
                 <hr>
-                
                 <div id="result">
                 </div>
             </article>

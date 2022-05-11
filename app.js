@@ -5,6 +5,7 @@ const app = express();
 const main = require('./main');
 const fuzzylogic = require('./fuzzyLogic');
 const cluster = require('./cluster');
+const tools = require('./tools');
 
 app.listen(3000, () => console.log("Listening at 3000 (go to 'localhost:3000')"));
 app.use(express.static(__dirname+'/public'));
@@ -19,7 +20,6 @@ app.use(express.json({
 app.post('/api',async (request,response,next)=>{
     console.log("Requête reçu !");
     var requestTime = Date.now();
-    
 
     const data = request.body;
 
@@ -28,6 +28,8 @@ app.post('/api',async (request,response,next)=>{
 
         // Create fuzzy logics
         fuzzylogic.launch(websiteData);
+
+        tools.writeToFile('result.json',JSON.stringify(websiteData));
 
         response.json({
             status:'success',

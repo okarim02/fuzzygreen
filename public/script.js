@@ -30,7 +30,8 @@ var criteres = ["nbRequest",
     "ecoIndex"
 ]
 
-var criteres_selected = [];
+var criteres_selected = criteres;
+var urls_scanned = [];
 
 function create_checkbox(){
     const container = document.getElementById('checkbox_area');
@@ -52,7 +53,24 @@ function create_checkbox(){
         container.appendChild(label);
         container.appendChild(br);
     }
+    container.onclick = function(ev) {
+        if(ev.target.value) {
+            criteres_selected.slice()
+            var index = criteres.indexOf(ev.target.value);
+            if (index !== -1) {
+                criteres_selected.splice(index, 1);
+            }
+        }
+    }
    
+}
+
+function decide(){
+    const container = document.getElementById('choice');
+    let search = document.getElementById('anaylse_url');
+    search.placeholder="Entrer l'url que vous souhaiter analyser !"
+    search.disable = false;
+    
 }
 
 function isUrl(string) {
@@ -86,7 +104,7 @@ function display_data(data) {
         let txt = document.createTextNode(text);
         header.appendChild(txt);
         headersRow.appendChild(header);
-    })
+    });
 
     tbl.appendChild(headersRow);
 
@@ -138,6 +156,7 @@ function display_data(data) {
     }
 
     depot.appendChild(tbl);
+    decide();
 }
 
 function display_loading() {
@@ -177,7 +196,7 @@ async function exec() {
 
     display_loading();
 
-    const data = { urls };
+    const data = { urls,criteres_selected };
     // for more info : https://developer.mozilla.org/fr/docs/Web/API/Fetch_API/Using_Fetch
     const options = {
         method: 'POST',
@@ -196,7 +215,6 @@ async function exec() {
         }
         let x = await res.json();
         console.log("Message :", x.message);
-
         display_data(JSON.parse(x.data));
     }).catch((err) => {
         console.error("error ;( : ", err);

@@ -28,7 +28,9 @@ function Result(tmp){
         'plugins': tmp.plugins,
         'ratio_etags': tmp.ratioHttp1,
         'host': tmp.host,
-        'ecoIndex': tmp.ecoIndex
+        'ecoIndex': tmp.ecoIndex,
+        'isMobileFriendly':tmp.isMobileFriendly
+
     };
 }
 
