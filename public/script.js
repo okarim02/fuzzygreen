@@ -1,5 +1,58 @@
-function test() {
+function begin() {
     console.log("Hello this is the function test !");
+    create_checkbox();
+}
+
+var criteres = ["nbRequest",
+    "size",
+    "domSize",
+    "JSHeapUsedSize",
+    "filesNotMin",
+    "policesUtilise",
+    "etagsNb",
+    "imagesWithoutLazyLoading",
+    "cssFiles",
+    "cssOrJsNotExt",
+    "filesWithError",
+    "socialButtonsFound",
+    "nbOfImagesWithSrcEmpty",
+    "isStatic",
+    "poweredBy",
+    "protocolHTTP",
+    "cms",
+    "loadTime",
+    "ratioLazyLoad",
+    "ratioimagesResizedInPage",
+    "ratioHttp1",
+    "plugins",
+    "ratio_etags",
+    "host",
+    "ecoIndex"
+]
+
+var criteres_selected = [];
+
+function create_checkbox(){
+    const container = document.getElementById('checkbox_area');
+    for(let i = 0 ;i < criteres.length ;i++){
+        let checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = 'criteria';
+        checkbox.name = criteres[i];
+        checkbox.value = criteres[i];
+        checkbox.checked = true;
+     
+        let label = document.createElement('label')
+        label.htmlFor = 'critere';
+        label.appendChild(document.createTextNode(criteres[i]));
+     
+        var br = document.createElement('br');
+
+        container.appendChild(checkbox);
+        container.appendChild(label);
+        container.appendChild(br);
+    }
+   
 }
 
 function isUrl(string) {
@@ -84,52 +137,7 @@ function display_data(data) {
         }
     }
 
-
-    // data.forEach(e => {
-    //     let row = document.createElement('tr');
-
-    //     Object.values(e).forEach(f=>{
-    //         let cell = document.createElement('td');
-    //         let txt = document.createTextNode(f);
-    //         cell.appendChild(txt);
-    //         row.appendChild(cell);
-    //     });
-    //     tbl.appendChild(row)
-    // });
-
-
     depot.appendChild(tbl);
-
-    // for (var prop in data) {
-    //     if (Object.prototype.hasOwnProperty.call(data, prop)) {
-    //         let ecoScore = document.createElement('h3');
-    //         depot.appendChild(ecoScore);
-    //         let newEl = document.createElement('div');
-    //         depot.appendChild(newEl);
-
-    //         if (prop == 'ecoIndex') {
-    //             ecoScore.style.backgroundColor = 'green';
-    //             ecoScore.textContent = prop + " => " + data[prop];
-    //         }else if (prop == 'size') {
-    //             newEl.style.fontSize = '15px';
-    //             newEl.style.border = '1px solid black';
-    //         }else if (["filesNotMin", "policesUtilise", "imagesWithoutLazyLoading"].includes(prop)) {
-    //             newEl.innerText = prop + "=>";
-    //             let conteneur = document.createElement('ul');
-    //             newEl.appendChild(conteneur);
-    //             data[prop].forEach(element => {
-    //                 const li = document.createElement('li')
-    //                 li.textContent = element + "\n"
-    //                 conteneur.appendChild(li);
-    //             });
-    //             conteneur.style.background = 'white';
-    //         } else if(prop == "host"){
-    //             newEl.innerText = `${data[prop].isGreen ? "Hébergeur green !" :"Hébergeur non green !"} \n >>> Energie utilisé : ${data[prop].energy == "" ? '...' : data[prop].energy}`;
-    //         } else {
-    //             newEl.innerText = `${prop} : ${data[prop]}`;
-    //         }
-    //     }
-    // }
 }
 
 function display_loading() {

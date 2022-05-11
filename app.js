@@ -27,7 +27,7 @@ app.post('/api',async (request,response,next)=>{
         const time = Date.now() - requestTime;
 
         // Create fuzzy logics
-        fuzzylogic.getSpecificData(websiteData);
+        fuzzylogic.launch(websiteData);
 
         response.json({
             status:'success',

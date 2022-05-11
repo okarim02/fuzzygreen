@@ -12,3 +12,13 @@ body{
     height:200px;
     font-size:14pt;
 }
+
+#checkbox_area{
+    position: fixed;
+    writing-mode: horizontal-tb;
+    max-block-size: auto;
+    left: 90%;
+    top:10%;
+    transform: translate(-50%,-50%);
+    background-color: green;
+}
