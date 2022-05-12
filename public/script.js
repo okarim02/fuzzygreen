@@ -55,7 +55,7 @@ function create_checkbox(){
     }
     container.onclick = function(ev) {
         if(ev.target.value) {
-            criteres_selected.slice()
+           // criteres_selected.slice()
             var index = criteres.indexOf(ev.target.value);
             if (index !== -1) {
                 criteres_selected.splice(index, 1);
@@ -69,7 +69,9 @@ function decide(){
     const container = document.getElementById('choice');
     let search = document.getElementById('anaylse_url');
     search.placeholder="Entrer l'url que vous souhaiter analyser !"
-    search.disable = false;
+    search.disabled = false;
+    let button = document.getElementById("submit2");
+    button.disabled=false;
     
 }
 

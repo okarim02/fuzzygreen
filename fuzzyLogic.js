@@ -5,13 +5,6 @@ const common = require('./common');
     Linguistic terms for now : excellant, medium, bad. 
 */
 
-function Shape(x0, x1, x2, x3) {
-    this.x0 = x0;
-    this.x1 = x1;
-    this.x2 = x2;
-    this.x3 = x3;
-}
-
 function average(array){
     let sum = 0 ;
     for(let i = 0 ; i < array.length;i++){ 
@@ -73,21 +66,29 @@ function getSpecificData(data,critere){
 }
 
 module.exports.launch = async function launch(data,url_data=common.exampleScrapperData){
-    // test critère : 
-    let crit_less = ["size","nbRequest","domSize","cssOrJsNotExt","ratioimagesResizedInPage","ratioHttp1",]
-    let crit_more = ["etagsNb"]
+    // test critères : 
+    let crit_less = ["size","nbRequest","domSize","cssOrJsNotExt","ratioimagesResizedInPage","ratioHttp1"];
+    let crit_more = ["etagsNb"];
     var fuzzification = {};
     // Test
     console.log(`Fuzzy logic`);
     for(let i of crit_less){
+        console.log("Critère testé :",i);
         const result = getSpecificData(data,i);
+        
         if(!result) continue; 
+        
+        if(result.min > url_data[i]){
+            result.min = url_data[i];
+        }
+        if(result.max < url_data[i]){
+            result.max = url_data[i];
+        }
+
         console.log("Data testé : ",url_data[i]);
         const fuzzyVal = getFuzzyValue(url_data[i],result);    
         fuzzification[i] = fuzzyVal;
     }
-
-    assert.ok(rules.and())
 
     // test 2 avec c2 : Nombres d'etags
     //const result2 = getSpecificData(data,"etagsNb")

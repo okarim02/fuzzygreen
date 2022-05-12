@@ -1,6 +1,8 @@
 // static content data
 
+
 module.exports = {
+    criteres_toNotCount : [],
     urls : ["https://seo-elp.fr/#/","https://www.lisi-automotive.com/fr/","http://usainbolt.com/","http://www.iut-bm.univ-fcomte.fr/pages/fr/a-votre-service-13757.html","https://www.angrybirds.com/"],
     lisi_pages : [
         "https://www.lisi-automotive.com/en/products/clipped-solutions/", // eco index : D / green it : D 
@@ -9,7 +11,8 @@ module.exports = {
         "https://www.lisi-automotive.com/en/lisi-insulating-bolt-for-mhev/", // E / E 
         "https://www.lisi-automotive.com/en/products/clipped-solutions/fasteners-for-panels/", // F / G
         "https://www.lisi-automotive.com/en/products/threaded-fasteners/screws-bolts/", // F / F 
-        "https://www.lisi-automotive.com/en/products/threaded-fasteners/nuts/" // F / F 
+        "https://www.lisi-automotive.com/en/products/threaded-fasteners/nuts/", // F / F 
+        "https://www.lisi-automotive.com/en/innovation-sealing-screws/" // F / E
     ],
     concurrents : [
         "https://www.ejot.fr/Fixations-Industrielles/Produits/EJOWELD%C2%AE/p/VBT_EJOWELD",
@@ -60,5 +63,5 @@ module.exports = {
         "host": { "isGreen": false, "energy": '' },
         "ecoIndex": 'B',
         "isMobileFriendly": false
-      }
+      },
 }

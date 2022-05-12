@@ -1,6 +1,7 @@
 // Content logic
 // @see doc api : {@link https://pptr.dev/#?product=Puppeteer&version=v13.5.2&show=outline}
 const puppeteer = require("puppeteer"); // npm i puppeteer 
+const common = require("./common");
 const tools = require('./tools');
 
 /*
@@ -21,7 +22,6 @@ var measures = {
     'cssOrJsNotExt': 0,
     'filesWithError': [],
     'socialButtonsFound': [],
-    'nbOfImagesWithSrcEmpty': 0,
     'isStatic': false,
     'poweredBy': [],
     'protocolHTTP': '',
@@ -36,17 +36,19 @@ var measures = {
     'isMobileFriendly':false
 }
 
-var measures_toDo = {}
-
-function setMeasurestoDo(criteria){
+function setMeasurestoDo(){
+    console.log("Common crit : ",common.criteres_toNotCount);
+    if(common.criteres_toNotCount.length==0) return;
     for(let i of measures){
-        if(criteria.includes(i)){
-            measures_toDo[i]=measures[i];
+        if(common.criteres_toNotCount.includes(i)){
+            delete measures[i];
         }
     }
+    console.log("New measures :",measures);
 }
 
 module.exports.getPageMetrics = async (url, page, callback) => {
+    setMeasurestoDo();
     //'use strict';
     
     // Todo : continue with the criteria
