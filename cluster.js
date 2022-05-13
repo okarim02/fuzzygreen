@@ -7,7 +7,6 @@ function Result(tmp){
         'size':tmp.size,
         'nbRequest': tmp.nbRequest,
         'domSize': tmp.domSize,
-        'JSHeapUsedSize': tmp.JSHeapUsedSize,
         'filesNotMin': tmp.filesNotMin,
         'policeUtilise': tmp.policeUtilise,
         'etagsNb':tmp.etagsNb,
