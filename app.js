@@ -1,3 +1,4 @@
+// Imports
 const express = require('express');
 const res = require('express/lib/response');
 const app = express();
@@ -7,16 +8,28 @@ const fuzzylogic = require('./fuzzyLogic');
 const cluster = require('./cluster');
 const tools = require('./tools');
 const common = require('./common');
+const PORT = 3000;
 
-app.listen(3000, () => console.log("Listening at 3000 (go to 'localhost:3000')"));
-app.use(express.static(__dirname+'/public'));
-app.set('view engine','ejs')
+// config
+app.use(express.static(__dirname + '/public'));
+app.use('/css',express.static(__dirname+'public/css'));
+app.use('/js',express.static(__dirname+'public/js'));
+app.use('/img',express.static(__dirname+'public/img'));
 
 // Same as bodyParser
 // http://expressjs.com/fr/api.html#express.json
 app.use(express.json({
     limit: '1mb'
 }));
+
+// Set template Engine
+app.set('view engine','ejs');
+
+
+// racine
+app.get('', (req,res)=>{
+    res.render("partials/index.ejs",{"criteres":common.criteres});
+})
 
 app.post('/api',async (request,response,next)=>{
     console.log("Requête reçu !");
@@ -53,4 +66,7 @@ app.post('/api',async (request,response,next)=>{
     next();
 
 });
+
+app.listen(PORT, () => console.log(`Listening at ${PORT} (go to 'localhost:3000')`));
+
 

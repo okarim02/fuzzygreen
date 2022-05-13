@@ -2,7 +2,31 @@
 
 
 module.exports = {
-    criteres_toNotCount : [],
+    criteres : ["nbRequest",
+    "size",
+    "domSize",
+    "JSHeapUsedSize",
+    "filesNotMin",
+    "policesUtilise",
+    "etagsNb",
+    "imagesWithoutLazyLoading",
+    "cssFiles",
+    "cssOrJsNotExt",
+    "filesWithError",
+    "socialButtonsFound",
+    "nbOfImagesWithSrcEmpty",
+    "isStatic",
+    "poweredBy",
+    "protocolHTTP",
+    "cms",
+    "loadTime",
+    "ratioLazyLoad",
+    "ratioimagesResizedInPage",
+    "ratioHttp1",
+    "plugins",
+    "ratio_etags",
+    "host",
+    "ecoIndex"],
     urls : ["https://seo-elp.fr/#/","https://www.lisi-automotive.com/fr/","http://usainbolt.com/","http://www.iut-bm.univ-fcomte.fr/pages/fr/a-votre-service-13757.html","https://www.angrybirds.com/"],
     lisi_pages : [
         "https://www.lisi-automotive.com/en/products/clipped-solutions/", // eco index : D / green it : D 

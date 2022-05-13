@@ -1,6 +1,6 @@
 function begin() {
     console.log("Hello this is the function test !");
-    create_checkbox();
+    //create_checkbox();
 }
 
 var criteres = ["nbRequest",
