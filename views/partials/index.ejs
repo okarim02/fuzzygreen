@@ -3,10 +3,6 @@
 <section>
     <article>
         <div id="checkbox_area">
-            <% criteres.forEach(crit => { %>
-                <input type="checkbox" id='criteria' name = <%= crit %> value = <%= crit %> checked="true">
-                <label for = <%= crit %>> <%= crit %> </label>
-            <% }); %> 
         </div>
         <div class="center">
             <textarea  id="url-enter" rows="2" cols="50" placeholder="Entrer un seul url pour un scan unique ou plusieurs pour comparer"></textarea>

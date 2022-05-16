@@ -9,58 +9,50 @@ const tools = require('./tools');
  * also https://www.checklyhq.com/learn/headless/request-interception/
 */
 
-var measures = {
-    'size': 0,
-    'nbRequest': 0,
-    'domSize': 0,
-    'filesNotMin': [],
-    'policesUtilise': [],
-    'etagsNb': 0,
-    'imagesWithoutLazyLoading': [],
-    'cssFiles': 0,
-    'cssOrJsNotExt': 0,
-    'filesWithError': [],
-    'socialButtonsFound': [],
-    'isStatic': false,
-    'poweredBy': [],
-    'protocolHTTP': '',
-    'cms': [],
-    'loadTime': 0,
-    'ratioLazyLoad': '2.0408163265306123%',
-    'ratioimagesResizedInPage': 0,
-    'ratioHttp1': 0,
-    'plugins': 'aucun plugin détecté',
-    'host': { isGreen: false, energy: '' },
-    'ecoIndex': '',
-    'isMobileFriendly':false
+function Measures(){
+    return {
+        'size': 0,
+        'nbRequest': 0,
+        'domSize': 0,
+        'filesNotMin': [],
+        'policesUtilise': [],
+        'etagsNb': 0,
+        'imagesWithoutLazyLoading': [],
+        'cssFiles': 0,
+        'cssOrJsNotExt': 0,
+        'filesWithError': [],
+        'socialButtonsFound': [],
+        'isStatic': false,
+        'poweredBy': [],
+        'protocolHTTP': '',
+        'cms': [],
+        'loadTime': 0,
+        'ratioLazyLoad': 0,
+        'ratioimagesResizedInPage': 0,
+        'ratioHttp1': 0,
+        'plugins': "",
+        'isMobileFriendly':false,
+        "imageSrcEmpty":0
+    }
 }
 
-function setMeasurestoDo(){
-    console.log("Common crit : ",common.criteres_toNotCount);
-    if(common.criteres_toNotCount.length==0) return;
-    for(let i of measures){
-        if(common.criteres_toNotCount.includes(i)){
-            delete measures[i];
+function setMeasurestoDo(criteres_selected){
+    let m = Measures(); 
+
+    console.log("crits to not delete : ",criteres_selected);
+    if(criteres_selected.length==0) return m;
+    for(let i in m){
+        if(!criteres_selected.includes(i)){
+            delete m[i];
         }
     }
-    console.log("New measures :",measures);
+    console.log("New measures :",m);
+    return m;
 }
 
-module.exports.getPageMetrics = async (url, page, callback) => {
-    setMeasurestoDo();
+module.exports.getPageMetrics = async (url, page,criteres_selected, callback) => {
+    var measures = setMeasurestoDo(criteres_selected);
     //'use strict';
-    
-    // Todo : continue with the criteria
-
-    /*
-    // @see cluster file
-    var browser = await puppeteer.launch({
-        devtools: true,
-        headless: true,
-        ignoreHTTPSErrors: true
-    }); 
-    const page = await browser.newPage();
-    */
 
     const gitMetrics = await page.metrics();
 
@@ -120,34 +112,37 @@ module.exports.getPageMetrics = async (url, page, callback) => {
                     //console.log("l'Image ci-dessus est trop grande ! ")
                 }
             }
-        }
 
+            // For more info : https://stackoverflow.com/questions/57524945/how-to-intercept-a-download-request-on-puppeteer-and-read-the-file-being-interce
+            if (response.request().resourceType() == "script" || response.request().resourceType() == "stylesheet") {
+                const content = await response.text();
+                const totalSize = await content.length;
+                const isMin = await tools.isMinified(content);
 
+                const poid = await (await response.buffer()).length;
 
-        // For more info : https://stackoverflow.com/questions/57524945/how-to-intercept-a-download-request-on-puppeteer-and-read-the-file-being-interce
-        if (response.url().endsWith('.js') || response.url().endsWith('.css')) {
-            const content = await response.text();
-            const totalSize = await content.length;
-            const isMin = await tools.isMinified(content);
-
-            const poid = await (await response.buffer()).length;
-
-            if (await response.url().endsWith('.js')) {
-                // check syntax
-                const resultCheck = await tools.checkSyntax(content);
-                if (resultCheck != "") {
-                    measures.filesWithError.push(response.url());
+                if (await response.request().resourceType() == "script") {
+                    // check syntax
+                    const resultCheck = await tools.checkSyntax(content);
+                    if (resultCheck != "") {
+                        measures.filesWithError.push(response.url());
+                    }
+                    // Check if there is sql inside a loop
+                    // todo 
+                    // const result = await tools.hasLoopInsideSql(content);
                 }
-                // Check if there is sql inside a loop
-                // todo 
-                // const result = await tools.hasLoopInsideSql(content);
-            }
 
-            if (!isMin) {
-                measures.filesNotMin.push(response.url())
-                //console.log(`${response.url()} \t taille : ${totalSize} , poid : ${poid} \t => Contenu non minimiser `)
+                if (!isMin) {
+                    if(measures.filesNotMin.includes(response.url())) measures.filesNotMin.push(response.url())
+                    //console.log(`${response.url()} \t taille : ${totalSize} , poid : ${poid} \t => Contenu non minimiser `)
+                }
             }
+        
         }
+
+
+
+        
 
         if (response.request().resourceType() == "font") {
             measures.policesUtilise.push(response.url());
@@ -162,7 +157,7 @@ module.exports.getPageMetrics = async (url, page, callback) => {
 
     measures.cms = await getCMS(page, browser = undefined).then(e => e ? e : []);
 
-    measures.isStatic = await isStatic(page);
+    measures.isStatic = await isStatic(page,measures);
     measures.loadTime = await getLoadTime(page);
 
     /* Todo : utiliser la méthode ci-dessous pour trouver le protocole utilisé.
@@ -180,6 +175,9 @@ module.exports.getPageMetrics = async (url, page, callback) => {
     measures.cssFiles = await page.evaluate(() => {
         return document.styleSheets.length;
     });
+
+    measures.ratio_etags = measures.etagsNb / measures.nbRequest;
+
     measures.ratioLazyLoad = res.ratio;
 
     measures.imagesWithoutLazyLoading = res.imagesNoLazy;
@@ -191,6 +189,8 @@ module.exports.getPageMetrics = async (url, page, callback) => {
     measures.domSize = await page.$$eval('*', array => array.length);
 
     measures.plugins = await getPlugins(page).then(e => e ? e.length : 0);
+
+    measures.imageSrcEmpty = await getImagesSrcEmpty(page);
     /*
      const pdfs = await getAllpdf(page);
      // check if a pdf's size is higher than normal
@@ -230,7 +230,7 @@ async function getLoadTime(page) {
     return perf.loadTime;
 }
 
-async function isStatic(page) {
+async function isStatic(page,measures) {
 
     /*
            1. Check if URLs end with .html, .htm, .shtml and doesn't contain '?'.
@@ -401,6 +401,24 @@ async function getRatioLazyImages(page) {
     const ratio = ((result.lazyImages / result.totalImages) * 100);
     const imagesNoLazy = result.notLazy;
     return { ratio, imagesNoLazy };
+}
+
+async function getImagesSrcEmpty(page){
+    const result = await page.evaluate(() => {
+        let imgs = document.querySelectorAll('img');
+        let count = 0 ;
+        for (let img of imgs) {
+            const attr = img.getAttribute('src');
+            if (attr == "") {
+                count+=1;
+            }
+        }
+
+        return count;
+    })
+
+    return result;
+
 }
 async function getPlugins(page) {
     const plugins = page.evaluate(() => {

@@ -28,7 +28,7 @@ app.set('view engine','ejs');
 
 // racine
 app.get('', (req,res)=>{
-    res.render("partials/index.ejs",{"criteres":common.criteres});
+    res.render("partials/index.ejs");
 })
 
 app.post('/api',async (request,response,next)=>{
@@ -41,11 +41,9 @@ app.post('/api',async (request,response,next)=>{
         const time = Date.now() - requestTime;
 
         // Create fuzzy logics
-        fuzzylogic.launch(websiteData);
-        
-        // Met à jour les critères 
-        common.criteres_toNotCount = data.criteres_selected;
+        //fuzzylogic.launch(websiteData);
 
+        // Write the results 
         tools.writeToFile('result.json',JSON.stringify(websiteData));
 
         response.json({

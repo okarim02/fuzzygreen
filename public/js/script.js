@@ -1,6 +1,6 @@
 function begin() {
     console.log("Hello this is the function test !");
-    //create_checkbox();
+    create_checkbox();
 }
 
 var criteres = ["nbRequest",
@@ -27,7 +27,8 @@ var criteres = ["nbRequest",
     "plugins",
     "ratio_etags",
     "host",
-    "ecoIndex"
+    "ecoIndex",
+    "mobileFriendly"
 ]
 
 var criteres_selected = criteres;
@@ -73,6 +74,7 @@ function decide(){
     let button = document.getElementById("submit2");
     button.disabled=false;
     
+    button.addEventListener("click",exec);
 }
 
 function isUrl(string) {
