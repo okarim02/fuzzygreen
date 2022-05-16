@@ -8,7 +8,10 @@ const fuzzylogic = require('./fuzzyLogic');
 const cluster = require('./cluster');
 const tools = require('./tools');
 const common = require('./common');
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const routes = require("./routes/analyse");
+
+app.use("/analyse",routes);
 
 // config
 app.use(express.static(__dirname + '/public'));
@@ -29,6 +32,10 @@ app.set('view engine','ejs');
 // racine
 app.get('', (req,res)=>{
     res.render("partials/index.ejs");
+})
+
+app.get('/about',(req,res)=>{
+    //res.send('about');
 })
 
 app.post('/api',async (request,response,next)=>{
