@@ -6,3 +6,4 @@ npm i node-fetch  // if something don't work => npm install node-fetch@2
 npm install express
 npm install ejs
 npm i puppeteer-cluster
+npm install body-parser

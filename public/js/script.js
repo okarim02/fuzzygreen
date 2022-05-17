@@ -46,7 +46,7 @@ function create_checkbox(){
      
         let label = document.createElement('label')
         label.htmlFor = 'critere';
-        label.appendChild(document.createTextNode(criteres[i]));
+        label.appendChild(document.createTextNode(criteres[i] + ", c"+(i+1)));
      
         var br = document.createElement('br');
 
@@ -162,7 +162,7 @@ function display_data(data) {
     depot.appendChild(tbl);
     decide();
 }
-
+/*
 function display_loading() {
     let el = document.getElementById('result');
     el.innerText = "Loading ...";
@@ -177,7 +177,7 @@ function show_error(message) {
     let el = document.getElementById('result');
     el.innerText = message;
     window.setTimeout(hide_loading, 3500);
-}
+}*/
 
 
 async function exec() {
@@ -198,7 +198,7 @@ async function exec() {
 
     console.log("Url(s) : ", urls);
 
-    display_loading();
+    //display_loading();
 
     const data = { urls,criteres_selected };
     // for more info : https://developer.mozilla.org/fr/docs/Web/API/Fetch_API/Using_Fetch
@@ -207,21 +207,23 @@ async function exec() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: data
     }
     // endpoint
-    await fetch('/api', options).then(async (res) => {
-        hide_loading();
+    await fetch('/result', options).then(async (res) => {
+        //hide_loading();
         if (res.status == "failure") {
             console.error("Une erreur est survénu ...");
-            show_error(res.message);
+            //show_error(res.message);
             return;
         }
+        /*
         let x = await res.json();
         console.log("Message :", x.message);
         display_data(JSON.parse(x.data));
+        */
     }).catch((err) => {
         console.error("error ;( : ", err);
-        show_error(err);
+        //show_error(err);
     });
 }
