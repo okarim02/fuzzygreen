@@ -67,7 +67,8 @@ function getSpecificData(data,critere){
 
 module.exports.launch = async function launch(data,url_data=common.exampleScrapperData){
     // test critères : 
-    let crit_less = ["size","nbRequest","domSize","cssOrJsNotExt","ratioimagesResizedInPage","ratioHttp1"];
+    let crit_less = ["size","nbRequest","domSize","cssOrJsNotExt","ratioimagesResizedInPage","ratioHttp1","fileNotMin","filesWithError","isStatic","socialButtonFound","nbOfImagesWithSrcEmpty","loadTime","ratioLazyLoad","cssFiles"];
+    // CMS ? => si aucun cms : good , sinon medium ou bad si bcp de plugins 
     let crit_more = ["etagsNb"];
     var fuzzification = {};
     // Test
