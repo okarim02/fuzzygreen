@@ -2,10 +2,10 @@ const express = require("express");
 let router = express.Router();
 const controllerAnalyse = require("../controllers/analyse");
 
-
 // racine
 router.get('/', (req,res)=>{
-    res.render("index.ejs");
+    console.log("?????????????????????");
+    res.render("analyse.ejs");
 })
 
 router.get('/about',(req,res)=>{
@@ -46,12 +46,10 @@ router.post('/api',async (request,response,next)=>{
 
 });
 */
-router.post("/result/:siteAnalyse",controllerAnalyse.analyse);
-
-router.post("/result",controllerAnalyse.compute,async(req,res)=>{
-    console.log("Requêtes reçu :");
-    console.log("Sites computed : ",req.body.urls);
-    res.render("analyse.ejs");
+/*
+router.get("/api/getResult",(req,res,next)=>{
+    res.render("analyse.ejs")
 });
+*/
 
 module.exports = router;

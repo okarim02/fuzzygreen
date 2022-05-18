@@ -207,10 +207,10 @@ async function exec() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: data
+        body: JSON.stringify(data)
     }
     // endpoint
-    await fetch('/result', options).then(async (res) => {
+    await fetch('/api', options).then(async (res) => {
         //hide_loading();
         if (res.status == "failure") {
             console.error("Une erreur est survénu ...");
