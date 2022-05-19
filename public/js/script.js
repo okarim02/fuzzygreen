@@ -217,8 +217,12 @@ async function exec() {
             //show_error(res.message);
             return;
         }
-        /*
         let x = await res.json();
+
+        if (x.redirected) {
+            window.location.href = x.redirected;
+        }
+        /*
         console.log("Message :", x.message);
         display_data(JSON.parse(x.data));
         */

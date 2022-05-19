@@ -41,32 +41,36 @@ app.post("/api",async(request,response)=>{
 
         // Write the results 
         tools.writeToFile('./services/result.json',JSON.stringify(websiteData));
-        /*
+        
+        console.log("Middleware analyse : Done");
+        
+        const obj = {
+            websiteData : websiteData,
+            redirected : "/getResult"
+        }
+        
         response.json({
             status:'success',
             message: `Traitement finit en ${time} ms`,
-            data : JSON.stringify(websiteData)
-        });*/
-        console.log("Middleware analyse : Done");
-        
-        response.send({ redirectTo: '/getResult' })
+            redirected: '/getResult',
+            data : JSON.stringify(obj)
+        });
 
         // next(JSON.stringify(websiteData));
     })
     .catch((err)=>{
         console.log("err:",err);
-        /*
+        
         response.json({
             status:'failure',
             message: 'Traitement interrompue'
-        });*/
-        next(err);
+        });
     })
 });
 
 app.get("/getResult",(req,res,next)=>{
     console.log("Compute done .");
-    res.render("index.ejs")
+    res.render("analyse.ejs")
 });
 
 app.listen(PORT, () => console.log(`Listening at ${PORT} (go to 'localhost:3000')`));

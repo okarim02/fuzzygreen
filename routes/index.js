@@ -4,8 +4,7 @@ const controllerAnalyse = require("../controllers/analyse");
 
 // racine
 router.get('/', (req,res)=>{
-    console.log("?????????????????????");
-    res.render("analyse.ejs");
+    res.render("index.ejs");
 })
 
 router.get('/about',(req,res)=>{
