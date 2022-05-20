@@ -33,6 +33,8 @@ app.post("/api",async(request,response)=>{
 
     const data = request.body;
 
+    tools.writeToFile('./services/crits.json',JSON.stringify(data.criteres_selected));
+
     await clust(data.urls,data.criteres_selected).then((websiteData)=>{
         const time = Date.now() - requestTime;
 

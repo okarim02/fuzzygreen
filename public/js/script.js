@@ -31,50 +31,65 @@ var criteres = ["nbRequest",
     "mobileFriendly"
 ]
 
-var criteres_selected = criteres;
+var criteres_selected = [...criteres];
+
+deleteItem(criteres_selected,"mobileFriendly");
+deleteItem(criteres_selected,"host");
+
 var urls_scanned = [];
 
-function create_checkbox(){
+function deleteItem(array,item){
+    var index = array.indexOf(item);
+    if (index !== -1) {
+        array.splice(index, 1);
+    }
+}
+// Do a table (flou, non flou (boolean))
+function create_checkbox() {
     const container = document.getElementById('checkbox_area');
-    for(let i = 0 ;i < criteres.length ;i++){
+    for (let i = 0; i < criteres.length; i++) {
         let checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.id = 'criteria';
         checkbox.name = criteres[i];
         checkbox.value = criteres[i];
-        checkbox.checked = true;
-     
+
+        // Exclude
+        if (!['host','mobileFriendly'].includes(criteres[i])) {
+            checkbox.defaultChecked = true;
+        }
+
         let label = document.createElement('label')
         label.htmlFor = 'critere';
-        label.appendChild(document.createTextNode(criteres[i] + ", c"+(i+1)));
-     
+        label.appendChild(document.createTextNode(criteres[i] + ", c" + (i + 1)));
+
         var br = document.createElement('br');
 
         container.appendChild(checkbox);
         container.appendChild(label);
         container.appendChild(br);
     }
-    container.onclick = function(ev) {
-        if(ev.target.value) {
-           // criteres_selected.slice()
+    container.onclick = function (ev) {
+        if (ev.target.value) {
+            // criteres_selected.slice()
             var index = criteres.indexOf(ev.target.value);
             if (index !== -1) {
                 criteres_selected.splice(index, 1);
             }
         }
     }
-   
+
 }
 
-function decide(){
+function decide() {
     const container = document.getElementById('choice');
     let search = document.getElementById('anaylse_url');
-    search.placeholder="Entrer l'url que vous souhaiter analyser !"
+    search.placeholder = "Entrer l'url que vous souhaiter analyser !"
     search.disabled = false;
     let button = document.getElementById("submit2");
-    button.disabled=false;
-    
-    button.addEventListener("click",exec);
+    button.disabled = false;
+
+    button.addEventListener("click", exec);
 }
 
 function isUrl(string) {
@@ -200,7 +215,7 @@ async function exec() {
 
     //display_loading();
 
-    const data = { urls,criteres_selected };
+    const data = { urls, criteres_selected };
     // for more info : https://developer.mozilla.org/fr/docs/Web/API/Fetch_API/Using_Fetch
     const options = {
         method: 'POST',
