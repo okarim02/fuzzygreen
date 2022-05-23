@@ -65,11 +65,13 @@ function getSpecificData(data,critere){
 
 }
 
-module.exports.launch = async function launch(data,url_data=common.exampleScrapperData){
+module.exports.launch = async function launch(data,data2=[common.exampleScrapperData]){
     // test critères : 
     let crit_less = ["size","nbRequest","domSize","cssOrJsNotExt","ratioimagesResizedInPage","ratioHttp1"];
     let crit_more = ["etagsNb"];
     var fuzzification = {};
+    let url_data = Object.values(data2[0])[0];
+    console.log("JOKER :) : ",url_data);
     // Test
     console.log(`Fuzzy logic`);
     for(let i of crit_less){

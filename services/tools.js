@@ -62,7 +62,7 @@ var tools = module.exports = {
     
         return (semicolons / linebreaks > 1 && linebreaks / total < 0.01);
     },
-    // todo continue ...
+    // delete it 
     hasSQLinsideLoop: async function hasSQLinsideLoop(content){
       var result,indices=[];
       for(let i = 0 ; i < sqlSyntax.length;i++){
@@ -74,11 +74,21 @@ var tools = module.exports = {
       }
 
     },
-    // Think about the sync way
+    // The sync way
     writeToFile : function writeToFile(name,json_toWrite) {
         fs.writeFileSync(name, "\n\n"+json_toWrite, function (err) {
           if (err) throw err;
           console.log('Saved!');
+        });
+    },
+    readFile : async function readFile(name){
+        await fs.readFileSync(name,function(err,data){
+          if (!err) {
+              return data;
+          } else {
+              console.log(err);
+              return "";
+          }
         });
     },
     getFileSize : async (url)=>{

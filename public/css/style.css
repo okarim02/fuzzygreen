@@ -15,8 +15,15 @@ body{
 }
 
 #checkbox_area{
-    position: relative;
-    left: 50%;
+    position: absolute;
+    left: 80%;
     bottom:30%;
     background-color: green;
 }
+
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+  }

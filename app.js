@@ -11,6 +11,9 @@ const common = require('./services/common');
 const fuzzylogic = require('./services/fuzzyLogic');
 const main = require('./services/main');
 
+const fs = require('fs');
+
+
 app.use("/",routes);
 
 // config
@@ -35,6 +38,8 @@ app.post("/api",async(request,response)=>{
 
     tools.writeToFile('./services/crits.json',JSON.stringify(data.criteres_selected));
 
+    console.log("A");
+
     await clust(data.urls,data.criteres_selected).then((websiteData)=>{
         const time = Date.now() - requestTime;
 
@@ -44,7 +49,6 @@ app.post("/api",async(request,response)=>{
         // Write the results 
         tools.writeToFile('./services/result.json',JSON.stringify(websiteData));
         
-        console.log("Middleware analyse : Done");
         
         const obj = {
             websiteData : websiteData,
@@ -58,7 +62,8 @@ app.post("/api",async(request,response)=>{
             data : JSON.stringify(obj)
         });
 
-        // next(JSON.stringify(websiteData));
+        console.log("Middleware analyse : Done");
+
     })
     .catch((err)=>{
         console.log("err:",err);
@@ -70,11 +75,42 @@ app.post("/api",async(request,response)=>{
     })
 });
 
-app.get("/getResult",(req,res,next)=>{
-    console.log("Compute done .");
-    res.render("analyse.ejs")
+app.get("/getResult",async (req,res,next)=>{
+    //const content = await tools.readFile("./services/result.json");
+    const content = fs.readFileSync('./services/result.json');
+    //let student = JSON.parse(rawdata);
+    res.render("analyse.ejs",{
+        "computedData": content ? content.length > 0 : false 
+    })
+});
+
+app.post("/getResult/analyse",async (req,res,next)=>{
+    // analyser la page 
+    const crits = await fs.readFileSync("./services/crits.json"); // Dernier critères qu'on a sauvegarder
+    const dataRead = await fs.readFileSync("./services/result.json"); // Dernière donnèes scanné
+    const computed_data = JSON.parse(dataRead);
+    const result = await clust(req.body.url,crits);
+
+    console.log("Computed data : ",computed_data);
+    console.log("Site analysé : ",result);
+
+    // Appeler fuzzy logic
+    // récuperer le résultat
+    fuzzylogic.launch(computed_data,result);
+
+    // Renvoyer le résultat en redirigant vert la page result
+    res.json({
+        status:'success',
+        message: `Traitement terminé`,
+        redirected: '/result'
+    });
+
+    // Ne pas oublier d'implémenter les options (telecharger en csv etc ...)
+})
+
+app.get("/result",(req,res,next)=>{
+    
+    
 });
 
 app.listen(PORT, () => console.log(`Listening at ${PORT} (go to 'localhost:3000')`));
-
-

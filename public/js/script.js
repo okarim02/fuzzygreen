@@ -81,17 +81,6 @@ function create_checkbox() {
 
 }
 
-function decide() {
-    const container = document.getElementById('choice');
-    let search = document.getElementById('anaylse_url');
-    search.placeholder = "Entrer l'url que vous souhaiter analyser !"
-    search.disabled = false;
-    let button = document.getElementById("submit2");
-    button.disabled = false;
-
-    button.addEventListener("click", exec);
-}
-
 function isUrl(string) {
     let url_string;
     try {
@@ -194,8 +183,47 @@ function show_error(message) {
     window.setTimeout(hide_loading, 3500);
 }*/
 
+async function analyse(){
+    let url = document.getElementById("url_toAnalyse").value.split(/[\n\s,"]+/);
+    if(!isUrl(url)){ 
+        console.error("Veuillez entrer une url valide");
+        return ;
+    }
+    const data = { url }
+    //button.addEventListener("click", exec);
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }
+    // endpoint
+    await fetch('/getResult/analyse', options).then(async (res) => {
+        //hide_loading();
+        if (res.status == "failure") {
+            console.error("Une erreur est survénu ...");
+            //show_error(res.message);
+            return;
+        }
+        let x = await res.json();
+        console.log("heho : ",x);
+        if (x.redirected) {
+            window.location.href = x.redirected;
+        }
+        /*
+        console.log("Message :", x.message);
+        display_data(JSON.parse(x.data));
+        */
+    }).catch((err) => {
+        console.error("error ;( : ", err);
+        //show_error(err);
+    });
+    
+}
 
-async function exec() {
+
+async function compute() {
     let urls = document.getElementById("url-enter").value.split(/[\n\s,"]+/);
 
     urls = urls.filter(function (el) { // Delete empty string and sus url.
@@ -233,7 +261,7 @@ async function exec() {
             return;
         }
         let x = await res.json();
-
+        console.log("heho : ",x);
         if (x.redirected) {
             window.location.href = x.redirected;
         }
