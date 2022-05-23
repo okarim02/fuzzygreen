@@ -5,3 +5,4 @@ node_modules
 .env
 void
 ./services/result.json
+./services/crits.json

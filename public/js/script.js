@@ -183,6 +183,34 @@ function show_error(message) {
     window.setTimeout(hide_loading, 3500);
 }*/
 
+async function resultat(){
+    console.log("affichage des resultats");
+    const options = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    await fetch('/getData', options).then(async (res) => {
+        //hide_loading();
+        if (res.status == "failure") {
+            console.error("Une erreur est survénu ...");
+            //show_error(res.message);
+            return;
+        }
+        console.log("Retour serveur : getData");
+
+        let x = await res.json();
+
+        console.log(" x : ",x.data);
+
+        display_data(JSON.parse(x.data));
+    }).catch((err) => {
+        console.error("error ;( : ", err);
+        //show_error(err);
+    });
+}
+
 async function analyse(){
     let url = document.getElementById("url_toAnalyse").value.split(/[\n\s,"]+/);
     if(!isUrl(url)){ 
@@ -206,8 +234,9 @@ async function analyse(){
             //show_error(res.message);
             return;
         }
+        console.log("Retour serveur");
         let x = await res.json();
-        console.log("heho : ",x);
+        
         if (x.redirected) {
             window.location.href = x.redirected;
         }
@@ -260,11 +289,13 @@ async function compute() {
             //show_error(res.message);
             return;
         }
+        console.log("Redirection : ",res.redirected)
         let x = await res.json();
-        console.log("heho : ",x);
+        
         if (x.redirected) {
             window.location.href = x.redirected;
         }
+        
         /*
         console.log("Message :", x.message);
         display_data(JSON.parse(x.data));

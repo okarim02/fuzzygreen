@@ -7,8 +7,8 @@ router.get('/', (req,res)=>{
     res.render("index.ejs");
 })
 
-router.get('/about',(req,res)=>{
-    //res.send('about');
+router.get('/result',(req,res)=>{
+    res.render("result.ejs");
 })
 /*
 router.post('/api',async (request,response,next)=>{

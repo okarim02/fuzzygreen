@@ -67,24 +67,24 @@ function getSpecificData(data,critere){
 
 module.exports.launch = async function launch(data,data2=[common.exampleScrapperData]){
     // test critères : 
-    let crit_less = ["size","nbRequest","domSize","cssOrJsNotExt","ratioimagesResizedInPage","ratioHttp1"];
+    let crit_less = ["size","nbRequest","domSize","cssOrJsNotExt","ratioimagesResizedInPage","ratioHttp1"]; // Plus la valeur est bas, plus on est dans l'excellent
     let crit_more = ["etagsNb"];
     var fuzzification = {};
     let url_data = Object.values(data2[0])[0];
-    console.log("JOKER :) : ",url_data);
     // Test
     console.log(`Fuzzy logic`);
     for(let i of crit_less){
         console.log("Critère testé :",i);
         const result = getSpecificData(data,i);
         
-        if(!result) continue; 
+        if(!result) continue;
         
         if(result.min > url_data[i]){
-            result.min = url_data[i];
+            result.min = url_data[i]-1;
         }
+
         if(result.max < url_data[i]){
-            result.max = url_data[i];
+            result.max = url_data[i]+1;
         }
 
         console.log("Data testé : ",url_data[i]);
@@ -95,6 +95,8 @@ module.exports.launch = async function launch(data,data2=[common.exampleScrapper
     // test 2 avec c2 : Nombres d'etags
     //const result2 = getSpecificData(data,"etagsNb")
     //if(result2) getFuzzyValue(45,result2,true);
+
+    
 }
 
 
