@@ -164,7 +164,6 @@ function display_data(data) {
     }
 
     depot.appendChild(tbl);
-    decide();
 }
 /*
 function display_loading() {
@@ -183,13 +182,14 @@ function show_error(message) {
     window.setTimeout(hide_loading, 3500);
 }*/
 
-async function resultat(){
-    console.log("affichage des resultats");
+// affiche les données calculé jusqu'a ici
+async function resultats(){
+    console.log("Fetch ! ");
     const options = {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
     }
     await fetch('/getData', options).then(async (res) => {
         //hide_loading();
@@ -198,16 +198,16 @@ async function resultat(){
             //show_error(res.message);
             return;
         }
-        console.log("Retour serveur : getData");
-
         let x = await res.json();
+        console.log("Message :", x.message);
 
-        console.log(" x : ",x.data);
-
-        display_data(JSON.parse(x.data));
+        const content = JSON.parse(x.data);
+        for(let i of Object.keys(content)){
+            console.log("content i ",content[i]);
+            display_data(content[i]);
+        }
     }).catch((err) => {
         console.error("error ;( : ", err);
-        //show_error(err);
     });
 }
 
@@ -218,7 +218,7 @@ async function analyse(){
         return ;
     }
     const data = { url }
-    //button.addEventListener("click", exec);
+
     const options = {
         method: 'POST',
         headers: {
@@ -236,17 +236,11 @@ async function analyse(){
         }
         console.log("Retour serveur");
         let x = await res.json();
-        
         if (x.redirected) {
             window.location.href = x.redirected;
         }
-        /*
-        console.log("Message :", x.message);
-        display_data(JSON.parse(x.data));
-        */
     }).catch((err) => {
         console.error("error ;( : ", err);
-        //show_error(err);
     });
     
 }
@@ -291,7 +285,6 @@ async function compute() {
         }
         console.log("Redirection : ",res.redirected)
         let x = await res.json();
-        
         if (x.redirected) {
             window.location.href = x.redirected;
         }

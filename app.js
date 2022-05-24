@@ -11,7 +11,13 @@ const common = require('./services/common');
 const fuzzylogic = require('./services/fuzzyLogic');
 const main = require('./services/main');
 
+// Sauvegarde les données dans la session de l'utilisateur
+var sessionStorage = require('node-sessionstorage');
+
+
 const fs = require('fs');
+
+var requestTime = Date.now();
 
 
 app.use("/",routes);
@@ -32,34 +38,19 @@ app.set('view engine','ejs');
 // MIddleware
 app.post("/api",async(request,response,next)=>{
     console.log("Middleware analyse : Requête reçu !");
-    
-    var requestTime = Date.now();
 
-    const data = request.body;
+    sessionStorage.setItem('criteres', JSON.stringify(request.body.criteres_selected));
 
-    tools.writeToFile('./services/crits.json',JSON.stringify(data.criteres_selected));
-
-    await clust(data.urls,data.criteres_selected).then((websiteData)=>{
+    await clust(request.body.urls,request.body.criteres_selected).then((websiteData)=>{
         const time = Date.now() - requestTime;
-
-        // Create fuzzy logics
-        //fuzzylogic.launch(websiteData);
-
-        // Write the results
-        // Todo : Utiliser des sessions plutot qu'un fichier pour sauvegarder les données.
-        tools.writeToFile('./services/result.json',JSON.stringify(websiteData));
         
-        
-        const obj = {
-            websiteData : websiteData,
-            redirected : "/getResult"
-        }
+        sessionStorage.setItem('computedData',JSON.stringify(websiteData));
         
         response.json({
             status:'success',
             message: `Traitement finit en ${time} ms`,
-            redirected: '/analyse',
-            data : JSON.stringify(obj)
+            redirected: '/getResult',
+            data : JSON.stringify({"redirected":"/getResult"})
         });
 
         console.log("Middleware analyse : Done");
@@ -82,24 +73,18 @@ app.get("/analyse",(req,res,next)=>{
     })
 })
 
+// Après avoir entrer l'url, l'analyse de cette page en plus de la fuzzy logic se déclenche
+// Puis le serveur redirigera une dernière fois l'utilisateur dans la page de résultat.
 app.post("/getResult/analyse",async (req,res,next)=>{
     // analyser la page 
-    const crits = await fs.readFileSync("./services/crits.json"); // Dernier critères qu'on a sauvegarder
-    const dataRead = await fs.readFileSync("./services/result.json"); // Dernière donnèes scanné
-    const computed_data = JSON.parse(dataRead);
+    const crits = JSON.parse(sessionStorage.getItem('criteres')); // Dernier critères qu'on a sauvegarder
+    const computed_data = JSON.parse(sessionStorage.getItem('computedData'));
     const url_data = await clust(req.body.url,crits);
 
-    // Ajout des résultats du site analysé dans le fichier result.json
-    // todo : fixer l'erreur
-    fs.appendFile("./services/result.json", JSON.stringify(url_data),(err)=>{
-        if(err) throw err;
-    })
+    sessionStorage.setItem('url_data', JSON.stringify(url_data));
 
-    console.log("Computed data : ",computed_data);
-    console.log("Site analysé : ",url_data);
-
-    // Appeler fuzzy logic
-    // récuperer le résultat
+    // Appel fuzzy logic
+    // todo : récuperer le résultat
     fuzzylogic.launch(computed_data,url_data);
 
     res.json({
@@ -107,17 +92,25 @@ app.post("/getResult/analyse",async (req,res,next)=>{
         message: `Traitement terminé`,
         redirected: '/result',
     });
-    // Ne pas oublier d'implémenter les options (telecharger en csv etc ...)
 })
 
 app.get("/getData",async (req,res,next)=>{
-    console.log("Récupération des données");
-    const dataRead = await fs.readFileSync("./services/result.json"); // Dernière donnèes scanné
-    const computed_data = JSON.parse(dataRead);
-    res.json({
+    console.log("/getData appelé");
+    const obj = {
+        "computed": JSON.parse(sessionStorage.getItem('computedData')),
+        "url_data" : JSON.parse(sessionStorage.getItem('url_data')),
+        "fuzzyData" : {}
+    }
+    await res.json({
         status:'success',
-        data : JSON.stringify(computed_data)
+        message: `Traitement terminé`,
+        data : await JSON.stringify(obj)
     });
-});
+})
+
+app.get('/result',(req,res,next)=>{
+    res.render("result.ejs");
+})
+
 
 app.listen(PORT, () => console.log(`Listening at ${PORT} (go to 'localhost:3000')`));
