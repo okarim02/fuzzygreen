@@ -49,8 +49,7 @@ app.post("/api",async(request,response,next)=>{
         response.json({
             status:'success',
             message: `Traitement finit en ${time} ms`,
-            redirected: '/getResult',
-            data : JSON.stringify({"redirected":"/getResult"})
+            redirected: '/analyse',
         });
 
         console.log("Middleware analyse : Done");
@@ -67,9 +66,9 @@ app.post("/api",async(request,response,next)=>{
 });
 
 app.get("/analyse",(req,res,next)=>{
-    const content = fs.readFileSync('./services/result.json');
+    const content = sessionStorage.getItem('computedData');
     res.render("analyse.ejs",{
-        "computedData" : content ? JSON.parse(content): false
+        "computedData" : content ? Object.keys(JSON.parse(content)).length>0: false
     })
 })
 
