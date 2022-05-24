@@ -235,9 +235,9 @@ async function resultats(){
         console.error("error ;( : ", err);
     });
 }
+
 // Voir http://jsfiddle.net/hybrid13i/JXrwM/;
 function generate_save_button(data){
-    //const format_data = reformat(data); // todo : donner des données plus convenable pour lors du téléchargement du Excel.
     let depot = document.getElementById('result');
     const button = document.createElement('button')
     button.innerText = 'Télécharger résultat'
@@ -268,7 +268,8 @@ function generateExcel(data){
 
         for(let j of Object.values(i[Object.keys(i)])){
             if(Array.isArray(j)){
-                row.push(j.toString())
+                // Afin de ne pas dépasser la limite de caractères pour une cellule excel, on n'affichera pas le contenu des tableaux mais leur taille.
+                row.push(j.length);
             }else{
                 row.push(j);
             }
