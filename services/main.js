@@ -20,10 +20,6 @@ module.exports.start = async function main(url,page,criteres_selected){
         }
     }).then(async ()=>{
         console.log("Wooo that work");
-        if(criteres_selected.includes("ecoIndex")){
-            const ecoIndex = await ecoScore.getEcoIndex(result.domSize,result.size,result.nbRequest);
-            result.ecoIndex = ecoIndex.grade;
-        }
         const domainName = tools.getDomain(baseUrl);
         /*
         //result.plugins = await api.infoAboutPluginAndTemplate(url);

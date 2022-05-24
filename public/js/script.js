@@ -27,7 +27,6 @@ var criteres = ["nbRequest",
     "plugins",
     "ratio_etags",
     "host",
-    "ecoIndex",
     "mobileFriendly"
 ]
 
