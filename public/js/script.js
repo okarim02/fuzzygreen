@@ -217,18 +217,69 @@ async function resultats(){
         document.getElementById('result').innerHTML="";
 
         const content = JSON.parse(x.data);
+
+        // Modif pour faciliter la conversion json en csv
+        content['computed'].push(content['url_data'][0]);
+        
+        generate_save_button(content['computed']);
+
         for(let i of Object.keys(content)){
             if(i=="fuzzyData"){
-                console.log("fuzzy : ",content[i]);
                 display_fuzzy(content[i]);
             }else{
+                console.log("data :",content[i]);
                 display_data(content[i]);
             }
-            console.log(i)
         }
     }).catch((err) => {
         console.error("error ;( : ", err);
     });
+}
+// Voir http://jsfiddle.net/hybrid13i/JXrwM/;
+function generate_save_button(data){
+    //const format_data = reformat(data); // todo : donner des données plus convenable pour lors du téléchargement du Excel.
+    let depot = document.getElementById('result');
+    const button = document.createElement('button')
+    button.innerText = 'Télécharger résultat'
+    button.addEventListener('click', () => {
+        generateExcel(data);
+      })
+    depot.appendChild(button);
+}
+
+function generateExcel(data){
+    let wb = XLSX.utils.book_new();
+    wb.Props = {
+        Title: 'data_fuzzyGreen',
+        Subject: 'result',
+        Author: 'FuzzyGreen',
+        CreatedDate: new Date(),
+    };
+    let wsName = 'newSheet';
+
+    let wsData = [
+        [...getHeaders(data[0])], // header
+    ];
+
+    for(let i of data){
+        let row = [];
+        let domain = (new URL(Object.keys(i)));
+        row.push(domain.hostname);
+
+        for(let j of Object.values(i[Object.keys(i)])){
+            if(Array.isArray(j)){
+                row.push(j.toString())
+            }else{
+                row.push(j);
+            }
+        }
+        wsData.push(row);
+    }
+
+    let ws = XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb, ws, wsName);
+
+    XLSX.writeFile(wb, 'result_fuzzyGreen.xlsx');
 }
 
 async function analyse(){
