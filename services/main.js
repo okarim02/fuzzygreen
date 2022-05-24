@@ -1,7 +1,6 @@
 const common = require("./common");
 // optional : var lodash = require('lodash');
 const scrapper = require('./scrapper');
-const ecoScore = require('./ecoIndex');
 const api = require('./api');
 const tools = require("./tools");
 

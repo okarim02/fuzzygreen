@@ -87,6 +87,5 @@ module.exports = {
     "imageSrcEmpty": 0,
     "ratio_etags": 0.4834123222748815,
     "host": { "isGreen": true, "energy": 'groeneenergie' },
-    "ecoIndex": 'E'
   },
 }
