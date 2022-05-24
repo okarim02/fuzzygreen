@@ -98,6 +98,7 @@ function getHeaders(data) {
 function display_data(data) {
 
     let depot = document.getElementById('result');
+
     let tbl = document.createElement('table');
 
     tbl.style.width = '100%';
@@ -165,6 +166,19 @@ function display_data(data) {
 
     depot.appendChild(tbl);
 }
+function display_fuzzy(data){
+    let depot = document.getElementById('fuzzyData');
+    depot.innerHTML="";
+    
+    let ul = document.createElement('ul');
+    
+    for(let i of Object.keys(data)){
+        const li = document.createElement('li')
+        li.textContent = `${i} : {excellent : ${ data[i][0] } , Medium : ${ data[i][1] } , Bad : ${ data[i][2] }}`;
+        ul.appendChild(li);
+    }
+    depot.appendChild(ul);
+}
 /*
 function display_loading() {
     let el = document.getElementById('result');
@@ -184,7 +198,6 @@ function show_error(message) {
 
 // affiche les données calculé jusqu'a ici
 async function resultats(){
-    console.log("Fetch ! ");
     const options = {
         method: 'GET',
         headers: {
@@ -201,10 +214,17 @@ async function resultats(){
         let x = await res.json();
         console.log("Message :", x.message);
 
+        document.getElementById('result').innerHTML="";
+
         const content = JSON.parse(x.data);
         for(let i of Object.keys(content)){
-            console.log("content i ",content[i]);
-            display_data(content[i]);
+            if(i=="fuzzyData"){
+                console.log("fuzzy : ",content[i]);
+                display_fuzzy(content[i]);
+            }else{
+                display_data(content[i]);
+            }
+            console.log(i)
         }
     }).catch((err) => {
         console.error("error ;( : ", err);
@@ -218,6 +238,8 @@ async function analyse(){
         return ;
     }
     const data = { url }
+
+    console.log("Lancement de l'analyse");
 
     const options = {
         method: 'POST',

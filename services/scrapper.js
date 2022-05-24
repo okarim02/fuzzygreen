@@ -38,15 +38,12 @@ function Measures(){
 
 function setMeasurestoDo(criteres_selected){
     let m = Measures(); 
-
-    console.log("crits to not delete : ",criteres_selected);
     if(criteres_selected.length==0) return m;
     for(let i in m){
         if(!criteres_selected.includes(i)){
             delete m[i];
         }
     }
-    console.log("New measures :",m);
     return m;
 }
 

@@ -79,11 +79,11 @@ module.exports.launch = async function launch(data,data2=[common.exampleScrapper
         
         if(!result) continue;
         
-        if(result.min > url_data[i]){
+        if(result.min >= url_data[i]){
             result.min = url_data[i]-1;
         }
 
-        if(result.max < url_data[i]){
+        if(result.max <= url_data[i]){
             result.max = url_data[i]+1;
         }
 
@@ -92,11 +92,8 @@ module.exports.launch = async function launch(data,data2=[common.exampleScrapper
         fuzzification[i] = fuzzyVal;
     }
 
-    // test 2 avec c2 : Nombres d'etags
-    //const result2 = getSpecificData(data,"etagsNb")
-    //if(result2) getFuzzyValue(45,result2,true);
-
-    
+    // Todo : Implémenter les règles ...
+    return fuzzification;
 }
 
 

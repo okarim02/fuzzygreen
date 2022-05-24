@@ -84,7 +84,9 @@ app.post("/getResult/analyse",async (req,res,next)=>{
 
     // Appel fuzzy logic
     // todo : récuperer le résultat
-    fuzzylogic.launch(computed_data,url_data);
+    const fuzzyResult  = await fuzzylogic.launch(computed_data,url_data);
+
+    sessionStorage.setItem("fuzzyResult",JSON.stringify(fuzzyResult));
 
     res.json({
         status:'success',
@@ -94,11 +96,10 @@ app.post("/getResult/analyse",async (req,res,next)=>{
 })
 
 app.get("/getData",async (req,res,next)=>{
-    console.log("/getData appelé");
     const obj = {
         "computed": JSON.parse(sessionStorage.getItem('computedData')),
         "url_data" : JSON.parse(sessionStorage.getItem('url_data')),
-        "fuzzyData" : {}
+        "fuzzyData" : JSON.parse(sessionStorage.getItem('fuzzyResult')),
     }
     await res.json({
         status:'success',
