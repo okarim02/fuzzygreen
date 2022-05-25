@@ -3,13 +3,9 @@
 <section>
     <article>
         <div id="choice">
-            <% if(computedData){ %>
-                <label> Is it green ?</label>
-                <input id="url_toAnalyse" type="search" placeholder="Entrer ici l'url à analyser" size="60">
-                <button id="submit2" onclick="analyse()"> Submit </button>
-            <% } else{ %>  
-                <h6>Il semblerait que le serveur ne possède aucune donnée pour lancer la logique floue, veuillez revenir à la page d'accueil et entrer une liste d'URL</h6>
-             <% } %>
+            <label> Is it green ?</label>
+            <input id="url_toAnalyse" type="search" placeholder="Entrer ici l'url à analyser" size="60">
+            <button id="submit2" onclick="analyse()"> Submit </button>
         </div>
         <a href="/" > Revenir en arrière </a>
     </article>

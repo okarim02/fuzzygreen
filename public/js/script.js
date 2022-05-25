@@ -195,46 +195,6 @@ function show_error(message) {
     window.setTimeout(hide_loading, 3500);
 }*/
 
-// affiche les données calculé jusqu'a ici
-async function resultats(){
-    const options = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    }
-    await fetch('/getData', options).then(async (res) => {
-        //hide_loading();
-        if (res.status == "failure") {
-            console.error("Une erreur est survénu ...");
-            //show_error(res.message);
-            return;
-        }
-        let x = await res.json();
-        console.log("Message :", x.message);
-
-        document.getElementById('result').innerHTML="";
-
-        const content = JSON.parse(x.data);
-
-        // Modif pour faciliter la conversion json en csv
-        content['computed'].push(content['url_data'][0]);
-        
-        generate_save_button(content['computed']);
-
-        for(let i of Object.keys(content)){
-            if(i=="fuzzyData"){
-                display_fuzzy(content[i]);
-            }else{
-                console.log("data :",content[i]);
-                display_data(content[i]);
-            }
-        }
-    }).catch((err) => {
-        console.error("error ;( : ", err);
-    });
-}
-
 // Voir http://jsfiddle.net/hybrid13i/JXrwM/;
 function generate_save_button(data){
     let depot = document.getElementById('result');
@@ -262,8 +222,7 @@ function generateExcel(data){
 
     for(let i of data){
         let row = [];
-        let domain = (new URL(Object.keys(i)));
-        row.push(domain.hostname);
+        row.push(Object.keys(i));
 
         for(let j of Object.values(i[Object.keys(i)])){
             if(Array.isArray(j)){
@@ -287,13 +246,38 @@ function generateExcel(data){
     XLSX.writeFile(wb, 'result_fuzzyGreen.xlsx');
 }
 
+// affiche les données calculé jusqu'a ici
+async function resultats(){
+    
+    const computedData = JSON.parse(sessionStorage.getItem('computedData'));
+    const url_data = JSON.parse(sessionStorage.getItem('url_data'));
+    const fuzzyData = JSON.parse(sessionStorage.getItem('fuzzyData'));
+
+    // Modif pour faciliter la conversion json en csv
+    computedData.push(url_data[0]);
+
+    generate_save_button(computedData);
+
+    display_data(computedData);
+    display_data(url_data);
+    display_fuzzy(fuzzyData);
+}
+
 async function analyse(){
     let url = document.getElementById("url_toAnalyse").value.split(/[\n\s,"]+/);
     if(!isUrl(url)){ 
         console.error("Veuillez entrer une url valide");
         return ;
     }
-    const data = { url }
+
+    const computedData = JSON.parse(sessionStorage.getItem('computedData'));
+    const crits = JSON.parse(sessionStorage.getItem('criteres'));
+    
+    const data = { 
+        "url":url , 
+        "computedData":computedData , 
+        "criteres":crits 
+    }
 
     console.log("Lancement de l'analyse");
 
@@ -314,6 +298,10 @@ async function analyse(){
         }
         console.log("Retour serveur");
         let x = await res.json();
+        let data = JSON.parse(x.data);
+        sessionStorage.setItem('url_data', JSON.stringify(data.url_data));
+        sessionStorage.setItem('fuzzyData',JSON.stringify(data.fuzzyResult));
+
         if (x.redirected) {
             window.location.href = x.redirected;
         }
@@ -344,6 +332,9 @@ async function compute() {
 
     //display_loading();
 
+    // Sauvegarde des critères pour plus tard ...
+    sessionStorage.setItem('criteres', JSON.stringify(criteres_selected));
+
     const data = { urls, criteres_selected };
     // for more info : https://developer.mozilla.org/fr/docs/Web/API/Fetch_API/Using_Fetch
     const options = {
@@ -362,7 +353,11 @@ async function compute() {
             return;
         }
         console.log("Redirection : ",res.redirected)
+        
         let x = await res.json();
+
+       sessionStorage.setItem('computedData', x.data);
+
         if (x.redirected) {
             window.location.href = x.redirected;
         }

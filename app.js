@@ -38,18 +38,15 @@ app.set('view engine','ejs');
 // MIddleware
 app.post("/api",async(request,response,next)=>{
     console.log("Middleware analyse : Requête reçu !");
-
-    sessionStorage.setItem('criteres', JSON.stringify(request.body.criteres_selected));
-
+    
     await clust(request.body.urls,request.body.criteres_selected).then((websiteData)=>{
         const time = Date.now() - requestTime;
-        
-        sessionStorage.setItem('computedData',JSON.stringify(websiteData));
         
         response.json({
             status:'success',
             message: `Traitement finit en ${time} ms`,
             redirected: '/analyse',
+            data : JSON.stringify(websiteData)
         });
 
         console.log("Middleware analyse : Done");
@@ -66,51 +63,34 @@ app.post("/api",async(request,response,next)=>{
 });
 
 app.get("/analyse",(req,res,next)=>{
-    const content = sessionStorage.getItem('computedData');
-    res.render("analyse.ejs",{
-        "computedData" : content ? Object.keys(JSON.parse(content)).length>0: false
-    })
+    res.render("analyse.ejs");
 })
 
 // Après avoir entrer l'url, l'analyse de cette page en plus de la fuzzy logic se déclenche
 // Puis le serveur redirigera une dernière fois l'utilisateur dans la page de résultat.
 app.post("/getResult/analyse",async (req,res,next)=>{
     // analyser la page 
-    const crits = JSON.parse(sessionStorage.getItem('criteres')); // Dernier critères qu'on a sauvegarder
-    const computed_data = JSON.parse(sessionStorage.getItem('computedData'));
+    const crits = req.body.criteres; // Dernier critères qu'on a sauvegarder
+    const computed_data = req.body.computedData;
     const url_data = await clust(req.body.url,crits);
-
-    sessionStorage.setItem('url_data', JSON.stringify(url_data));
 
     // Appel fuzzy logic
     // todo : récuperer le résultat
     const fuzzyResult  = await fuzzylogic.launch(computed_data,url_data);
 
-    sessionStorage.setItem("fuzzyResult",JSON.stringify(fuzzyResult));
-
     res.json({
         status:'success',
         message: `Traitement terminé`,
         redirected: '/result',
-    });
-})
-
-app.get("/getData",async (req,res,next)=>{
-    const obj = {
-        "computed": JSON.parse(sessionStorage.getItem('computedData')),
-        "url_data" : JSON.parse(sessionStorage.getItem('url_data')),
-        "fuzzyData" : JSON.parse(sessionStorage.getItem('fuzzyResult')),
-    }
-    await res.json({
-        status:'success',
-        message: `Traitement terminé`,
-        data : await JSON.stringify(obj)
+        data : JSON.stringify({
+            "fuzzyResult": fuzzyResult,
+            "url_data":url_data 
+        })
     });
 })
 
 app.get('/result',(req,res,next)=>{
     res.render("result.ejs");
 })
-
 
 app.listen(PORT, () => console.log(`Listening at ${PORT} (go to 'localhost:3000')`));
