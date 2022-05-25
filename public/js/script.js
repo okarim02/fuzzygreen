@@ -168,6 +168,9 @@ function display_data(data) {
 function display_fuzzy(data){
     let depot = document.getElementById('fuzzyData');
     depot.innerHTML="";
+    const title = document.createElement('h3');
+    title.innerText = "Fuzzy logic : ";
+    depot.appendChild(title);
     
     let ul = document.createElement('ul');
     
@@ -182,9 +185,6 @@ function display_fuzzy(data){
 function display_loading() {
     let el = document.getElementById('loading');
     el.classList.add("display");
-    setTimeout(()=>{
-        el.classList.remove("display");
-    },5000);
 }
 
 function hide_loading() {
