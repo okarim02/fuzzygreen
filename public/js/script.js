@@ -178,22 +178,25 @@ function display_fuzzy(data){
     }
     depot.appendChild(ul);
 }
-/*
+
 function display_loading() {
-    let el = document.getElementById('result');
-    el.innerText = "Loading ...";
+    let el = document.getElementById('loading');
+    el.classList.add("display");
+    setTimeout(()=>{
+        el.classList.remove("display");
+    },5000);
 }
 
 function hide_loading() {
-    let el = document.getElementById('result');
-    el.innerText = "";
+    let el = document.getElementById('loading');
+    el.classList.remove("display");
 }
 
 function show_error(message) {
-    let el = document.getElementById('result');
+    let el = document.getElementById('loading');
     el.innerText = message;
     window.setTimeout(hide_loading, 3500);
-}*/
+}
 
 // Voir http://jsfiddle.net/hybrid13i/JXrwM/;
 function generate_save_button(data){
@@ -264,6 +267,7 @@ async function resultats(){
 }
 
 async function analyse(){
+    display_loading()
     let url = document.getElementById("url_toAnalyse").value.split(/[\n\s,"]+/);
     if(!isUrl(url)){ 
         console.error("Veuillez entrer une url valide");
@@ -305,6 +309,7 @@ async function analyse(){
         if (x.redirected) {
             window.location.href = x.redirected;
         }
+        hide_loading();
     }).catch((err) => {
         console.error("error ;( : ", err);
     });
@@ -313,6 +318,9 @@ async function analyse(){
 
 
 async function compute() {
+
+    display_loading();
+
     let urls = document.getElementById("url-enter").value.split(/[\n\s,"]+/);
 
     urls = urls.filter(function (el) { // Delete empty string and sus url.
@@ -329,8 +337,6 @@ async function compute() {
     }
 
     console.log("Url(s) : ", urls);
-
-    //display_loading();
 
     // Sauvegarde des critères pour plus tard ...
     sessionStorage.setItem('criteres', JSON.stringify(criteres_selected));
@@ -362,10 +368,7 @@ async function compute() {
             window.location.href = x.redirected;
         }
         
-        /*
-        console.log("Message :", x.message);
-        display_data(JSON.parse(x.data));
-        */
+        hide_loading();
     }).catch((err) => {
         console.error("error ;( : ", err);
         //show_error(err);
