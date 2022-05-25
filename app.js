@@ -30,8 +30,8 @@ app.use('/img',express.static(__dirname+'public/img'));
 
 // Same as bodyParser
 // http://expressjs.com/fr/api.html#express.json
-app.use(bodyParser.json());
-
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 // Set template Engine
 app.set('view engine','ejs');
 
