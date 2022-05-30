@@ -194,8 +194,7 @@ function hide_loading() {
 
 function show_error(message) {
     let el = document.getElementById('loading');
-    el.innerText = message;
-    window.setTimeout(hide_loading, 3500);
+    alert(message);
 }
 
 // Voir http://jsfiddle.net/hybrid13i/JXrwM/;
@@ -268,17 +267,21 @@ async function resultats(){
 
 async function analyse(){
     display_loading()
-    let url = document.getElementById("url_toAnalyse").value.split(/[\n\s,"]+/);
-    if(!isUrl(url)){ 
-        console.error("Veuillez entrer une url valide");
-        return ;
+    let urls = reformate_url([document.getElementById("url_toAnalyse").value]);
+
+    console.log("Url entrer : ",urls[0]);
+
+    if (urls.length == 0) {
+        show_error("Url invalide");
+        console.log("Aucune url valide entrer...");
+        return;
     }
 
     const computedData = JSON.parse(sessionStorage.getItem('computedData'));
     const crits = JSON.parse(sessionStorage.getItem('criteres'));
     
     const data = { 
-        "url":url , 
+        "url":urls, 
         "computedData":computedData , 
         "criteres":crits 
     }
@@ -303,6 +306,7 @@ async function analyse(){
         console.log("Retour serveur");
         let x = await res.json();
         let data = JSON.parse(x.data);
+
         sessionStorage.setItem('url_data', JSON.stringify(data.url_data));
         sessionStorage.setItem('fuzzyData',JSON.stringify(data.fuzzyResult));
 
@@ -316,20 +320,35 @@ async function analyse(){
     
 }
 
+function reformate_url(array){
+    let urls = [...array]
+    for(let i = 0 ;  i< urls.length ;i++){
+        if(urls[i].indexOf("http://") <0 && urls[i].indexOf("https://")<0){
+            if(urls[i].indexOf("www") < 0){
+                urls[i]="http://www."+urls[i];
+            }else{
+                urls[i]="http://"+urls[i];
+            }
+        }   
+        if (!isUrl(urls[i]) || urls[i] == 'http://www.') {
+            show_error("Url incomplet : "+urls[i]);
+            urls[i]="";
+        }
+    }
+    urls = urls.filter(function(el){
+        return el!="";
+    });
+
+    console.log("urls reformat : ",urls);
+    return urls;
+}
+
 
 async function compute() {
 
     display_loading();
 
-    let urls = document.getElementById("url-enter").value.split(/[\n\s,"]+/);
-
-    urls = urls.filter(function (el) { // Delete empty string and sus url.
-        if (el == '' || !isUrl(el)) {
-            if (el != '') console.error("Cette url est suspect :", el);
-            return false;
-        }
-        return true;
-    });
+    let urls = reformate_url(document.getElementById("url-enter").value.split(/[\n\s,"]+/));
 
     if (urls.length == 0) {
         console.log("Aucune url valide entrer...");
@@ -371,6 +390,6 @@ async function compute() {
         hide_loading();
     }).catch((err) => {
         console.error("error ;( : ", err);
-        //show_error(err);
+        show_error(err);
     });
-}
+}  

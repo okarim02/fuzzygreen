@@ -38,7 +38,7 @@ module.exports.start = async function main(url,page,criteres_selected){
         } 
     }).catch(async e=>{ // todo , gérer l'erreur : faux url.
         console.error("oops something went wrong => ",e);
-        result = new Error("Oops something went wrong");
+        throw new Error("Oops something went wrong");
     });
 
     console.log(result);

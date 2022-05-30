@@ -174,14 +174,18 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
     });
 
     measures.ratio_etags = measures.etagsNb / measures.nbRequest;
+    measures.ratio_etags = parseFloat(measures.ratio_etags).toFixed(2);
 
     measures.ratioLazyLoad = res.ratio;
+    measures.ratioLazyLoad = parseFloat(measures.ratioLazyLoad).toFixed(2);
 
     measures.imagesWithoutLazyLoading = res.imagesNoLazy;
 
     measures.ratioimagesResizedInPage = await getImagesResized(page).then(e => e.ratio);
+    measures.ratioimagesResizedInPage = parseFloat(measures.ratioimagesResizedInPage).toFixed(2)
 
     measures.ratioHttp1 = await (counter_http1 / measures.nbRequest) * 100;
+    measures.ratioHttp1 = parseFloat(measures.ratioHttp1).toFixed(2);
 
     measures.domSize = await page.$$eval('*', array => array.length);
 
