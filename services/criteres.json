@@ -1,0 +1,125 @@
+[
+    {
+        "id" : 0,
+        "critere" : "Size",
+        "description": "Poid de la page, Représente ce que l'utilisateur télécharge en Ko",
+        "conseil": "Ce critères peut être diminuer en tenant compte des autres critères d'éco-conception, ce qui en soit logique, car par exemple : diminuer le poid des images va alléger le poid de la page"
+    },
+    {
+        "id" : 1,
+        "critere" : "Nombre de requêtes",
+        "description": "Le site web échange avec divers acteurs (clients, api, base de données ...) et donc émet des requêtes.",
+        "conseil": "Ce critères peut être diminuer dans un premier temps en limitant le nombre de fichier à télécharger du côté client pour ce faire, combiner les fichiers static (css,js) est une solution mais la plus important est d'utiliser au maximum le cache du navigateur."
+    },
+    {
+        "id": 2,
+        "critere":"Taille du DOM",
+        "description":"Le dom représente la compléxité d'une page, plus la taille du dom est grand, plus la page possède un très grand nombre d'élément (balises div, images etc...).",
+        "conseil": "Adopter l'approche mobile first, privilégier un site web simple"
+    },
+    {
+        "id":3,
+        "critere" : "Utilisation d'etags",
+        "description":"Permet d'éviter au serveur de faire deux fois la même requêtes, ainsi le but est de mettre en cache les résultats",
+        "conseil": ""
+    },
+    {
+        "id":4,
+        "critere":"lazy load",
+        "description":"Si la page est scrollable, l'idée est de charger seulement les élémets observable par l'utilisateur",
+        "conseil" : "Il existe le lazy loading natif déjà intégré aux navigateurs, il suffit juste d'ajouter l'attribut <loading> aux balise IMG"
+    },
+    {
+        "id":5,
+        "critere":"Page statique",
+        "description":"Cela dépend du site web, si le site ne propose quasiment aucune interaction avec les utilisateurs alors il est envisagé de la rendre statique.Une page dynamique propose plusieurs logiciels qui tourne fournissant à l'utilisateur des services ce qui nécessite des échanges or une page statique est directement charger dans le navigateur car les fichiers statique utilise seulement HTTP du serveur contrairement au contenu dynamique avec Java,Ruby,Python et des bases de données ... ",
+        "conseil":"Il existe des générateur de page statique en ligne et également proposé par wordpress"
+    },
+    {
+        "id":6,
+        "_comment":"Critère peu intérressant, mais pour certaine raison il est inclus dans l'application mais pas le tableau, A supprimer ?",
+        "critere":"Protocol http",
+        "description":"Le protocole utilisé est important, votre site web utilise http1 si il n'y a pas de 's' à http dans l'url",
+        "conseil":"http2 en plus d'être récent, il est plus sécuriser et plus rapide que http1"
+    },
+    {
+        "id":7,
+        "_comment":"Sous critères de 'Utilisation d'une template ou de plugins' ",
+        "critere":"CMS utilisé",
+        "description":"Utilisé des templates comme wordpress est utile et est déjà suffisament optimiser",
+        "conseil":"Malgré que wordpress est optimisé il reste lourd a utilisé surtout si on utilise pas 100% de ses fonctionnalité, éviter également d'importer beaucoup de plugins"
+    },
+    {
+        "id":8,
+        "_comment":" Encore une fois, pas inclus dans le tableau, a faire ....",
+        "critere": "Temps",
+        "description": "Temps en ms auquel votre page s'est chargé"
+    },
+    {
+        "id": 9,
+        "critere":"Taille des images modifier depuis le navigateur",
+        "description":"Redimensionner une image avec les propriétés width et height de la balise <img> est du dégaspillage car il charge quand même l'image originale dans le navigateur et donc consomme pour rien.",
+        "conseil" : "Changer la taille d'une image depuis un logiciel du style photoshop"
+    },
+    {
+        "id":10,
+        "_comment":"Critère bizzare, à revoir",
+        "critere":"ratio http1",
+        "description":"HTTP2 est rapide et sécurisé, propose la compréssion des headers et donc réduit la bande passante"
+    },
+    {
+        "id":11,
+        "critere":"Hébergeur vert",
+        "description":"Des hébergeur fournissent des services en utilisant l'énérgie vert et donc compense ses émissions de gaz à effet de serre",
+        "conseil":"Opter pour un hébergeur inclus dans la liste fournit par greenIT"
+    },
+    {
+        "id":12,
+        "critere":"minification des fichiers CSS et JS",
+        "description":"On peut diminuer le poid de fichier JS en supprimant des lignes vide ou des espaces inutile",
+        "conseil": "Adopter des outils comme YUI compressor."
+    },
+    {
+        "id":13,
+        "critere":"Images avec src vide",
+        "description":"La page génére des requêtes http pour trouver l'image",
+        "conseil":"Eviter de laissé des balises IMG avec un src vide"
+    },
+    {
+        "id":15,
+        "critere":"CSS ou JS interne(inline)",
+        "description":"Il est fortément déconseiller de mettre du css dans des balises car à chaque chargement le contenu sera rechargé",
+        "conseil":""
+    },
+    {
+        "id":16,
+        "critere":"valider le code JS",
+        "description":"Si le code respecte les règles de syntaxe alors cela allègera le travail de l'interpréteur et donc du CPU.",
+        "conseil":"Adopter des outils comme JSLint"
+    },
+    {
+        "id":17,
+        "critere":"Eviter les boutons réseaux sociaux",
+        "description":"Le click sur ces boutons génère des requêtes inutile comme par exemple le nombre de likes (Facebook)",
+        "conseil":""
+    },
+    {
+        "id": 18,
+        "critere":"Adaptation de la page en mobile",
+        "description":"Sachant que 50,1 % du temps passé sur internet se fait depuis des appareil mobile, une page compatible avec ce format avantagera votre site web",
+        "conseil" : "Si votre page n'est pas mobile friendly, veuillez revoir la structure de votre page : Par exemple prévoir l'utilisateur d'une template, changer la taille et l'emplacement des boutons ou encore revoir le choix de la police utilisé ..."
+    },
+    {
+        "id":19,
+        "critere":"police standards",
+        "description":"Adopter les polices par défault économise de la bande passant car on importe aucunes polices.",
+        "conseil":"Si ce n'est pas possible, limiter vous à 3 polices"
+    },
+    {
+        "id":20,
+        "critere":"Optimiser les fichiers pdf",
+        "description":"Optimiser la taille des fichiers pdf va alléger le poid de la requêtes associé",
+        "conseil":""
+    }
+    
+]
