@@ -7,14 +7,15 @@ const tools = require("./tools");
 module.exports.start = async function main(url,page,criteres_selected){
     
     const baseUrl = url ;
-    console.log("Site web testé : ",baseUrl)
+    console.log("Site web testé : ",baseUrl);
+    console.log("Critères séléctionner : ",criteres_selected);
     
     var result = {};
     result.url = url;
 
     await scrapper.getPageMetrics(baseUrl,page,criteres_selected,(data,response)=>{
         if(response){
-            data.size = Math.round(data.size/1000);
+            data['PageSize(Ko)'] = Math.round(data['PageSize(Ko)']/1000);
             result = data;
         }
     }).then(async ()=>{
@@ -25,7 +26,7 @@ module.exports.start = async function main(url,page,criteres_selected){
 
         */
         // Took so many time that the server response crash
-        if(criteres_selected.includes("mobileFriendly")){
+        if(criteres_selected.includes("isMobileFriendly")){
             result.isMobileFriendly = await api.isMobileFriendly(url)
         }; // Took so long, fix this !
         

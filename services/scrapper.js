@@ -11,28 +11,32 @@ const tools = require('./tools');
 
 function Measures(){
     return {
-        'size': 0,
-        'nbRequest': 0,
-        'domSize': 0,
-        'filesNotMin': [],
-        'policesUtilise': [],
+        'PageSize(Ko)': 0,
+        'RequestsNb': 0,
+        'DOMsize(nb elem)': 0,
+        //'filesNotMin': [],
+        'JSMinification':[],
+        'CSSMinification':[],
+        'FontsNb': [],
+        'etagsRatio':0.0,
         'etagsNb': 0,
         'imagesWithoutLazyLoading': [],
+        'lazyLoadRatio': 0,
         'cssFiles': 0,
-        'cssOrJsNotExt': 0,
+        //'cssOrJsNotExt': 0,
+        'CSSNotExt':0,
+        'JSNotExt':0,
         'filesWithError': [],
-        'socialButtonsFound': [],
-        'isStatic': false,
-        'poweredBy': [],
-        'protocolHTTP': '',
-        'cms': [],
-        'loadTime': 0,
-        'ratioLazyLoad': 0,
-        'ratioimagesResizedInPage': 0,
-        'ratioHttp1': 0,
-        'plugins': "",
+        'socialButtons': [],
+        'isStatic': 1,
+        'CMS': [],
+        'loadTime(ms)': 0,
+        'imgResize': 0,
+        'Http1.1/Http2requests': 0,
+        'pluginsNb': 0,
         'isMobileFriendly':false,
-        "imageSrcEmpty":0
+        "imgSrcEmpty":0,
+        "host":{}
     }
 }
 
@@ -64,7 +68,7 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
     });
     // listen for the server's responses
     page.on('response', async (response) => {
-        measures.nbRequest += 1
+        measures.RequestsNb += 1
 
         if (response.url().startsWith("http:")) {
             counter_http1 += 1;
@@ -76,7 +80,6 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
             let poweredBy = response.headers()['x-powered-by'];
             if (poweredBy != undefined) {
                 poweredBy = poweredBy.split('\n');
-                measures.poweredBy = poweredBy;
             }
         }
 
@@ -88,7 +91,7 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
             }
             response.buffer().then(
                 buffer => {
-                    measures.size += buffer.length
+                    measures['PageSize(Ko)'] += buffer.length
                 },
                 error => {
                     console.error(`${response.status()} ${response.url()} Erreur: ${error}`);
@@ -115,7 +118,6 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
                 const content = await response.text();
                 const totalSize = await content.length;
                 const isMin = await tools.isMinified(content);
-
                 const poid = await (await response.buffer()).length;
 
                 if (await response.request().resourceType() == "script") {
@@ -130,32 +132,34 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
                 }
 
                 if (!isMin) {
-                    if(measures.filesNotMin.includes(response.url())) measures.filesNotMin.push(response.url())
-                    //console.log(`${response.url()} \t taille : ${totalSize} , poid : ${poid} \t => Contenu non minimiser `)
+                    if(response.request().resourceType()=="script"){
+                        if(!measures.JSMinification.includes(response.url()) && response.url() != ""){
+                            measures.JSMinification.push(response.url());
+                        }
+                    }else{
+                        if(!measures.CSSMinification.includes(response.url)){
+                            measures.CSSMinification.push(response.url());
+                        }
+                    }
                 }
             }
         
         }
 
-
-
-        
-
         if (response.request().resourceType() == "font") {
-            measures.policesUtilise.push(response.url());
+            measures.FontsNb.push(response.url());
         }
     })
 
     const url_object = new URL(url);
-    measures.protocolHTTP = url_object.protocol; // http2 => good | http1 => bad 
 
     // GO TO THE PAGE 
     await page.goto(url, { waitUntil: ('networkidle0') });
 
-    measures.cms = await getCMS(page, browser = undefined).then(e => e ? e : []);
+    measures.CMS = await getCMS(page, browser = undefined).then(e => e ? e : []);
 
-    measures.isStatic = await isStatic(page,measures);
-    measures.loadTime = await getLoadTime(page);
+    measures.isStatic = await isStatic(page,measures) ? 1 : 0;
+    measures['loadTime(ms)'] = await getLoadTime(page);
 
     /* Todo : utiliser la méthode ci-dessous pour trouver le protocole utilisé.
     * Goal : Get the protocol using for each request/response
@@ -164,8 +168,11 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
     */
     const client = await page.target().createCDPSession();
 
-    const isNotExt = await countNumberOfInlineStyleSheet(page);
-    measures.cssOrJsNotExt += isNotExt;
+    // Critères id: 15 et 16 .
+    await countNumberOfInlineStyleSheet(page).then((jsNotExt,cssNotExt)=>{
+        measures.JSNotExt = jsNotExt;
+        measures.CSSNotExt = cssNotExt;
+    });
 
     const res = await getRatioLazyImages(page);
 
@@ -173,25 +180,25 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
         return document.styleSheets.length;
     });
 
-    measures.ratio_etags = measures.etagsNb / measures.nbRequest;
-    measures.ratio_etags = parseFloat(measures.ratio_etags).toFixed(2);
+    measures.etagsRatio = measures.etagsNb / measures.RequestsNb;
+    measures.etagsRatio = parseFloat(measures.etagsRatio).toFixed(2);
 
-    measures.ratioLazyLoad = res.ratio;
-    measures.ratioLazyLoad = parseFloat(measures.ratioLazyLoad).toFixed(2);
+    measures.lazyLoadRatio = res.ratio;
+    measures.lazyLoadRatio = parseFloat(measures.lazyLoadRatio).toFixed(2) ? parseFloat(measures.lazyLoadRatio).toFixed(2) : 0.0 ;
 
     measures.imagesWithoutLazyLoading = res.imagesNoLazy;
 
-    measures.ratioimagesResizedInPage = await getImagesResized(page).then(e => e.ratio);
-    measures.ratioimagesResizedInPage = parseFloat(measures.ratioimagesResizedInPage).toFixed(2)
+    measures.imgResize = await getImagesResized(page).then(e => e.ratio);
+    measures.imgResize = isNaN(parseFloat(measures.imgResize).toFixed(2)) ? parseFloat(measures.imgResize).toFixed(2) : 0.0;
 
-    measures.ratioHttp1 = await (counter_http1 / measures.nbRequest) * 100;
-    measures.ratioHttp1 = parseFloat(measures.ratioHttp1).toFixed(2);
+    measures['Http1.1/Http2requests'] = await (counter_http1 / measures.RequestsNb) * 100;
+    measures['Http1.1/Http2requests'] = parseFloat(measures['Http1.1/Http2requests']).toFixed(2);
 
-    measures.domSize = await page.$$eval('*', array => array.length);
+    measures['DOMsize(nb elem)'] = await page.$$eval('*', array => array.length);
 
-    measures.plugins = await getPlugins(page).then(e => e ? e.length : 0);
+    measures.pluginsNb = await getPlugins(page).then(e => e ? e.length : 0);
 
-    measures.imageSrcEmpty = await getImagesSrcEmpty(page);
+    measures.imgSrcEmpty = await getImagesSrcEmpty(page);
     /*
      const pdfs = await getAllpdf(page);
      // check if a pdf's size is higher than normal
@@ -243,9 +250,7 @@ async function isStatic(page,measures) {
 
            More info : https://iconicdigitalworld.com/how-to-check-if-a-website-is-dynamic-or-or-static/#:~:text=To%20find%20out%20how%20to,JSP%2C%20the%20page%20is%20dynamic.
        */
-    if (measures.poweredBy.length != 0) { // rule 3.
-        return false;
-    }
+ 
     const url = page.url();
 
     if (url.includes('?')) { // 1.
@@ -345,16 +350,25 @@ async function getAllpdf(page) {
 async function countNumberOfInlineStyleSheet(page) {
     const result = await page.evaluate(() => {
         let stylesheets = document.styleSheets;
-        var count = 0;
+        let scripts = document.scripts;
+
+        var countCSS = 0;
+        var countJS = 0;
+
         for (let i of stylesheets) {
             if (!i.href) {
-                count += 1;
+                countCSS += 1;
             }
         }
-        return count;
+        for (let i of scripts) {
+            if (!i.href) {
+                countJS += 1;
+            }
+        }
+        return {countCSS,countJS};
     })
 
-    return result;
+    return result.countCSS,result.countJS;
 
 }
 
@@ -392,6 +406,7 @@ async function getRatioLazyImages(page) {
             if (attr != null) {
                 lazyImages += 1;
             } else {
+                if(!img.isASvg && img.src != "")
                 notLazy.push(img.src);
             }
         }

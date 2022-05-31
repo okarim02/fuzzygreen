@@ -1,38 +1,39 @@
 function begin() {
     console.log("Hello this is the function test !");
+
     create_checkbox();
 }
 
-var criteres = ["nbRequest",
-    "size",
-    "domSize",
-    "JSHeapUsedSize",
-    "filesNotMin",
-    "policesUtilise",
-    "etagsNb",
-    "imagesWithoutLazyLoading",
-    "cssFiles",
-    "cssOrJsNotExt",
-    "filesWithError",
-    "socialButtonsFound",
-    "nbOfImagesWithSrcEmpty",
-    "isStatic",
-    "poweredBy",
-    "protocolHTTP",
-    "cms",
-    "loadTime",
-    "ratioLazyLoad",
-    "ratioimagesResizedInPage",
-    "ratioHttp1",
-    "plugins",
-    "ratio_etags",
-    "host",
-    "mobileFriendly"
+var criteres = [
+    'PageSize(Ko)',
+    'RequestsNb',
+    'DOMsize(nb elem)',
+    'JSMinification',
+    'CSSMinification',
+    'FontsNb',
+    'etagsRatio',
+    'etagsNb',
+    'imagesWithoutLazyLoading',
+    'lazyLoadRatio',
+    'cssFiles',
+    'CSSNotExt',
+    'JSNotExt',
+    'filesWithError',
+    'socialButtons',
+    'isStatic',
+    'CMS',
+    'loadTime(ms)',
+    'imgResize',
+    'Http1.1/Http2requests ',
+    'pluginsNb',
+    'isMobileFriendly',
+    'imgSrcEmpty',
+    'host'
 ]
 
 var criteres_selected = [...criteres];
 
-deleteItem(criteres_selected,"mobileFriendly");
+deleteItem(criteres_selected,"isMobileFriendly");
 deleteItem(criteres_selected,"host");
 
 var urls_scanned = [];
@@ -54,7 +55,7 @@ function create_checkbox() {
         checkbox.value = criteres[i];
 
         // Exclude
-        if (!['host','mobileFriendly'].includes(criteres[i])) {
+        if (!['host','isMobileFriendly'].includes(criteres[i])) {
             checkbox.defaultChecked = true;
         }
 
@@ -72,8 +73,11 @@ function create_checkbox() {
         if (ev.target.value) {
             // criteres_selected.slice()
             var index = criteres.indexOf(ev.target.value);
-            if (index !== -1) {
+            let index2 = criteres_selected.indexOf(ev.target.value);
+            if (index2 !== -1) {
                 criteres_selected.splice(index, 1);
+            }else{
+                criteres_selected.push(ev.target.value);
             }
         }
     }
@@ -91,10 +95,12 @@ function isUrl(string) {
 }
 
 function getHeaders(data) {
-    return ["url", ...Object.keys(data[Object.keys(data)[0]])];// Loop for each proprieties .
+    return ["url", ...Object.keys(data[Object.keys(data)[0]])];// Loop pour chaque clé de la première données scanner.
 }
 
 function display_data(data) {
+
+    console.log("DATA : ",data);
 
     let depot = document.getElementById('result');
 
@@ -134,28 +140,43 @@ function display_data(data) {
                 let cell = document.createElement('td');
                 cell.style.border = '1px solid black';
                 let txt;
-
-                if (["filesNotMin", "policesUtilise", "imagesWithoutLazyLoading", "cssFiles", "filesWithError"].includes(val)) {
+                var list_urls;
+                if (["cms","JSMinification","CSSMinification", "FontsNb", "imagesWithoutLazyLoading", "filesWithError","socialButtons"].includes(val)) {
                     txt = document.createElement('details');
-                    const list_urls = data[i][key][val];
+                    list_urls = data[i][key][val];
                     let ul = document.createElement('ul');
                     for (let element in list_urls) {
                         const li = document.createElement('li')
-                        li.textContent = list_urls[element] + "\n"
-                        ul.appendChild(li);
+                        if(!["FontsNb"].includes(val)){ // Don't need balise 'a' for download fonts
+                            let a_b = document.createElement('a');
+                            a_b.setAttribute('href',list_urls[element]);
+                            a_b.textContent = list_urls[element] + " \n ";
+                            ul.append(a_b);
+                        }else{
+                            li.textContent = list_urls[element] + "\n"
+                            ul.appendChild(li);
+                        }
                     }
                     ul.style.background = 'white';
                     txt.appendChild(ul);
+                    cell.appendChild(document.createTextNode('Nb : '+ (list_urls.length == undefined ? 0 : list_urls.length)));
+
                 } else {
                     // In case of the green host data
                     if (val === 'host') {
-                        txt = document.createTextNode(JSON.stringify(data[i][key][val]));
-                    } else {
-                        txt = document.createTextNode(data[i][key][val]);
+                        let host_data = data[i][key][val]
+                        txt = document.createTextNode(`${host_data.isGreen ? "1":"0"} ; \n\n Energie utilisé : ${host_data.energy != "" ? host_data.energy : "NaN"}`);
+                    } else if(val === "isMobileFriendly"){
+                        txt = document.createTextNode(`${data[i][key][val] ? "1":"0"}`);
+                    }else{
+                        let v = data[i][key][val];
+                        txt = document.createTextNode(isNaN(v)  ? '0' : v);
                     }
                 }
 
                 cell.appendChild(txt);
+
+                
                 row.appendChild(cell);
             }
 
@@ -229,7 +250,7 @@ function generateExcel(data){
         for(let j of Object.values(i[Object.keys(i)])){
             if(Array.isArray(j)){
                 if(j.length<3){
-                    row.push(j.toString());
+                    row.push(j.toString().length == 0 ? "0" : j.toString);
                 }else{
                     // Afin de ne pas dépasser la limite de caractères pour une cellule excel, on n'affichera pas le contenu des tableaux mais leur taille.
                     row.push(j.length);
@@ -265,6 +286,7 @@ async function resultats(){
     display_fuzzy(fuzzyData);
 }
 
+// Page analyse
 async function analyse(){
     display_loading()
     let urls = reformate_url([document.getElementById("url_toAnalyse").value]);
@@ -343,7 +365,7 @@ function reformate_url(array){
     return urls;
 }
 
-
+// Page Initial
 async function compute() {
 
     display_loading();

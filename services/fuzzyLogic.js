@@ -67,7 +67,7 @@ function getSpecificData(data,critere){
 
 module.exports.launch = async function launch(data,data2=[common.exampleScrapperData]){
     // test critères : 
-    let crit_less = ["size","nbRequest","domSize","cssOrJsNotExt","ratioimagesResizedInPage","ratioHttp1"]; // Plus la valeur est bas, plus on est dans l'excellent
+    let crit_less = ["Size(Kb)","RequestsNb","DOMsize(nb elem)","CSSNotExt","JSNotExt","ratioimagesResizedInPage","Http2requests"]; // Plus la valeur est bas, plus on est dans l'excellent
     let crit_more = ["etagsNb"];
     var fuzzification = {};
     let url_data = Object.values(data2[0])[0];
