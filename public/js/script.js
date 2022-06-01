@@ -98,6 +98,7 @@ function getHeaders(data) {
     return ["url", ...Object.keys(data[Object.keys(data)[0]])];// Loop pour chaque clé de la première données scanner.
 }
 
+// Affichage du tableau 
 function display_data(data) {
 
     console.log("DATA : ",data);
@@ -141,7 +142,7 @@ function display_data(data) {
                 cell.style.border = '1px solid black';
                 let txt;
                 var list_urls;
-                if (["cms","JSMinification","CSSMinification", "FontsNb", "imagesWithoutLazyLoading", "filesWithError","socialButtons"].includes(val)) {
+                if (["CMS","JSMinification","CSSMinification", "FontsNb", "imagesWithoutLazyLoading", "filesWithError","socialButtons"].includes(val)) {
                     txt = document.createElement('details');
                     list_urls = data[i][key][val];
                     let ul = document.createElement('ul');
