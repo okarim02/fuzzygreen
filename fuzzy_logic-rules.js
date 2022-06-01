@@ -1,3 +1,4 @@
+// code copied from : https://github.com/sebs/node-fuzzylogic
 module.exports.and = function (a, b, cbA, cbB) {
     'use strict';
     var ret = Math.min(a, b);
