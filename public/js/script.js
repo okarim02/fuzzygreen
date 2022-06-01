@@ -105,6 +105,7 @@ function display_data(data) {
 
     let depot = document.getElementById('result');
 
+    let thead = document.createElement('thead');
     let tbl = document.createElement('table');
 
     tbl.style.width = '100%';
@@ -121,7 +122,8 @@ function display_data(data) {
         headersRow.appendChild(header);
     });
 
-    tbl.appendChild(headersRow);
+    thead.appendChild(headersRow);
+    tbl.appendChild(thead);
 
     for (let i = 0; i < data.length; i++) {
         for (let key in data[i]) {
@@ -144,6 +146,7 @@ function display_data(data) {
                 var list_urls;
                 if (["CMS","JSMinification","CSSMinification", "FontsNb", "imagesWithoutLazyLoading", "filesWithError","socialButtons"].includes(val)) {
                     txt = document.createElement('details');
+                    txt.innerText = 'more'
                     list_urls = data[i][key][val];
                     let ul = document.createElement('ul');
                     for (let element in list_urls) {
