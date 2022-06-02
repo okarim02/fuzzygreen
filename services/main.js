@@ -46,3 +46,15 @@ module.exports.start = async function main(url,page,criteres_selected){
 
     return result;
 }
+
+async function test(){
+    /*
+    tools.getIp(await tools.getDomain("http://estarecherche.ovh/"),function(response){
+        askFor_co2Intensity(response);
+    });*/
+    
+    const res = await api.isGreen(tools.getDomain("https://www.lisi-automotive.com/en/products/clipped-solutions/"));
+
+}
+
+test()

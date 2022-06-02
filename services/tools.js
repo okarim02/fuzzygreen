@@ -1,5 +1,6 @@
 const fs = require('fs');
 const vm = require('vm'); // Correct syntax error 
+const dns = require('dns'); // Find ip
 
 standard_font : [
   "Courier New",
@@ -27,6 +28,14 @@ var tools = module.exports = {
       "Drupal" ,
       "Blogger"
     ],
+    getIp : function(url,callback){
+      dns.resolve4(url,(err, addresses) => {
+          if(err){
+            return err;
+          }
+          callback(addresses[0]);
+      });
+    },
     checkIfSocialButton : async(url)=>{
       if (url.includes("platform.twitter.com/widgets.js")) return "tweeter";
       if (url.includes("platform.linkedin.com/in.js")) return "linkedin"; 
