@@ -3,32 +3,31 @@ function begin() {
 
     create_checkbox();
 }
-
+// Catégorie: design, serveur, hébergement
 var criteres = [
-    'PageSize(Ko)',
+    'PageSize(Ko)', // Serveur
     'RequestsNb',
     'DOMsize(nb elem)',
-    'JSMinification',
+    'JSMinification', 
     'CSSMinification',
-    'FontsNb',
     'etagsRatio',
     'etagsNb',
-    'imagesWithoutLazyLoading',
     'lazyLoadRatio',
-    'cssFiles',
+    'filesWithError',
     'CSSNotExt',
     'JSNotExt',
-    'filesWithError',
-    'socialButtons',
     'isStatic',
-    'CMS',
-    'loadTime(ms)',
-    'imgResize',
     'Http1.1/Http2requests ',
     'pluginsNb',
+    'FontsNb', // design
+    'imagesWithoutLazyLoading',
+    'cssFiles',
+    'socialButtons',
+    'CMS',
+    'imgResize',
     'isMobileFriendly',
     'imgSrcEmpty',
-    'host'
+    'host'// hébergement
 ]
 
 var criteres_selected = [...criteres];
@@ -111,8 +110,10 @@ function display_data(data) {
     tbl.style.width = '100%';
     tbl.style.border = '3px solid black';
 
-    let headersRow = document.createElement('tr');
+    // ajout des groupes
+    thead.innerHTML+="<tr><th colspan='15'>Serveur</th><th colspan='8'>Design</th><th colspan='1'>hébergement</th></tr>"
 
+    let headersRow = document.createElement('tr');
     let headers = getHeaders(data[0]);
 
     headers.forEach(text => {
@@ -168,6 +169,7 @@ function display_data(data) {
                 } else {
                     // In case of the green host data
                     if (val === 'host') {
+                        // Création d'une nouvelle ligne pour séparer les groupes (voir structure d'un tableau)
                         let host_data = data[i][key][val]
                         txt = document.createTextNode(`${host_data.isGreen ? "1":"0"} ; \n\n Energie utilisé : ${host_data.energy != "" ? host_data.energy : "NaN"}`);
                     } else if(val === "isMobileFriendly"){
@@ -261,7 +263,11 @@ function generateExcel(data){
                 }
                 
             }else{
-                row.push(j);
+                if(typeof j === 'object'){
+                    row.push(JSON.stringify(j));
+                }else{
+                    row.push(j.toString());
+                }
             }
         }
         wsData.push(row);

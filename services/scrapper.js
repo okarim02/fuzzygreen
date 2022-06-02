@@ -11,32 +11,32 @@ const tools = require('./tools');
 
 function Measures(){
     return {
-        'PageSize(Ko)': 0,
+        'PageSize(Ko)': 0, // Serveur
         'RequestsNb': 0,
         'DOMsize(nb elem)': 0,
         //'filesNotMin': [],
         'JSMinification':[],
         'CSSMinification':[],
-        'FontsNb': [],
+        'CSSNotExt':0,
+        'JSNotExt':0,
         'etagsRatio':0.0,
         'etagsNb': 0,
+        'filesWithError': [],
+        'isStatic': 1,
+        'pluginsNb': 0,
+        'Http1.1/Http2requests': 0,
+        'FontsNb': [], // design
         'imagesWithoutLazyLoading': [],
         'lazyLoadRatio': 0,
         'cssFiles': 0,
         //'cssOrJsNotExt': 0,
-        'CSSNotExt':0,
-        'JSNotExt':0,
-        'filesWithError': [],
         'socialButtons': [],
-        'isStatic': 1,
         'CMS': [],
-        'loadTime(ms)': 0,
+        //'loadTime(ms)': 0, // A supprimer
         'imgResize': 0,
-        'Http1.1/Http2requests': 0,
-        'pluginsNb': 0,
         'isMobileFriendly':false,
         "imgSrcEmpty":0,
-        "host":{}
+        "host":{} // hosting
     }
 }
 
@@ -159,7 +159,7 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
     measures.CMS = await getCMS(page, browser = undefined).then(e => e ? e : []);
 
     measures.isStatic = await isStatic(page,measures) ? 1 : 0;
-    measures['loadTime(ms)'] = await getLoadTime(page);
+    //measures['loadTime(ms)'] = await getLoadTime(page);
 
     /* Todo : utiliser la méthode ci-dessous pour trouver le protocole utilisé.
     * Goal : Get the protocol using for each request/response
