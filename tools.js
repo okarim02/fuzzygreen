@@ -27,6 +27,12 @@ var tools = module.exports = {
       "Drupal" ,
       "Blogger"
     ],
+    draw(string){
+      fs.writeFileSync("./file.svg",string,(err)=>{
+        if(err){ return console.err(err) }
+        console.log("Fichier sauvegarder");
+      })
+    },
     checkIfSocialButton : async(url)=>{
       if (url.includes("platform.twitter.com/widgets.js")) return "tweeter";
       if (url.includes("platform.linkedin.com/in.js")) return "linkedin"; 
