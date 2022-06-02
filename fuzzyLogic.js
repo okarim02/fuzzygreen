@@ -75,34 +75,37 @@ function main(){
 	// Fuzzifier ===========================
 	
 	var fuzzyvariable_pageSize = logic
-	.or('Excellent', new Triangle(20, 40, 60))
-	.or('Medium', new Triangle(40,60,80))
-	.or('Bad', new Triangle(40,60,80))
-		.defuzzify(40); // Example : pageSize = 40 Ko => except : Medium
+	.init('Excellent', new Triangle(10, 40, 60))
+	.or('Medium', new Triangle(40,100,125))
+	.or('Bad', new Triangle(110,150,220))
+		.defuzzify(50); // Example : pageSize = 40 Ko => except : Excellent
 	
 	var fuzzyvariable_RequestsNb = logic
-	.or('Excellent', new Triangle(20, 40, 60))
-	.or('Medium', new Triangle(40,60,80))
-	.or('Bad', new Triangle(40,60,80))
-		.defuzzify(10); // Example : Requests numbers = 10 => except : Excellent
+	.init('Excellent', new Triangle(0, 50, 65))
+	.or('Medium', new Triangle(60,100,110))
+	.or('Bad', new Triangle(105,150,200))
+		.defuzzify(160); // Example : Requests numbers = 10 => except : Excellent
 
 	var fuzzyvariable_DOMsize = logic
-	.or('Excellent', new Triangle(20, 40, 60))
-	.or('Medium', new Triangle(40,60,80))
-	.or('Bad', new Triangle(40,60,80))
-		.defuzzify(60); // Example : domSize = 60 => except : Bad
+	.init('Excellent', new Triangle(20, 60, 100))
+	.or('Medium', new Triangle(85,125,150))
+	.or('Bad', new Triangle(115,180,225))
+		.defuzzify(150); // Example : domSize = 60 => except : Medium
 
-	console.log(fuzzyvariable_pageSize + "," + fuzzyvariable_RequestsNb + ", "+ fuzzyvariable_DOMsize)
+	console.log(fuzzyvariable_pageSize.defuzzified + "," + fuzzyvariable_RequestsNb.defuzzified + ","+ fuzzyvariable_DOMsize.defuzzified)
 
 	// Fuzzy value  
 	var sustainability = {}
-	sustainability.excellent = fuzzyvariable_pageSize.toString() == "Excellent" &&  fuzzyvariable_RequestsNb.toString() == "Excellent" &&  fuzzyvariable_DOMsize.toString() == "Excellent" ? "Excellent" : ""
+	sustainability.excellent = fuzzyvariable_pageSize.toString() == "Excellent" &&  fuzzyvariable_RequestsNb.toString() == "Excellent" &&  (fuzzyvariable_DOMsize.toString() == "Medium" || fuzzyvariable_DOMsize.toString() == "Excellent") ? 1 : 0
+	sustainability.medium = fuzzyvariable_pageSize.toString() == "Bad" &&  fuzzyvariable_RequestsNb.toString() == "Bad" &&  fuzzyvariable_DOMsize.toString() == "Excellent" ? 1 : 0
+	sustainability.bad = fuzzyvariable_pageSize.toString() == "Excellent" &&  fuzzyvariable_RequestsNb.toString() == "Bad" &&  fuzzyvariable_DOMsize.toString() == "Bad" ? 1 : 0
+	
+	console.log(sustainability);
 	// ... 
 	
 	// -----------------
 	// Test dessiner un trapeze : 
 	draw(20,0,30,1,90,1,100,0);
-	console.log(res.valueOf());
  
 	var logic = new Logic();
 	var res = logic
@@ -111,7 +114,6 @@ function main(){
 	.or('enragedAttack', new Grade(90, 100))
 		.defuzzify(40);
 
-	console.log(res.toString())
 }
 
 
