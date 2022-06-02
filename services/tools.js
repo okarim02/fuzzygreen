@@ -28,6 +28,13 @@ var tools = module.exports = {
       "Drupal" ,
       "Blogger"
     ],
+    readPixels : function(name){
+      // install png-js
+      var PNG = require('png-js');
+      PNG.decode(name, function(pixels) {
+        // pixels is a 1d array (in rgba order) of decoded pixel data
+    });
+    },
     getIp : function(url,callback){
       dns.resolve4(url,(err, addresses) => {
           if(err){

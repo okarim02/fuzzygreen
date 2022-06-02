@@ -2,7 +2,7 @@
     {
         "id" : 0,
         "critere" : "Size",
-        "header": "Size(Ko)", 
+        "header": "PageSize(Ko)", 
         "description": "Poid de la page, Représente ce que l'utilisateur télécharge en Ko",
         "conseil": "Ce critères peut être diminuer en tenant compte des autres critères d'éco-conception, ce qui en soit logique, car par exemple : diminuer le poid des images va alléger le poid de la page"
     },

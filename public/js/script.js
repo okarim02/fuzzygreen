@@ -171,7 +171,8 @@ function display_data(data) {
                     if (val === 'host') {
                         // Création d'une nouvelle ligne pour séparer les groupes (voir structure d'un tableau)
                         let host_data = data[i][key][val]
-                        txt = document.createTextNode(`${host_data.isGreen ? "1":"0"} ; \n\n Energie utilisé : ${host_data.energy != "" ? host_data.energy : "NaN"}`);
+                        txt = document.createTextNode(`${host_data.isGreen ? "1":"0"} ; \n\n Energie utilisé : ${host_data.energy != "" ? host_data.energy : "NaN"} ; 
+                        Pays : ${host_data.country} \n\n co2 : ${JSON.stringify(host_data.co2_info)}`);
                     } else if(val === "isMobileFriendly"){
                         txt = document.createTextNode(`${data[i][key][val] ? "1":"0"}`);
                     }else{

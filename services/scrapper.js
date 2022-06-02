@@ -55,9 +55,6 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
     var measures = setMeasurestoDo(criteres_selected);
     //'use strict';
 
-    // Take screenshot 
-    await page.screenshot({ path: `page.jpeg` });
-
     const gitMetrics = await page.metrics();
 
     // Use to do more things with the requests made by the website (check the doc)
@@ -158,6 +155,11 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
 
     // GO TO THE PAGE 
     await page.goto(url, { waitUntil: ('networkidle0') });
+
+    // Take screenshot 
+    await page.screenshot({ path: `page.png` });
+
+    measures.ratioWhitePixels = tools.readPixels('page.png')
 
     measures.CMS = await getCMS(page, browser = undefined).then(e => e ? e : []);
 

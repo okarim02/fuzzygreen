@@ -34,7 +34,9 @@ module.exports.start = async function main(url,page,criteres_selected){
             const resultGreen = await api.isGreen(domainName);
             result.host={ 
                 "isGreen":resultGreen.green,
-                "energy": resultGreen.moreData ? resultGreen.moreData[0].model : ""
+                "energy": resultGreen.moreData ? resultGreen.moreData[0].model : "",
+                "country":resultGreen.moreData ? resultGreen.moreData['co2 from greenfound'].Country : "",
+                "co2_info": resultGreen.moreData ? resultGreen.moreData['co2 from greenfound']['cO2 info'] : "",
             };
         } 
     }).catch(async e=>{ // todo , gérer l'erreur : faux url.
