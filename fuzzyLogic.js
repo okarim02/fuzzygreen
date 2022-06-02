@@ -94,12 +94,15 @@ function main(){
 
 	console.log(fuzzyvariable_pageSize.defuzzified + "," + fuzzyvariable_RequestsNb.defuzzified + ","+ fuzzyvariable_DOMsize.defuzzified)
 
-	// Fuzzy value  
-	var sustainability = {}
+	// Fuzzy rules  
+	var sustainability = {}; // exc && exc && exc 
 	sustainability.excellent = fuzzyvariable_pageSize.toString() == "Excellent" &&  fuzzyvariable_RequestsNb.toString() == "Excellent" &&  (fuzzyvariable_DOMsize.toString() == "Medium" || fuzzyvariable_DOMsize.toString() == "Excellent") ? 1 : 0
 	sustainability.medium = fuzzyvariable_pageSize.toString() == "Bad" &&  fuzzyvariable_RequestsNb.toString() == "Bad" &&  fuzzyvariable_DOMsize.toString() == "Excellent" ? 1 : 0
 	sustainability.bad = fuzzyvariable_pageSize.toString() == "Excellent" &&  fuzzyvariable_RequestsNb.toString() == "Bad" &&  fuzzyvariable_DOMsize.toString() == "Bad" ? 1 : 0
 	
+	// More compact 
+	sustainability.excellent = (fuzzyvariable_pageSize.toString() == "Excellent" && fuzzyvariable_RequestsNb.toString() == "Excellent") || fuzzyvariable_DOMsize.toString() == "Excellent" // ...   
+
 	console.log(sustainability);
 	// ... 
 	
