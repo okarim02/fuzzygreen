@@ -58,55 +58,48 @@
         "conseil":"Malgré que wordpress est optimisé il reste lourd a utilisé surtout si on utilise pas 100% de ses fonctionnalité, éviter également d'importer beaucoup de plugins"
     },
     {
-        "id":8,
-        "_comment":"Pas inclus dans le tableau, a faire ....",
-        "critere": "Temps",
-        "header":"loadTime(ms)",
-        "description": "Temps en ms auquel votre page s'est chargé"
-    },
-    {
-        "id": 9,
+        "id": 8,
         "critere":"Taille des images modifier depuis le navigateur",
         "header":"imgResize",
         "description":"Redimensionner une image avec les propriétés width et height de la balise <img> est du dégaspillage car il charge quand même l'image originale dans le navigateur et donc consomme pour rien.",
         "conseil" : "Changer la taille d'une image depuis un logiciel du style photoshop"
     },
     {
-        "id":10,
+        "id":9,
         "_comment":"Critère bizzare, à revoir",
         "critere":"ratio http1",
         "header":"Http1.1/Http2requests",
         "description":"HTTP2 est rapide et sécurisé, propose la compréssion des headers et donc réduit la bande passante"
     },
     {
-        "id":11,
+        "id":10,
         "critere":"Hébergeur vert",
         "description":"Des hébergeur fournissent des services en utilisant l'énérgie vert et donc compense ses émissions de gaz à effet de serre",
         "conseil":"Opter pour un hébergeur inclus dans la liste fournit par greenIT"
     },
     {
-        "id":12,
+        "id":11,
         "critere":"minification des fichiers JS",
         "header":"JSMinification",
         "description":"On peut diminuer le poid de fichier JS en supprimant des lignes vide ou des espaces inutile",
         "conseil": "Adopter des outils comme YUI compressor."
     },
     {
-        "id":13,
+        "id":12,
         "critere":"minification des fichiers CSS",
         "header":"CSSMinification",
         "description":"On peut diminuer le poid de fichier CSS en supprimant des lignes vide ou des espaces inutile",
         "conseil": "Adopter des outils comme YUI compressor."
     },
     {
-        "id":14,
+        "id":13,
         "critere":"Images avec src vide",
         "header":"imgSrcEmpty",
         "description":"La page génére des requêtes http pour trouver l'image",
         "conseil":"Eviter de laissé des balises IMG avec un src vide"
     },
     {
-        "id":15,
+        "id":14,
         "critere":"JS interne(inline)",
         "_comment":"Nom différent du côté site web",
         "header":"JSNotExt",
@@ -114,7 +107,7 @@
         "conseil":""
     },
     {
-        "id":16,
+        "id":15,
         "critere":"CSS interne(inline)",
         "header":"CSSNotExt",
         "_comment":"Nom différent du côté site web",
@@ -122,40 +115,40 @@
         "conseil":""
     },
     {
-        "id":17,
+        "id":16,
         "critere":"valider le code JS",
         "header":"filesWithError",
         "description":"Si le code respecte les règles de syntaxe alors cela allègera le travail de l'interpréteur et donc du CPU.",
         "conseil":"Adopter des outils comme JSLint"
     },
     {
-        "id":18,
+        "id":17,
         "critere":"Eviter les boutons réseaux sociaux",
         "header":"socialButtons",
         "description":"Le click sur ces boutons génère des requêtes inutile comme par exemple le nombre de likes (Facebook)",
         "conseil":""
     },
     {
-        "id": 19,
+        "id": 18,
         "critere":"Adaptation de la page en mobile",
         "description":"Sachant que 50,1 % du temps passé sur internet se fait depuis des appareil mobile, une page compatible avec ce format avantagera votre site web",
         "conseil" : "Si votre page n'est pas mobile friendly, veuillez revoir la structure de votre page : Par exemple prévoir l'utilisateur d'une template, changer la taille et l'emplacement des boutons ou encore revoir le choix de la police utilisé ..."
     },
     {
-        "id":20,
+        "id":19,
         "critere":"police standards",
         "header":"FontsNb",
         "description":"Adopter les polices par défault économise de la bande passant car on importe aucunes polices.",
         "conseil":"Si ce n'est pas possible, limiter vous à 3 polices"
     },
     {
-        "id":21,
+        "id":20,
         "critere":"Optimiser les fichiers pdf",
         "description":"Optimiser la taille des fichiers pdf va alléger le poid de la requêtes associé",
         "conseil":""
     },
     {
-        "id":22,
+        "id":21,
         "critere":"Nombres de fichiers css",
         "_comment":"Critère dans le tableau ?",
         "header":"cssFiles"
