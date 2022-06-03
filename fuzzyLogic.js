@@ -108,7 +108,7 @@ function main(){
 	
 	// -----------------
 	// Test dessiner un trapeze : 
-	draw(20,0,30,1,90,1,100,0);
+	//draw(20,0,30,1,90,1,100,0);
  
 	var logic = new Logic();
 	var res = logic
