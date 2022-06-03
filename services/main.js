@@ -3,7 +3,7 @@ const common = require("./common");
 const scrapper = require('./scrapper');
 const api = require('./api');
 const tools = require("./tools");
-
+// Calls scrapper file and Api file
 module.exports.start = async function main(url,page,criteres_selected){
     
     const baseUrl = url ;
@@ -31,13 +31,21 @@ module.exports.start = async function main(url,page,criteres_selected){
         }; // Took so long, fix this !
         
         if(criteres_selected.includes("host")){
-            const resultGreen = await api.isGreen(domainName);
-            result.host={ 
-                "isGreen":resultGreen.green,
-                "energy": resultGreen.moreData ? resultGreen.moreData[0].model : "",
-                "country":resultGreen.moreData ? resultGreen.moreData['co2 from greenfound'].Country : "",
-                "co2_info": resultGreen.moreData ? resultGreen.moreData['co2 from greenfound']['cO2 info'] : "",
-            };
+            let resultGreen = await api.isGreen(domainName).then((resultGreen)=>{
+                for(let i of Object.keys(resultGreen.moreData)){
+                    resultGreen[i] = resultGreen[i] || '0';
+                }
+                result.host={ 
+                    "isGreen":resultGreen.green,
+                    "energy": resultGreen.moreData.hosted[0].model || "None",
+                    "country": resultGreen.moreData['co2 from greenfound'].country_code,
+                    "co2_info_greenfoundation": resultGreen.moreData['co2 from greenfound']['cO2 info'] || "None",
+                    "co2_info_elec_map": resultGreen.moreData['co2 from electricity map'] || "",
+                };
+            })
+            .catch((err)=>{
+                console.error("Something wrong with isGreen API, check your url : ",domainName);
+            });
         } 
     }).catch(async e=>{ // todo , gérer l'erreur : faux url.
         console.error("oops something went wrong => ",e);
@@ -55,8 +63,8 @@ async function test(){
         askFor_co2Intensity(response);
     });*/
     
-    const res = await api.isGreen(tools.getDomain("https://www.lisi-automotive.com/en/products/clipped-solutions/"));
-
+    const resultGreen = await api.isGreen(tools.getDomain("google.com"));
+    console.log("Result : ",resultGreen)
 }
 
-test()
+//test()

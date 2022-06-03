@@ -35,13 +35,16 @@ var tools = module.exports = {
         // pixels is a 1d array (in rgba order) of decoded pixel data
     });
     },
-    getIp : function(url,callback){
-      dns.resolve4(url,(err, addresses) => {
+    getIp : function(domain){
+      return new Promise((resolve, reject)=>{
+        dns.resolve4(domain,(err, addresses) => {
           if(err){
-            return err;
+            return reject(err);
           }
-          callback(addresses[0]);
-      });
+          resolve(addresses[0]);
+        });
+      })
+     
     },
     checkIfSocialButton : async(url)=>{
       if (url.includes("platform.twitter.com/widgets.js")) return "tweeter";
