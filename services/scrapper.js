@@ -85,6 +85,11 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
 
         // We only want non-data requests 
         if (!response.url().startsWith('data:')) {
+            // fonts
+            if (response.request().resourceType() == "font") {
+                measures.FontsNb.push(response.url());
+            }
+            
             const btSocial = await tools.checkIfSocialButton(response.url())
             if (btSocial != "") {
                 measures.socialButtonsFind.push(response.url());
@@ -146,9 +151,7 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
         
         }
 
-        if (response.request().resourceType() == "font") {
-            measures.FontsNb.push(response.url());
-        }
+        
     })
 
     const url_object = new URL(url);
@@ -193,8 +196,7 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
 
     measures.imagesWithoutLazyLoading = res.imagesNoLazy;
 
-    measures.imgResize = await getImagesResized(page).then(e => e.ratio);
-    measures.imgResize = isNaN(parseFloat(measures.imgResize).toFixed(2)) ? parseFloat(measures.imgResize).toFixed(2) : 0.0;
+    measures.imgResize = await getImagesResized(page).then(e => e.imagesResized.length);
 
     measures['Http1.1/Http2requests'] = await (counter_http1 / measures.RequestsNb) * 100;
     measures['Http1.1/Http2requests'] = parseFloat(measures['Http1.1/Http2requests']).toFixed(2);
@@ -407,6 +409,9 @@ async function getRatioLazyImages(page) {
         let lazyImages = 0;
         let notLazy = [];
         for (let img of imgs) {
+            if(img.src.includes('data:')){
+                continue;
+            }
             const attr = img.getAttribute("loading");
             if (attr != null) {
                 lazyImages += 1;
