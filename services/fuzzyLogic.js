@@ -25,8 +25,17 @@ function getEcart(values,moyenne){
     return Math.sqrt(sum/values.length);
 }
 
+function getMedian(arr){
+    const mid = Math.floor(arr.length / 2),
+    nums = [...arr].sort((a, b) => a - b);
+    return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2.0;
+}
+
+
+// todo : refaire cette fonction pour inclure directement les données du critère
 function getSpecificData(data,critere){
  
+    // ... 
     let valuesData = []
     data.map((obj)=>{
         Object.values(obj).forEach(e=>{
@@ -55,12 +64,15 @@ function getSpecificData(data,critere){
 
     console.log("Ecart choisit : ",ecart);
 
+    let median = getMedian(valuesData);
+
     return {
         "values":valuesData,
         "min": minMax[0],
         "max":minMax[1],
         "average":moyenne,
         "ecart":ecart,
+        "median": median
     }
 
 }
@@ -80,18 +92,18 @@ module.exports.launch = async function launch(data,data2=[common.exampleScrapper
         if(!result) continue;
         
         if(result.min >= url_data[i]){
-            result.min = url_data[i]-1;
+            result.min_tmp = url_data[i]-1;
         }
 
         if(result.max <= url_data[i]){
-            result.max = url_data[i]+1;
+            result.max_tmp = url_data[i]+1;
         }
 
         console.log("Data testé : ",url_data[i]);
         const fuzzyVal = getFuzzyValue(url_data[i],result);    
         fuzzification[i] = {} 
         fuzzification[i]["fuzzification"] = fuzzyVal;
-        fuzzification[i]["other"] = {min: result.min , max: result.max, moyenne : result.average};
+        fuzzification[i]["other"] = {min: result.min , max: result.max, moyenne : result.average, median: result.median};
     }
 
     // Todo : Implémenter les règles ...
@@ -113,10 +125,10 @@ function getFuzzyValue(value,data,inverse=false) {
         |___/_\______/___\_|____
 
     */
-    let min = data.min;
+    let min = data.min_tmp || data.min;
     let aver = data.average;
     let ecar = data.ecart;
-    let max = data.max;
+    let max = data.max_tmp || data.max;
 
     let excellant = fuzzylogic.triangle(value, min,min,aver);
     let medium = fuzzylogic.triangle(value, aver-ecar, ecar, aver+ecar);

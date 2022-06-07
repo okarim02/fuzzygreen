@@ -201,6 +201,9 @@ function display_data(data) {
     depot.appendChild(tbl);
 }
 function display_fuzzy(data){
+
+    console.log("fuzzy data : ",data['RequestsNb']);
+    
     let depot = document.getElementById('fuzzyData');
     depot.innerHTML="";
     const title = document.createElement('h3');
@@ -212,7 +215,7 @@ function display_fuzzy(data){
     for(let i of Object.keys(data)){
         const li = document.createElement('li')
         li.textContent = `${i} : {excellent : ${ data[i]["fuzzification"][0] } , Medium : ${ data[i]["fuzzification"][1] } , Bad : ${ data[i]["fuzzification"][2] }}` + 
-        `=> min : ${ data[i]['other'].min } ; max : ${ data[i]['other'].max } ; average : ${ data[i]['other'].moyenne }`;
+        `=> min : ${ data[i]['other'].min } ; max : ${ data[i]['other'].max } ; average : ${ data[i]['other'].moyenne } ; median : ${data[i]['other'].median }`;
 
         ul.appendChild(li);
     }
@@ -236,6 +239,7 @@ function show_error(message) {
 
 // Voir http://jsfiddle.net/hybrid13i/JXrwM/;
 function generate_save_button(data){
+    console.log("generet ! ", data);
     let depot = document.getElementById('result');
     const button = document.createElement('button')
     button.innerText = 'Télécharger résultat'
@@ -256,17 +260,17 @@ function generateExcel(data){
     let wsName = 'newSheet';
 
     let wsData = [
-        [...getHeaders(data[0])], // header
+        [...getHeaders(data['urls_data'][0])], // header
     ];
 
-    for(let i of data){
-        let row = [];
-        row.push(Object.keys(i));
+    for(let i of data['urls_data']){
+        let row = []; // Création de la ligne excel
+        row.push(Object.keys(i)); // insertion url 
 
         for(let j of Object.values(i[Object.keys(i)])){
             if(Array.isArray(j)){
                 if(j.length<3){
-                    row.push(j.toString().length == 0 ? "0" : j.toString);
+                    row.push(j.length == 0 ? "0" : j.toString()); // Si l'élément est un tableau alors on affiche sa taille 
                 }else{
                     // Afin de ne pas dépasser la limite de caractères pour une cellule excel, on n'affichera pas le contenu des tableaux mais leur taille.
                     row.push(j.length);
@@ -282,6 +286,29 @@ function generateExcel(data){
         }
         wsData.push(row);
     }
+
+    // Fuzzy data 
+    // en-tête
+    
+    wsData.push([''])
+    wsData.push(['Fuzzy logic'])
+    wsData.push([''])
+    let criteres = Object.keys(data['fuzzy_data'])
+
+    let entete_fuzzy = Object.keys(data['fuzzy_data'][criteres[0]]['other']);
+
+    wsData.push(['Criteria',...entete_fuzzy])
+    
+    for(let i of criteres){
+        let row = []
+        row.push(i); // critère analyse
+        row.push(data['fuzzy_data'][i]['other'].min)
+        row.push(data['fuzzy_data'][i]['other'].max)
+        row.push(data['fuzzy_data'][i]['other'].moyenne)
+        row.push(data['fuzzy_data'][i]['other'].median)
+        wsData.push(row);
+    }
+
 
     let ws = XLSX.utils.aoa_to_sheet(wsData);
     XLSX.utils.book_append_sheet(wb, ws, wsName);
@@ -299,7 +326,7 @@ async function resultats(){
     // Modif pour faciliter la conversion json en csv
     computedData.push(url_data[0]);
 
-    generate_save_button(computedData);
+    generate_save_button({"urls_data":computedData,"fuzzy_data":fuzzyData});
 
     display_data(computedData);
     display_data(url_data);
