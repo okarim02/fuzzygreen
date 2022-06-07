@@ -3,15 +3,15 @@
         "id" : 0,
         "critere" : "Size",
         "header": "PageSize(Ko)", 
-        "description": "Poid de la page, Représente ce que l'utilisateur télécharge en Ko",
-        "conseil": "Ce critères peut être diminuer en tenant compte des autres critères d'éco-conception, ce qui en soit logique, car par exemple : diminuer le poid des images va alléger le poid de la page"
+        "description": "Poids de la page, Représente ce que l'utilisateur télécharge en Ko",
+        "conseil": "Votre page est trop lourd, vérifier le contenu de votre site web par exemple: si les images sont optimisées"
     },
     {
         "id" : 1,
         "critere" : "Nombre de requêtes",
         "header": "RequestsNb", 
         "description": "Le site web échange avec divers acteurs (clients, api, base de données ...) et donc émet des requêtes.",
-        "conseil": "Ce critères peut être diminuer dans un premier temps en limitant le nombre de fichier à télécharger du côté client pour ce faire, combiner les fichiers static (css,js) est une solution mais la plus important est d'utiliser au maximum le cache du navigateur."
+        "conseil": "Ce critère peut être diminué dans un premier temps en limitant le nombre de fichiers à télécharger du côté client pour ce faire, combiner les fichiers statiques (css,js) est une solution mais la plus importante est d'utiliser au maximum le cache du navigateur."
     },
     {
         "id": 2,

@@ -42,7 +42,9 @@ module.exports = {
         "https://www.lisi-medical.com/page-produits/implants-instruments-orthopedie-1",
         "https://www.piolax.co.jp/en/products/car/"
     ],
-    exampleScrapperData :{"size": 5468,
+    exampleScrapperData :
+    
+    {"size": 5468,
     "nbRequest": 211,
     "domSize": 589,
     "filesNotMin": [],

@@ -85,6 +85,11 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
 
         // We only want non-data requests 
         if (!response.url().startsWith('data:')) {
+            // fonts
+            if (response.request().resourceType() == "font") {
+                measures.FontsNb.push(response.url());
+            }
+            
             const btSocial = await tools.checkIfSocialButton(response.url())
             if (btSocial != "") {
                 measures.socialButtonsFind.push(response.url());
@@ -146,9 +151,7 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
         
         }
 
-        if (response.request().resourceType() == "font") {
-            measures.FontsNb.push(response.url());
-        }
+        
     })
 
     const url_object = new URL(url);

@@ -1,5 +1,5 @@
 const { response } = require('express');
-const { replaceStrings } = require('lighthouse/report/generator/report-generator');
+//const { replaceStrings } = require('lighthouse/report/generator/report-generator');
 const fetch = require('node-fetch');
 
 //const lighthouse = require("lighthouse");
