@@ -70,7 +70,7 @@ module.exports.launch = async function launch(data,data2=[common.exampleScrapper
     let crit_less = ["Size(Kb)","RequestsNb","DOMsize(nb elem)","CSSNotExt","JSNotExt","ratioimagesResizedInPage","Http2requests"]; // Plus la valeur est bas, plus on est dans l'excellent
     let crit_more = ["etagsNb"];
     var fuzzification = {};
-    let url_data = Object.values(data2[0])[0];
+    let url_data = Object.values(data2[0])[0]; // Récupère les valeurs, en résumé il exclut la clé : l'url car de data2 inclus l'url.
     // Test
     console.log(`Fuzzy logic`);
     for(let i of crit_less){
@@ -89,7 +89,9 @@ module.exports.launch = async function launch(data,data2=[common.exampleScrapper
 
         console.log("Data testé : ",url_data[i]);
         const fuzzyVal = getFuzzyValue(url_data[i],result);    
-        fuzzification[i] = fuzzyVal;
+        fuzzification[i] = {} 
+        fuzzification[i]["fuzzification"] = fuzzyVal;
+        fuzzification[i]["other"] = {min: result.min , max: result.max, moyenne : result.average};
     }
 
     // Todo : Implémenter les règles ...

@@ -211,7 +211,9 @@ function display_fuzzy(data){
     
     for(let i of Object.keys(data)){
         const li = document.createElement('li')
-        li.textContent = `${i} : {excellent : ${ data[i][0] } , Medium : ${ data[i][1] } , Bad : ${ data[i][2] }}`;
+        li.textContent = `${i} : {excellent : ${ data[i]["fuzzification"][0] } , Medium : ${ data[i]["fuzzification"][1] } , Bad : ${ data[i]["fuzzification"][2] }}` + 
+        `=> min : ${ data[i]['other'].min } ; max : ${ data[i]['other'].max } ; average : ${ data[i]['other'].moyenne }`;
+
         ul.appendChild(li);
     }
     depot.appendChild(ul);
@@ -289,7 +291,7 @@ function generateExcel(data){
 
 // affiche les données calculé jusqu'a ici
 async function resultats(){
-    
+
     const computedData = JSON.parse(sessionStorage.getItem('computedData'));
     const url_data = JSON.parse(sessionStorage.getItem('url_data'));
     const fuzzyData = JSON.parse(sessionStorage.getItem('fuzzyData'));
@@ -302,6 +304,8 @@ async function resultats(){
     display_data(computedData);
     display_data(url_data);
     display_fuzzy(fuzzyData);
+
+    document.getElementById('fetch_result').style = "display : none;"
 }
 
 // Page analyse
