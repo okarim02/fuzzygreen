@@ -73,12 +73,36 @@ function main(){
 	var logic = new Logic();
 
 	// Fuzzifier ===========================
+
+	var fuzzyvariable_pageSize = logic 
+	.init('excellent', new Triangle(10, 10, 30))
+	.or('medium', new Triangle(15,30,50))
+	.or('bad', new Triangle(30,65,65))
+		.defuzzify(5); // Example : pageSize = 5 Ko => except : Excellent
+
+	var fuzzyvariable_DOMsize = logic
+	.init('excellent', new Triangle(20, 60, 100))
+	.or('medium', new Triangle(85,125,150))
+	.or('bad', new Triangle(115,180,225))
+		.defuzzify(25); // Example : domSize = 25 nodes => except : Excellent
 	
-	var fuzzyvariable_pageSize = logic
-	.init('Excellent', new Triangle(10, 40, 60))
-	.or('Medium', new Triangle(40,100,125))
-	.or('Bad', new Triangle(110,150,220))
-		.defuzzify(50); // Example : pageSize = 40 Ko => except : Excellent
+	
+	// Rules : 
+	// IF PageSize is Excellent AND DOMsize is Excellent THEN sustainability IS Excellent 
+	// IF PageSize is Medium THEN sustainability IS Medium 
+	// IF PageSize is Bad AND DOMsize is Bad THEN sustainability IS Bad 
+	/*
+
+	// Faux : let res = Math.min(fuzzyvariable_pageSize.rules[0].fuzzy,fuzzyvariable_DOMsize.rules[0].fuzzy) || Math.min(fuzzyvariable_pageSize.rules[0].fuzzy,fuzzyvariable_DOMsize.rules[0].fuzzy) || Math.min(fuzzyvariable_pageSize.rules[0].fuzzy,fuzzyvariable_DOMsize.rules[0].fuzzy)
+// essais 
+	var fuzzy_sus = logic
+	.init('excellent',new Triangle(0.55,1,1))
+	.or('medium',new Triangle(0.08333,0.5,0.9167)) // cordonnées construit automatiquement via MathLab.
+	.or('bad',new Triangle(-0.4167,0,0.4167))
+		.defuzzify(res)
+	
+	console.log(fuzzy_sus);
+
 	
 	var fuzzyvariable_RequestsNb = logic
 	.init('Excellent', new Triangle(0, 50, 65))
@@ -116,7 +140,7 @@ function main(){
 	.or('normalAttack', new Trapezoid(20, 30, 90, 100))
 	.or('enragedAttack', new Grade(90, 100))
 		.defuzzify(40);
-
+	*/
 }
 
 
