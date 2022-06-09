@@ -86,13 +86,18 @@ function main(){
 	.or('bad', new Triangle(115,180,225))
 		.defuzzify(25); // Example : domSize = 25 nodes => except : Excellent
 	
-	
-	// Rules : 
+// Rules : 
 	// IF PageSize is Excellent AND DOMsize is Excellent THEN sustainability IS Excellent 
 	// IF PageSize is Medium THEN sustainability IS Medium 
 	// IF PageSize is Bad AND DOMsize is Bad THEN sustainability IS Bad 
-	/*
 
+	sustainability = {}
+	sustainability.excellant = fuzzyvariable_DOMsize.defuzzified == "excellent" && fuzzyvariable_pageSize.defuzzified == "excellent" ? "excellent":"";
+	sustainability.medium = fuzzyvariable_DOMsize.defuzzified == "medium"  ? "medium":"";
+	sustainability.bad = fuzzyvariable_DOMsize.defuzzified == "bad" && fuzzyvariable_pageSize.defuzzified == "bad" ? "bad":"";
+
+	/*
+	
 	// Faux : let res = Math.min(fuzzyvariable_pageSize.rules[0].fuzzy,fuzzyvariable_DOMsize.rules[0].fuzzy) || Math.min(fuzzyvariable_pageSize.rules[0].fuzzy,fuzzyvariable_DOMsize.rules[0].fuzzy) || Math.min(fuzzyvariable_pageSize.rules[0].fuzzy,fuzzyvariable_DOMsize.rules[0].fuzzy)
 // essais 
 	var fuzzy_sus = logic
@@ -273,6 +278,129 @@ function fuzzyJS(){
     console.log(result);
 }
 
+// Test fuzzymodule
 
+var FuzzyModule = require('fuzzymodule');
 
-main();
+var AttackModule = function() {
+
+    this.fzmod = new FuzzyModule();
+
+    this.distanceFLV = this.fzmod.createFLV("distance");
+
+    this.close_to_target = this.distanceFLV.addLeftShoulderSet("close", 0, 9000, 40000);
+    this.average_to_target = this.distanceFLV.addTriangleSet("average", 9000, 40000, 60000);
+    this.far_to_target = this.distanceFLV.addRightShoulderSet("far", 40000, 60000, 400000);
+
+    this.sizeFLV = this.fzmod.createFLV("size");
+
+    this.small_target = this.sizeFLV.addLeftShoulderSet("small", 1, 3, 6);
+    this.medium_target = this.sizeFLV.addTriangleSet("medium", 3, 6, 8);
+    this.big_target = this.sizeFLV.addRightShoulderSet("big", 6, 8, 10);
+
+    this.desirabilityFLV = this.fzmod.createFLV("desirability");
+
+    this.undesirable = this.desirabilityFLV.addLeftShoulderSet("undesirable", 0, 30, 50);
+    this.desirable = this.desirabilityFLV.addTriangleSet("desirable", 30, 50, 70);
+    this.very_desirable = this.desirabilityFLV.addRightShoulderSet("very_desirable", 50, 70, 100);
+
+    this.declareRules = function() {
+        var close = this.fzmod.makeNewFuzzyTerm(this.close_to_target);
+        var average = this.fzmod.makeNewFuzzyTerm(this.average_to_target);
+        var far = this.fzmod.makeNewFuzzyTerm(this.far_to_target);
+
+        var small = this.fzmod.makeNewFuzzyTerm(this.small_target);
+        var medium = this.fzmod.makeNewFuzzyTerm(this.medium_target);
+        var big = this.fzmod.makeNewFuzzyTerm(this.big_target);
+
+        var desirable = this.fzmod.makeNewFuzzyTerm(this.desirable);
+        var undesirable = this.fzmod.makeNewFuzzyTerm(this.undesirable);
+        var very_desirable = this.fzmod.makeNewFuzzyTerm(this.very_desirable);
+
+        this.fzmod.addRule(close.fzAndWith(small), desirable);
+        this.fzmod.addRule(close.fzAndWith(medium), desirable);
+        this.fzmod.addRule(close.fzAndWith(big), very_desirable);
+
+        this.fzmod.addRule(average.fzAndWith(small), undesirable);
+        this.fzmod.addRule(average.fzAndWith(medium), desirable);
+        this.fzmod.addRule(average.fzAndWith(big), very_desirable);
+
+        this.fzmod.addRule(far.fzAndWith(small), undesirable);
+        this.fzmod.addRule(far.fzAndWith(medium), undesirable);
+        this.fzmod.addRule(far.fzAndWith(big), desirable);
+    };
+
+    this.getCrispValue = function(distance, size) {
+        this.fzmod.fuzzify("distance", distance);
+        this.fzmod.fuzzify("size", size);
+        this.declareRules();
+        return this.fzmod.deFuzzify("desirability");
+    };
+
+}
+
+var a = new AttackModule();
+let result = a.getCrispValue(47900, 5);
+
+//console.log(result)
+
+var SustainabilityModule = function() {
+
+    this.fzmod = new FuzzyModule();
+
+    this.domSizeFLV = this.fzmod.createFLV("domSize");
+
+    this.excellent_domSize = this.domSizeFLV.addTriangleSet("excellent", 10, 10, 30);
+    this.medium_domSize = this.domSizeFLV.addTriangleSet("medium", 10, 30, 50);
+    this.bad_domSize = this.domSizeFLV.addTriangleSet("bad", 30, 50, 65);
+
+    this.requestNbFLV = this.fzmod.createFLV("requestsNb");
+
+    this.excellent_requestsNb = this.requestNbFLV.addTriangleSet("excellent", 20, 60,100);
+    this.medium_requestsNb = this.requestNbFLV.addTriangleSet("medium", 60, 100, 200);
+    this.bad_requestsNb = this.requestNbFLV.addTriangleSet("bad", 100, 200, 250);
+
+    this.sustainabilityFLV = this.fzmod.createFLV("sustainability");
+
+    this.bad_sustainability = this.sustainabilityFLV.addTriangleSet("bad", 0, 30, 50);
+    this.medium_sustainability = this.sustainabilityFLV.addTriangleSet("medium", 30, 50, 70);
+    this.excellent_sustainability = this.sustainabilityFLV.addTriangleSet("excellent", 50, 70, 100);
+
+    this.declareRules = function() {
+        var veryGood_domSize = this.fzmod.makeNewFuzzyTerm(this.excellent_domSize);
+        var good_domSize = this.fzmod.makeNewFuzzyTerm(this.medium_domSize);
+        var veryBad_domSize = this.fzmod.makeNewFuzzyTerm(this.bad_domSize);
+
+        var veryGood_requestsNb = this.fzmod.makeNewFuzzyTerm(this.excellent_requestsNb);
+        var good_requestsNb = this.fzmod.makeNewFuzzyTerm(this.medium_requestsNb);
+        var veryBad_requestsNb = this.fzmod.makeNewFuzzyTerm(this.bad_requestsNb);
+
+        var veryGood_sustainability = this.fzmod.makeNewFuzzyTerm(this.excellent_sustainability);
+        var good_sustainability = this.fzmod.makeNewFuzzyTerm(this.medium_sustainability);
+        var veryBad_sustainability = this.fzmod.makeNewFuzzyTerm(this.bad_sustainability);
+
+        this.fzmod.addRule(veryGood_domSize.fzAndWith(veryGood_requestsNb), veryGood_sustainability);
+        this.fzmod.addRule(veryGood_domSize.fzAndWith(good_requestsNb), veryGood_sustainability);
+        this.fzmod.addRule(veryGood_domSize.fzAndWith(veryBad_requestsNb), good_sustainability);
+
+        this.fzmod.addRule(good_domSize.fzAndWith(veryGood_requestsNb), veryGood_sustainability);
+        this.fzmod.addRule(good_domSize.fzAndWith(good_requestsNb), good_sustainability);
+        this.fzmod.addRule(good_domSize.fzAndWith(veryBad_requestsNb), veryBad_sustainability);
+
+        this.fzmod.addRule(veryBad_domSize.fzAndWith(veryGood_requestsNb), good_sustainability);
+        this.fzmod.addRule(veryBad_domSize.fzAndWith(good_requestsNb), veryBad_sustainability);
+        this.fzmod.addRule(veryBad_domSize.fzAndWith(veryBad_requestsNb), veryBad_sustainability);
+    };
+
+    this.getCrispValue = function(domSize, requestsNb) {
+        this.fzmod.fuzzify("domSize", domSize);
+        this.fzmod.fuzzify("requestsNb", requestsNb);
+        this.declareRules();
+        return this.fzmod.deFuzzify("sustainability");
+    };
+
+}
+
+var b = new SustainabilityModule();
+let result2 = b.getCrispValue(10, 200); // Plus la valeur est grande, plus le site est excellent
+console.log(result2)

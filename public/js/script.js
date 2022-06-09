@@ -96,6 +96,7 @@ function getHeaders(data) {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 // Affichage du tableau 
+<<<<<<< Updated upstream
 =======
 <<<<<<< Updated upstream
 >>>>>>> Stashed changes
@@ -104,11 +105,32 @@ function getHeaders(data) {
 >>>>>>> Stashed changes
 function display_data(data) {
 =======
+=======
+<<<<<<< Updated upstream
+function display_data(data) {
+=======
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
+function display_data(data) {
+=======
+>>>>>>> Stashed changes
 // Affichage du tableau 
 
 function display_data(data,data2) {
 >>>>>>> Stashed changes
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+=======
+function display_data(data,data2) {
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 <<<<<<< Updated upstream
 =======
@@ -335,13 +357,58 @@ function display_data(data,data2) {
 >>>>>>> Stashed changes
                 row.appendChild(cell);
             }
+              
+            
 
             tbl.appendChild(row)
         }
     }
 
+<<<<<<< Updated upstream
     // Affichage min max average median  
     // Ces valeurs ont été calculé lors de la phase : fuzzy _ logic et récupérabe depuis la valeur : fuzzyData.
+=======
+<<<<<<< Updated upstream
+    depot.appendChild(tbl);
+}
+function display_fuzzy(data){
+=======
+    // Affichage min max average median  
+    // Ces valeurs ont été calculé lors de la phase : fuzzy _ logic et récupérabe depuis la valeur : fuzzyData.
+<<<<<<< Updated upstream
+=======
+
+    criteres_analyse =  Object.keys(data2);
+    headers_infos = ['min','max','average','median']
+
+    for(let i = 0 ; i < criteres_analyse.length;i++){
+        let row = `<tr>
+            <td> ${ headers_infos[i] } </td>
+            <td>
+                ${data2[criteres_analyse[i]].other.min}
+            </td>
+        </tr>`
+        tbl.innerHTML += row;
+    }
+
+    depot.appendChild(tbl);
+}
+function display_fuzzy(data){
+>>>>>>> Stashed changes
+
+    criteres_analyse =  Object.keys(data2);
+    headers_infos = ['min','max','average','median']
+
+    for(let i = 0 ; i < criteres_analyse.length;i++){
+        let row = `<tr>
+            <td> ${ headers_infos[i] } </td>
+            <td>
+                ${data2[criteres_analyse[i]].other.min}
+            </td>
+        </tr>`
+
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
     criteres_analyse =  Object.keys(data2);
     headers_infos = ['min','max','average','median']
@@ -457,10 +524,10 @@ function generateExcel(data){
     let entete_fuzzy = Object.keys(data['fuzzy_data'][criteres[0]]['other']);
 
     wsData.push(['Criteria',...entete_fuzzy])
-    
+
     for(let i of criteres){
         let row = []
-        row.push(i); // critère analyse
+        row.push(i);
         row.push(data['fuzzy_data'][i]['other'].min)
         row.push(data['fuzzy_data'][i]['other'].max)
         row.push(data['fuzzy_data'][i]['other'].moyenne)
@@ -489,12 +556,26 @@ async function resultats(){
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+=======
+    display_data(computedData);
+=======
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+<<<<<<< Updated upstream
     display_data(computedData);
 =======
     display_data(computedData,fuzzyData);
 >>>>>>> Stashed changes
 =======
     display_data(computedData,fuzzyData);
+>>>>>>> Stashed changes
+<<<<<<< Updated upstream
+=======
+=======
+    display_data(computedData,fuzzyData);
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 >>>>>>> Stashed changes
     display_data(url_data);
     display_fuzzy(fuzzyData);

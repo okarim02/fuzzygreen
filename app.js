@@ -66,12 +66,61 @@ app.post('/api',async (request,response,next)=>{
             message: 'Traitement interrompue'
         });
     })
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+});
+>>>>>>> Stashed changes
 
     console.log("Done");
     next();
 
+<<<<<<< Updated upstream
 });
 
 app.listen(PORT, () => console.log(`Listening at ${PORT} (go to 'localhost:3000')`));
+=======
+=======
+
+    console.log("Done");
+    next();
+
+<<<<<<< Updated upstream
+});
+
+app.listen(PORT, () => console.log(`Listening at ${PORT} (go to 'localhost:3000')`));
+=======
+>>>>>>> Stashed changes
+// Après avoir entrer l'url, l'analyse de cette page en plus de la fuzzy logic se déclenche
+// Puis le serveur redirigera une dernière fois l'utilisateur dans la page de résultat.
+app.post("/getResult/analyse",async (req,res,next)=>{
+    // analyser la page 
+    const crits = req.body.criteres; // Dernier critères qu'on a sauvegarder
+    const computed_data = req.body.computedData;
+    const url_data = await clust(req.body.url,crits);
+
+    // Appel fuzzy logic
+    // todo : récuperer le résultat
+    const fuzzyResult  = await fuzzylogic.launch(computed_data,url_data);
+
+    res.json({
+        status:'success',
+        message: `Traitement terminé`,
+        redirected: '/result',
+        data : JSON.stringify({
+            "fuzzyResult": fuzzyResult,
+<<<<<<< Updated upstream
+            "url_data":url_data 
+        })
+    });
+})
+=======
+            "url_data":url_data
+        })
+    });
+})
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 
