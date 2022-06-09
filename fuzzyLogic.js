@@ -344,7 +344,7 @@ let result = a.getCrispValue(47900, 5);
 
 //console.log(result)
 
-var SustainabilityModule = function() {
+var R1Module = function() {
 
     this.fzmod = new FuzzyModule();
 
@@ -360,6 +360,13 @@ var SustainabilityModule = function() {
     this.medium_requestsNb = this.requestNbFLV.addTriangleSet("medium", 60, 100, 200);
     this.bad_requestsNb = this.requestNbFLV.addTriangleSet("bad", 100, 200, 250);
 
+    this.pageSize = this.fzmod.createFLV("pageSize");
+
+	this.excellent_pageSize = this.requestNbFLV.addTriangleSet("excellent", 25, 100,260);
+    this.medium_pageSize = this.requestNbFLV.addTriangleSet("medium", 100, 260, 320);
+    this.bad_pageSize = this.requestNbFLV.addTriangleSet("bad", 260, 320, 500);
+
+	// Result
     this.sustainabilityFLV = this.fzmod.createFLV("sustainability");
 
     this.bad_sustainability = this.sustainabilityFLV.addTriangleSet("bad", 0, 30, 50);
@@ -375,9 +382,124 @@ var SustainabilityModule = function() {
         var good_requestsNb = this.fzmod.makeNewFuzzyTerm(this.medium_requestsNb);
         var veryBad_requestsNb = this.fzmod.makeNewFuzzyTerm(this.bad_requestsNb);
 
+		var veryGood_pageSize = this.fzmod.makeNewFuzzyTerm(this.excellent_pageSize);
+        var good_pageSize = this.fzmod.makeNewFuzzyTerm(this.medium_pageSize);
+        var veryBad_pageSize = this.fzmod.makeNewFuzzyTerm(this.bad_pageSize);
+
         var veryGood_sustainability = this.fzmod.makeNewFuzzyTerm(this.excellent_sustainability);
         var good_sustainability = this.fzmod.makeNewFuzzyTerm(this.medium_sustainability);
         var veryBad_sustainability = this.fzmod.makeNewFuzzyTerm(this.bad_sustainability);
+
+		// règles
+
+        this.fzmod.addRule(veryGood_domSize.fzAndWith(veryGood_requestsNb), veryGood_sustainability);
+        this.fzmod.addRule(veryGood_requestsNb.fzOrWith(veryGood_pageSize), veryGood_sustainability);
+
+        this.fzmod.addRule(veryGood_domSize.fzAndWith(good_requestsNb), veryGood_sustainability);
+        this.fzmod.addRule(veryGood_domSize.fzAndWith(veryBad_requestsNb), good_sustainability);
+
+        this.fzmod.addRule(good_domSize.fzAndWith(veryGood_requestsNb), veryGood_sustainability);
+        this.fzmod.addRule(good_domSize.fzAndWith(good_requestsNb), good_sustainability);
+        
+
+        this.fzmod.addRule(good_domSize.fzAndWith(veryBad_requestsNb), veryBad_sustainability);
+
+        this.fzmod.addRule(veryBad_domSize.fzAndWith(veryGood_requestsNb), good_sustainability);
+        this.fzmod.addRule(veryBad_domSize.fzAndWith(good_requestsNb), veryBad_sustainability);
+        this.fzmod.addRule(veryBad_domSize.fzAndWith(veryBad_requestsNb), veryBad_sustainability);
+
+        /*
+        IF DOMsize IS EXCELLENT AND RequestNB is Excellent OR PageSize is Excellent THen Sustainability is Excellent
+        IF DOMsize IS Medium AND RequestNB is MEDIUM OR RequestNb is Excellent THen Sustainability is Excellent
+        IF DOMsize IS Bad AND Not RequestNB is Excellent THen Sustainability is Excellent
+        */
+
+		// Ajout du critère : pageSize :
+
+		// this.fzmod.addRule(veryGood_pageSize.fzAndWith(veryGood_requestsNb), veryGood_sustainability);
+        // this.fzmod.addRule(veryGood_pageSize.fzAndWith(good_requestsNb), veryGood_sustainability);
+        // this.fzmod.addRule(veryGood_pageSize.fzAndWith(veryBad_requestsNb), good_sustainability);
+
+		// this.fzmod.addRule(good_pageSize.fzAndWith(veryGood_requestsNb), veryGood_sustainability);
+        // this.fzmod.addRule(good_pageSize.fzAndWith(good_requestsNb), good_sustainability);
+        // this.fzmod.addRule(good_pageSize.fzAndWith(veryBad_requestsNb), veryBad_sustainability);
+
+		// this.fzmod.addRule(veryBad_domSize.fzAndWith(veryGood_requestsNb), good_sustainability);
+        // this.fzmod.addRule(veryBad_domSize.fzAndWith(good_requestsNb), veryBad_sustainability);
+        // this.fzmod.addRule(veryBad_domSize.fzAndWith(veryBad_requestsNb), veryBad_sustainability);
+
+		// // ... 
+		// this.fzmod.addRule(veryGood_pageSize.fzAndWith(veryGood_domSize), veryGood_sustainability);
+        // this.fzmod.addRule(veryGood_pageSize.fzAndWith(good_domSize), veryGood_sustainability);
+        // this.fzmod.addRule(veryGood_pageSize.fzAndWith(veryBad_domSize), good_sustainability);
+
+		// this.fzmod.addRule(good_pageSize.fzAndWith(veryGood_domSize), veryGood_sustainability);
+        // this.fzmod.addRule(good_pageSize.fzAndWith(good_domSize), good_sustainability);
+        // this.fzmod.addRule(good_pageSize.fzAndWith(veryBad_domSize), veryBad_sustainability);
+
+		// this.fzmod.addRule(veryBad_pageSize.fzAndWith(veryGood_domSize), good_sustainability);
+        // this.fzmod.addRule(veryBad_pageSize.fzAndWith(good_domSize), veryBad_sustainability);
+        // this.fzmod.addRule(veryBad_pageSize.fzAndWith(veryBad_domSize), veryBad_sustainability);
+    };
+
+    this.getCrispValue = function(domSize, requestsNb) {
+        this.fzmod.fuzzify("domSize", domSize);
+        this.fzmod.fuzzify("requestsNb", requestsNb);
+        this.fzmod.fuzzify("pageSize", pageSize);
+
+        this.declareRules();
+        return this.fzmod.deFuzzify("sustainability");
+    };
+
+}
+
+var R1 = new R1Module();
+
+let r1 = R1.getCrispValue(15, 200); // Plus la valeur est grande, plus le site est excellent
+
+console.log(r1)
+/*
+var R2Module = function() {
+
+    this.fzmod = new FuzzyModule();
+
+    this.pageSize = this.fzmod.createFLV("pageSize");
+
+	this.excellent_pageSize = this.requestNbFLV.addTriangleSet("excellent", 25, 100,260);
+    this.medium_pageSize = this.requestNbFLV.addTriangleSet("medium", 100, 260, 320);
+    this.bad_pageSize = this.requestNbFLV.addTriangleSet("bad", 260, 320, 500);
+
+    this.etagsNb = this.fzmod.createFLV("etagsNb");
+
+    this.excellent_etagsNb = this.requestNbFLV.addTriangleSet("excellent", 25, 100,260);
+    this.medium_etagsNb= this.requestNbFLV.addTriangleSet("medium", 100, 260, 320);
+    this.bad_etagsNb = this.requestNbFLV.addTriangleSet("bad", 260, 320, 500);
+
+	// Result
+    this.sustainabilityFLV = this.fzmod.createFLV("sustainability");
+
+    this.bad_sustainability = this.sustainabilityFLV.addTriangleSet("bad", 0, 30, 50);
+    this.medium_sustainability = this.sustainabilityFLV.addTriangleSet("medium", 30, 50, 70);
+    this.excellent_sustainability = this.sustainabilityFLV.addTriangleSet("excellent", 50, 70, 100);
+
+    this.declareRules = function() {
+        var veryGood_domSize = this.fzmod.makeNewFuzzyTerm(this.excellent_domSize);
+        var good_domSize = this.fzmod.makeNewFuzzyTerm(this.medium_domSize);
+        var veryBad_domSize = this.fzmod.makeNewFuzzyTerm(this.bad_domSize);
+
+        var veryGood_requestsNb = this.fzmod.makeNewFuzzyTerm(this.excellent_requestsNb);
+        var good_requestsNb = this.fzmod.makeNewFuzzyTerm(this.medium_requestsNb);
+        var veryBad_requestsNb = this.fzmod.makeNewFuzzyTerm(this.bad_requestsNb);
+
+		var veryGood_pageSize = this.fzmod.makeNewFuzzyTerm(this.excellent_pageSize);
+        var good_pageSize = this.fzmod.makeNewFuzzyTerm(this.medium_pageSize);
+        var veryBad_pageSize = this.fzmod.makeNewFuzzyTerm(this.bad_pageSize);
+
+        var veryGood_sustainability = this.fzmod.makeNewFuzzyTerm(this.excellent_sustainability);
+        var good_sustainability = this.fzmod.makeNewFuzzyTerm(this.medium_sustainability);
+        var veryBad_sustainability = this.fzmod.makeNewFuzzyTerm(this.bad_sustainability);
+
+		// règles
 
         this.fzmod.addRule(veryGood_domSize.fzAndWith(veryGood_requestsNb), veryGood_sustainability);
         this.fzmod.addRule(veryGood_domSize.fzAndWith(good_requestsNb), veryGood_sustainability);
@@ -390,17 +512,46 @@ var SustainabilityModule = function() {
         this.fzmod.addRule(veryBad_domSize.fzAndWith(veryGood_requestsNb), good_sustainability);
         this.fzmod.addRule(veryBad_domSize.fzAndWith(good_requestsNb), veryBad_sustainability);
         this.fzmod.addRule(veryBad_domSize.fzAndWith(veryBad_requestsNb), veryBad_sustainability);
+
+		// Ajout du critère : pageSize :
+
+		this.fzmod.addRule(veryGood_pageSize.fzAndWith(veryGood_requestsNb), veryGood_sustainability);
+        this.fzmod.addRule(veryGood_pageSize.fzAndWith(good_requestsNb), veryGood_sustainability);
+        this.fzmod.addRule(veryGood_pageSize.fzAndWith(veryBad_requestsNb), good_sustainability);
+
+		this.fzmod.addRule(good_pageSize.fzAndWith(veryGood_requestsNb), veryGood_sustainability);
+        this.fzmod.addRule(good_pageSize.fzAndWith(good_requestsNb), good_sustainability);
+        this.fzmod.addRule(good_pageSize.fzAndWith(veryBad_requestsNb), veryBad_sustainability);
+
+		this.fzmod.addRule(veryBad_domSize.fzAndWith(veryGood_requestsNb), good_sustainability);
+        this.fzmod.addRule(veryBad_domSize.fzAndWith(good_requestsNb), veryBad_sustainability);
+        this.fzmod.addRule(veryBad_domSize.fzAndWith(veryBad_requestsNb), veryBad_sustainability);
+
+		// ... 
+		this.fzmod.addRule(veryGood_pageSize.fzAndWith(veryGood_domSize), veryGood_sustainability);
+        this.fzmod.addRule(veryGood_pageSize.fzAndWith(good_domSize), veryGood_sustainability);
+        this.fzmod.addRule(veryGood_pageSize.fzAndWith(veryBad_domSize), good_sustainability);
+
+		this.fzmod.addRule(good_pageSize.fzAndWith(veryGood_domSize), veryGood_sustainability);
+        this.fzmod.addRule(good_pageSize.fzAndWith(good_domSize), good_sustainability);
+        this.fzmod.addRule(good_pageSize.fzAndWith(veryBad_domSize), veryBad_sustainability);
+
+		this.fzmod.addRule(veryBad_pageSize.fzAndWith(veryGood_domSize), good_sustainability);
+        this.fzmod.addRule(veryBad_pageSize.fzAndWith(good_domSize), veryBad_sustainability);
+        this.fzmod.addRule(veryBad_pageSize.fzAndWith(veryBad_domSize), veryBad_sustainability);
     };
 
-    this.getCrispValue = function(domSize, requestsNb) {
+    this.getCrispValue = function(domSize, requestsNb,pageSize) {
         this.fzmod.fuzzify("domSize", domSize);
         this.fzmod.fuzzify("requestsNb", requestsNb);
+        this.fzmod.fuzzify("pageSize", pageSize);
+
         this.declareRules();
         return this.fzmod.deFuzzify("sustainability");
     };
 
 }
 
-var b = new SustainabilityModule();
-let result2 = b.getCrispValue(10, 200); // Plus la valeur est grande, plus le site est excellent
-console.log(result2)
+var R2 = new R2Module();
+
+*/
