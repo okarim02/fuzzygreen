@@ -104,4 +104,76 @@ module.exports = {
     "ratio_etags": 0.4834123222748815,
     "host": { "isGreen": true, "energy": 'groeneenergie' },
   },
+
+  otherExempleOfScrapperData : 
+  {
+    "esta-groupe.fr":
+    {
+      'PageSize(Ko)': 685,
+      'RequestsNb': 39,
+      'DOMsize(nb elem)': 219,
+      'JSMinification': [],
+      'CSSMinification': [],
+      'CSSNotExt': undefined,
+      'JSNotExt': 8,
+      'etagsRatio': '0.41',
+      'etagsNb': 16,
+      'filesWithError': [],
+      'isStatic': 1,
+      'pluginsNb': 0,
+      'FontsNb': [],
+      'imagesWithoutLazyLoading': [
+        'http://ent.univ-fcomte.fr/media/skins/universality/uportal3/images/portal_logo.png',
+        'http://ent.univ-fcomte.fr/media/org/jasig/portal/channels/webproxy/presidence.jpg',
+        'http://ent.univ-fcomte.fr/media/org/jasig/portal/channels/webproxy/accessibilite.jpg',
+        'http://ent.univ-fcomte.fr/media/org/jasig/portal/channels/webproxy/bu-2.jpg'
+      ],
+      'lazyLoadRatio': '0.00',
+      'cssFiles': 6,
+      'socialButtons': [],
+      'CMS': [],
+      'imgResize': 0,
+      'imgSrcEmpty': 0,
+      'host': {},
+      'ratioWhitePixels': undefined,
+      'Http1.1/Http2requests': '94.87'
+    },
+    "http://www.google.com":
+    {
+      'PageSize(Ko)': 490,
+      'RequestsNb': 18,
+      'DOMsize(nb elem)': 347,
+      'JSMinification': [],
+      'CSSMinification': [],
+      'CSSNotExt': undefined,
+      'JSNotExt': 8,
+      'etagsRatio': '0.00',
+      'etagsNb': 0,
+      'filesWithError': [],
+      'isStatic': 0,
+      'pluginsNb': 0,
+      'FontsNb': [],
+      'imagesWithoutLazyLoading': [
+        'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
+        'https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg'
+      ],
+      'lazyLoadRatio': '0.00',
+      'cssFiles': 33,
+      'socialButtons': [],
+      'CMS': [],
+      'imgResize': 1,
+      'imgSrcEmpty': 0,
+      'host': {
+        'isGreen': true,
+        'energy': 'groeneenergie',
+        'country': 'US',
+        'co2_info_greenfoundation': { 'carbon_intensity': 378.625, 'generation_from_fossil': 60.18 },
+        'co2_info_elec_map': { 'carbonIntensity': 'NaN', 'fossilFuelPercentage': 'NaN' }
+      },
+      'ratioWhitePixels': undefined,
+      'Http1.1/Http2requests': '5.56'
+    }
+  }
+   
 }
+
