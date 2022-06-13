@@ -93,4 +93,6 @@ app.get('/result',(req,res,next)=>{
     res.render("result.ejs");
 })
 
-app.listen(PORT, () => console.log(`Listening at ${PORT} (go to 'localhost:3000')`));
+app.listen(PORT, async () => { 
+    console.log(`Listening at ${PORT} (go to 'localhost:3000')`)
+});
