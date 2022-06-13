@@ -218,15 +218,27 @@ function display_fuzzy(data){
         const li = document.createElement('li')
         li.textContent = `${criteres[i]}` + `=> min : ${ data[criteres[i]]['other'].min } ; max : ${ data[criteres[i]]['other'].max } ; average : ${ data[criteres[i]]['other'].moyenne } ; median : ${data[criteres[i]]['other'].median }`;
         ul.appendChild(li);
-
     }
     depot.appendChild(ul);
 
+    // Affichage defuzzification
     const subtitle = document.createElement('h4');
-    subtitle.innerText = `"Defuzzification <br> `;
-    // saut de ligne + liste a puce 
-    //excellent : ${data[criteres[criteres.length-1]][0]}, medium : ${data[criteres[criteres.length-1]][1]}, bad :  ${data[criteres[criteres.length-1]][2]}
+    subtitle.innerText = `Defuzzification`;
+    
+    ul = document.createElement('ul');
+    ul.innerHTML= `
+        <li>
+            excellent: ${data[criteres[criteres.length-1]][0]}
+        </li>
+        <li>
+            Medium: ${data[criteres[criteres.length-1]][1]}
+        </li>
+        <li>
+            Bad: ${data[criteres[criteres.length-1]][2]}
+        </li>
+    `
     depot.appendChild(subtitle);
+    depot.appendChild(ul);
 }
 
 function display_loading() {
