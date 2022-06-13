@@ -110,7 +110,7 @@ function display_data(data) {
     tbl.style.border = '3px solid black';
 
     // ajout des groupes
-    thead.innerHTML+="<tr><th colspan='15'>Serveur</th><th colspan='8'>Design</th><th colspan='1'>hébergement</th></tr>"
+    //thead.innerHTML+="<tr><th colspan='15'>Serveur</th><th colspan='8'>Design</th><th colspan='1'>hébergement</th></tr>"
 
     let headersRow = document.createElement('tr');
     let headers = getHeaders(data[0]);
@@ -202,24 +202,31 @@ function display_data(data) {
 }
 function display_fuzzy(data){
 
-    console.log("fuzzy data : ",data['RequestsNb']);
+    console.log("fuzzy data : ",data);
     
     let depot = document.getElementById('fuzzyData');
     depot.innerHTML="";
     const title = document.createElement('h3');
-    title.innerText = "Fuzzy logic : ";
+    title.innerText = "Criteria intervals: ";
     depot.appendChild(title);
     
     let ul = document.createElement('ul');
-    
-    for(let i of Object.keys(data)){
-        const li = document.createElement('li')
-        li.textContent = `${i} : {excellent : ${ data[i]["fuzzification"][0] } , Medium : ${ data[i]["fuzzification"][1] } , Bad : ${ data[i]["fuzzification"][2] }}` + 
-        `=> min : ${ data[i]['other'].min } ; max : ${ data[i]['other'].max } ; average : ${ data[i]['other'].moyenne } ; median : ${data[i]['other'].median }`;
 
+    let criteres = Object.keys(data);
+
+    for(let i = 0 ; i < criteres.length-1;i++){
+        const li = document.createElement('li')
+        li.textContent = `${criteres[i]}` + `=> min : ${ data[criteres[i]]['other'].min } ; max : ${ data[criteres[i]]['other'].max } ; average : ${ data[criteres[i]]['other'].moyenne } ; median : ${data[criteres[i]]['other'].median }`;
         ul.appendChild(li);
+
     }
     depot.appendChild(ul);
+
+    const subtitle = document.createElement('h4');
+    subtitle.innerText = `"Defuzzification <br> `;
+    // saut de ligne + liste a puce 
+    //excellent : ${data[criteres[criteres.length-1]][0]}, medium : ${data[criteres[criteres.length-1]][1]}, bad :  ${data[criteres[criteres.length-1]][2]}
+    depot.appendChild(subtitle);
 }
 
 function display_loading() {

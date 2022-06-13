@@ -1,4 +1,4 @@
-const fuzzylogic = require('fuzzylogic'); // Todo : Paquet npm à supprimer
+const fuzzylogic = require('fuzzylogic');
 const common = require('./common');
 const FuzzyModule = require('fuzzymodule');
 
@@ -170,7 +170,7 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
     
     Exemple : 
         Entrées : Size(Kb), RequestsNb  => Sortie : o1 = 70 (Excellent: 0,5; Medium: 0,5; Bad:0)
-        Entrées : DOMsize(nb elem), CSSNotExt  => Sortie : o2 = 30 (Excellent: 0; Medium: 0,5; Bad:0.5)
+        Entrées : DOMsize(nb elem), cssFiles  => Sortie : o2 = 30 (Excellent: 0; Medium: 0,5; Bad:0.5)
         ... 
         // étape 3 
         Entrées : o1, o2 => Sortie : s1 
@@ -211,7 +211,7 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
 
         let fuzzyval1 = a.getCrispValue(url_data[crit_less[i]], url_data[crit_less[i+1]]);
 
-        console.log("o"+i," : ",fuzzyval1);
+        console.log("o"+(i+1)," : ",fuzzyval1);
         
         s_list.push(fuzzyval1);
 
@@ -227,6 +227,9 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
     }
 
     let max = 0;
+    /*
+    Sustainability = Math.max(s0,s1,...)
+    */
     for(let i of s_list){
         if(i>max){
             max=i
@@ -235,8 +238,26 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
 
     console.log("Sustainable : ",max);
     
-    fuzzyLogic_values["sustainable"]=max;
+    fuzzyLogic_values["sustainable"]=getFuzzyValue(max);
+
+
+    console.log("echelle : ",fuzzyLogic_values["sustainable"]);
+
+    console.log("fuzzy data : ",fuzzyLogic_values);
 
     // Todo : Implémenter les règles ...
     return fuzzyLogic_values;
 }
+
+function getFuzzyValue(value) {
+    
+    let excellant = fuzzylogic.triangle(value, 50,70,100);
+    let medium = fuzzylogic.triangle(value, 30, 50, 70);
+    let bad = fuzzylogic.triangle(value, 0,30,50);
+
+    console.log('excellant: '+ excellant);
+    console.log('medium: '+ medium);
+    console.log('bad: '+bad);
+    
+    return [excellant,medium,bad];
+};
