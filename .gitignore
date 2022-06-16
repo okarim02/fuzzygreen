@@ -1,7 +1,11 @@
 seleniumwebdrivers
 package-lock.json
-package.json
 node_modules
 .env
 void
 page.png
+execute.js
+app-linux
+app-macos
+app-win.execute
+chromium

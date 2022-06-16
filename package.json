@@ -1,0 +1,44 @@
+{
+  "name": "eco-outil",
+  "version": "1.0.0",
+  "description": "",
+  "bin": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron execute.js"
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/okarim02/eco-outil.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/okarim02/eco-outil/issues"
+  },
+  "homepage": "https://github.com/okarim02/eco-outil#readme",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "dotenv": "^16.0.0",
+    "ejs": "^3.1.8",
+    "es6-fuzz": "^3.0.6",
+    "express": "^4.17.3",
+    "fuzzylogic": "^0.3.5",
+    "fuzzymodule": "^1.0.1",
+    "lighthouse": "^9.5.0",
+    "node-fetch": "^2.6.7",
+    "node-sessionstorage": "^1.0.0",
+    "node-whois": "^2.1.3",
+    "png-js": "^1.0.0",
+    "puppeteer": "^13.5.2",
+    "puppeteer-cluster": "^0.23.0"
+  },
+  "devDependencies": {
+    "electron": "^19.0.4"
+  },
+  "pkg": {
+    "assets": [ "node_modules/**/*", "public/**/*","views/**/*","chromium/**/*"],
+    "targets": [ "node12-macos-x64", "node10-win-x64" ]
+  }
+}
