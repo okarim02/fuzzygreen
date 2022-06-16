@@ -5,6 +5,8 @@ const PORT = process.env.PORT || 3000;
 const routes = require("./routes");
 const bodyParser = require('body-parser');
 
+require('dotenv').config({path: __dirname + '/.env'})
+
 const { clust } = require("./services/cluster");
 const tools = require('./services/tools');
 const common = require('./services/common');
