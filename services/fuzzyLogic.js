@@ -156,7 +156,7 @@ function getSpecificData(data,critere){
 
 module.exports.launch = async function launch(data=[common.otherExempleOfScrapperData],data2=[common.exampleScrapperData]){
     // test critères : 
-    let crit_less = ["PageSize(Ko)","RequestsNb","DOMsize(nb elem)","imgResize","cssFiles","etagsNb"]; // Plus la valeur est bas, plus on est dans l'excellent // critère retiré pour l'instant : "Http2requests"
+    let crit_less = ["PageSize(Ko)","RequestsNb","DOMsize(nb elem)","imgResize","cssFiles","Http1.1/Http2requests"]; // Plus la valeur est bas, plus on est dans l'excellent // critère retiré pour l'instant : "Http2requests"
     let crit_more = ["etagsNb"];
     var fuzzyLogic_values = {};
     let url_data = Object.values(data2[0])[0]; // Récupère les valeurs de l'url scanner
@@ -169,25 +169,30 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
     3) Avec les résultats refaire la même chose mais avec comme entrée o1,o2,... et obtenir le résultat final : s1
     
     Exemple : 
-        Entrées : Size(Kb), RequestsNb  => Sortie : o1 = 70 (Excellent: 0,5; Medium: 0,5; Bad:0)
+        Entrées : Size(Kb), RequestsNb  => Sortie : o1 = 70 (Excellent: 0,5; Medium: 0,5; Bad:0) correspond à la sustainability 
         Entrées : DOMsize(nb elem), cssFiles  => Sortie : o2 = 30 (Excellent: 0; Medium: 0,5; Bad:0.5)
         ... 
-        // étape 3 
-        Entrées : o1, o2 => Sortie : s1 
-        ... 
-
+        
         // Etape 4 
-        s1 + s2 + s3 => Sustainability : Good => x, medium => x, bad => x 
+        o1 + o2 + o3 (on prend le max)=> Sustainability : Good => x, medium => x, bad => x 
 
     */
     var s_list = []
-    for(let i = 0 ; i < crit_less.length-2;i+=2){
+    for(let i = 0 ; i < crit_less.length;i+=2){
+
+        console.log("c"+(i)+": ",crit_less[i]);  
+        console.log("c"+(i+1)+": ",crit_less[i+1]);  
+            
 
         let result_act = getSpecificData(data,crit_less[i]); // résultat actuelle
         let result_ap = getSpecificData(data,crit_less[i+1]); // résultat du critère suivant
 
         console.log("res1 :",result_act);
         console.log("res2 :",result_ap);
+
+        console.log("Donné testé c"+(i)+": ",url_data[crit_less[i]]);
+        console.log("Donné testé c"+(i+1)+": ",url_data[crit_less[i+1]]);
+
 
         if(result_act== undefined || result_ap==undefined) continue;
         
@@ -211,7 +216,7 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
 
         let fuzzyval1 = a.getCrispValue(url_data[crit_less[i]], url_data[crit_less[i+1]]);
 
-        console.log("o"+(i+1)," : ",fuzzyval1);
+        console.log("o"+i," : ",fuzzyval1);
         
         s_list.push(fuzzyval1);
 
