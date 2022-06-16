@@ -40,7 +40,7 @@ var urls_scanned = [];
 function deleteItem(array,item){
     var index = array.indexOf(item);
     if (index !== -1) {
-        array.splice(index, 1);
+        array[index] = "None";
     }
 }
 // todo : Do a table (flou, non flou (boolean))
@@ -68,15 +68,16 @@ function create_checkbox() {
         container.appendChild(label);
         container.appendChild(br);
     }
+
     container.onclick = function (ev) {
         if (ev.target.value) {
             // criteres_selected.slice()
-            var index = criteres.indexOf(ev.target.value);
-            let index2 = criteres_selected.indexOf(ev.target.value);
-            if (index2 !== -1) {
-                criteres_selected.splice(index, 1);
+            var index = criteres.indexOf(ev.target.value);// Obtient l'index du critère 
+            let index2 = criteres_selected.indexOf(ev.target.value); 
+            if (index2 !== -1) { // Vérifie si le critère n'est pas séléctionner, sinon il est ajouté 
+                criteres_selected[index] = "None";
             }else{
-                criteres_selected.push(ev.target.value);
+                criteres_selected[index] = criteres[index];
             }
         }
     }
