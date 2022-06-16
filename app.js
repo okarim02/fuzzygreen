@@ -33,7 +33,10 @@ app.use('/img',express.static(__dirname+'public/img'));
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 // Set template Engine
-app.set('view engine','ejs');
+app.engine('html',require('ejs').renderFile);
+app.set('view engine','html');
+
+app.set('views', __dirname+'/views'); // <== c'est cette ligne qu'il faut rajouter
 
 // MIddleware
 app.post("/api",async(request,response,next)=>{
@@ -71,8 +74,8 @@ app.get("/analyse",(req,res,next)=>{
 app.post("/getResult/analyse",async (req,res,next)=>{
     // analyser la page 
     const crits = req.body.criteres; // Dernier critères qu'on a sauvegarder
-    const computed_data = req.body.computedData;
-    const url_data = await clust(req.body.url,crits);
+    const computed_data = req.body.computedData; // Contiens les données de tous les sites analysés
+    const url_data = await clust(req.body.url,crits); // Continens les données du site qu'on souhaite évaluer  
 
     // Appel fuzzy logic
     // todo : récuperer le résultat

@@ -146,10 +146,10 @@ function display_data(data) {
                 cell.style.border = '1px solid black';
                 let txt;
                 var list_urls;
-                if (["CMS","JSMinification","CSSMinification", "FontsNb", "imagesWithoutLazyLoading", "filesWithError","socialButtons"].includes(val)) {
+                if (typeof data[i][key][val] === 'object' && !Array.isArray(data[i][key][val]) && data[i][key][val] !== null) {
                     txt = document.createElement('details');
                     txt.innerText = 'more'
-                    list_urls = data[i][key][val];
+                    list_urls = data[i][key][val].liste;
                     let ul = document.createElement('ul');
                     for (let element in list_urls) {
                         const li = document.createElement('li')
@@ -165,7 +165,7 @@ function display_data(data) {
                     }
                     ul.style.background = 'white';
                     txt.appendChild(ul);
-                    cell.appendChild(document.createTextNode('Nb : '+ (list_urls.length == undefined ? 0 : list_urls.length)));
+                    cell.appendChild(document.createTextNode('Nb : '+ data[i][key][val].nb));
 
                 } else {
                     // In case of the green host data

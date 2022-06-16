@@ -111,12 +111,15 @@ class fuzzyVariable{
 
 // todo : refaire cette fonction pour inclure directement les données du critère
 function getSpecificData(data,critere){
-     
-    // a déplacer ... 
+
     let valuesData = []
     data.map((obj)=>{
         Object.values(obj).forEach(e=>{
-            valuesData.push(e[critere])
+            if(typeof e[critere] === 'object' && !Array.isArray(e[critere]) && e[critere] !== null){
+                valuesData.push(e[critere].nb); 
+            }else{
+                valuesData.push(e[critere]); 
+            }
         })
     })
     valuesData = valuesData.filter((el)=>{
@@ -156,10 +159,13 @@ function getSpecificData(data,critere){
 
 module.exports.launch = async function launch(data=[common.otherExempleOfScrapperData],data2=[common.exampleScrapperData]){
     // test critères : 
-    let crit_less = ["PageSize(Ko)","RequestsNb","DOMsize(nb elem)","imgResize","cssFiles","etagsNb"]; // Plus la valeur est bas, plus on est dans l'excellent // critère retiré pour l'instant : "Http2requests"
+    let crit_less = ["PageSize(Ko)","RequestsNb","DOMsize(nb elem)","imgResize","cssFiles","Http1.1/Http2requests","JSMinification","CSSMinification","imagesWithoutLazyLoading","FontsNb","lazyLoadRatio","socialButtons","etagsRatio","etagsNb"]; // Plus la valeur est bas, plus on est dans l'excellence // critère retiré pour l'instant : "Http2requests"
     let crit_more = ["etagsNb"];
     var fuzzyLogic_values = {};
     let url_data = Object.values(data2[0])[0]; // Récupère les valeurs de l'url scanner
+
+    data.push(data2[0]);
+
     // Test
     console.log(`Fuzzy logic`);
     /*
@@ -181,7 +187,7 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
 
     */
     var s_list = []
-    for(let i = 0 ; i < crit_less.length-2;i+=2){
+    for(let i = 0 ; i < crit_less.length;i+=2){
 
         let result_act = getSpecificData(data,crit_less[i]); // résultat actuelle
         let result_ap = getSpecificData(data,crit_less[i+1]); // résultat du critère suivant

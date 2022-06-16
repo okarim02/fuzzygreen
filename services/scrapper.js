@@ -9,29 +9,54 @@ const tools = require('./tools');
  * also https://www.checklyhq.com/learn/headless/request-interception/
 */
 
+function test(){
+    tools.readPixels('../page.png')
+}
+
 function Measures(){
     return {
         'PageSize(Ko)': 0, // Serveur
         'RequestsNb': 0,
         'DOMsize(nb elem)': 0,
         //'filesNotMin': [],
-        'JSMinification':[],
-        'CSSMinification':[],
+        'JSMinification':{
+            liste : [],
+            nb : 0,
+        },
+        'CSSMinification':{
+            liste : [],
+            nb : 0,
+        },
         'CSSNotExt':0,
         'JSNotExt':0,
         'etagsRatio':0.0,
         'etagsNb': 0,
-        'filesWithError': [],
+        'filesWithError': {
+            liste : [],
+            nb : 0,
+        },
         'isStatic': 1,
         'pluginsNb': 0,
         'Http1.1/Http2requests': 0,
-        'FontsNb': [], // design
-        'imagesWithoutLazyLoading': [],
+        'FontsNb': {
+            liste : [],
+            nb : 0, // nb : numbers
+        }, // design
+        'imagesWithoutLazyLoading': {
+            liste : [],
+            nb : 0,
+        },
         'lazyLoadRatio': 0,
         'cssFiles': 0,
         //'cssOrJsNotExt': 0,
-        'socialButtons': [],
-        'CMS': [],
+        'socialButtons':{
+            liste : [],
+            nb : 0,
+        },
+        'CMS': {
+            liste : [],
+            nb : 0,
+        },
         //'loadTime(ms)': 0, // A supprimer
         'imgResize': 0,
         'isMobileFriendly':false,
@@ -54,7 +79,7 @@ function setMeasurestoDo(criteres_selected){
 module.exports.getPageMetrics = async (url, page,criteres_selected, callback) => {
     var measures = setMeasurestoDo(criteres_selected);
     //'use strict';
-
+    acceptCookies(page); // Accepte les cookies 
     const gitMetrics = await page.metrics();
 
     // Use to do more things with the requests made by the website (check the doc)
@@ -87,12 +112,12 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
         if (!response.url().startsWith('data:')) {
             // fonts
             if (response.request().resourceType() == "font") {
-                measures.FontsNb.push(response.url());
+                measures.FontsNb.liste.push(response.url());
             }
             
             const btSocial = await tools.checkIfSocialButton(response.url())
             if (btSocial != "") {
-                measures.socialButtonsFind.push(response.url());
+                //measures.socialButtonsFind.liste.push(response.url());
             }
             response.buffer().then(
                 buffer => {
@@ -129,7 +154,7 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
                     // check syntax
                     const resultCheck = await tools.checkSyntax(content);
                     if (resultCheck != "") {
-                        measures.filesWithError.push(response.url());
+                        measures.filesWithError.liste.push(response.url());
                     }
                     // Check if there is sql inside a loop
                     // todo 
@@ -138,12 +163,12 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
 
                 if (!isMin) {
                     if(response.request().resourceType()=="script"){
-                        if(!measures.JSMinification.includes(response.url()) && response.url() != ""){
-                            measures.JSMinification.push(response.url());
+                        if(!measures.JSMinification.liste.includes(response.url()) && response.url() != ""){
+                            measures.JSMinification.liste.push(response.url());
                         }
                     }else{
-                        if(!measures.CSSMinification.includes(response.url)){
-                            measures.CSSMinification.push(response.url());
+                        if(!measures.CSSMinification.liste.includes(response.url)){
+                            measures.CSSMinification.liste.push(response.url());
                         }
                     }
                 }
@@ -160,11 +185,14 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
     await page.goto(url, { waitUntil: ('networkidle0') });
 
     // Take screenshot 
-    await page.screenshot({ path: `page.png` });
+    await page.screenshot({ path: `page.png`, fullPage:true});
+    /*
 
     measures.ratioWhitePixels = tools.readPixels('page.png')
+    */
+    measures.CMS.liste = await getCMS(page, browser = undefined).then(e => e ? e : []);
+    measures.CMS.nb = measures.CMS.liste.length;
 
-    measures.CMS = await getCMS(page, browser = undefined).then(e => e ? e : []);
 
     measures.isStatic = await isStatic(page,measures) ? 1 : 0;
     //measures['loadTime(ms)'] = await getLoadTime(page);
@@ -194,7 +222,9 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
     measures.lazyLoadRatio = res.ratio;
     measures.lazyLoadRatio = parseFloat(measures.lazyLoadRatio).toFixed(2) ? parseFloat(measures.lazyLoadRatio).toFixed(2) : 0.0 ;
 
-    measures.imagesWithoutLazyLoading = res.imagesNoLazy;
+    measures.imagesWithoutLazyLoading.liste = res.imagesNoLazy;
+    measures.imagesWithoutLazyLoading.nb = res.imagesNoLazy.length;
+    
 
     measures.imgResize = await getImagesResized(page).then(e => e.imagesResized.length);
 
@@ -219,11 +249,21 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
      }
      */
 
+    measures.JSMinification.nb = measures.JSMinification.liste.length;
+    measures.CSSMinification.nb = measures.CSSMinification.liste.length;
+    measures.filesWithError.nb = measures.filesWithError.liste.length;
+    measures.FontsNb.nb = measures.FontsNb.liste.length;
+    //measures.socialButtonsFind.nb = measures.socialButtonsFind.liste.length;
+
+
+
     await page.close();
     //await browser.close();
 
     callback(measures, true);
 }
+
+//************************** UTILS ***************************/
 
 async function getRobot(br, url) {
     const robot = await br.newPage();
@@ -235,6 +275,20 @@ async function getRobot(br, url) {
     return content;
 }
 
+async function acceptCookies(page){
+    await page.evaluate(_ => {
+        function xcc_contains(selector, text) {
+            var elements = document.querySelectorAll(selector);
+            return Array.prototype.filter.call(elements, function(element){
+                return RegExp(text, "i").test(element.textContent.trim());
+            });
+        }
+        var _xcc;
+        _xcc = xcc_contains('[id*=cookie] a, [class*=cookie] a, [id*=cookie] button, [class*=cookie] button', '^(Alle Accept all|Accept|I understand|Agree|I agree|Okay|OK)$');
+        if (_xcc != null && _xcc.length != 0) { _xcc[0].click(); }
+    });
+}
+
 async function getLoadTime(page) {
     const perf = await page.evaluate(_ => {
         const { loadEventEnd, navigationStart } = performance.timing
@@ -244,6 +298,10 @@ async function getLoadTime(page) {
     })
     return perf.loadTime;
 }
+
+
+//******************************************************** */
+
 
 async function isStatic(page,measures) {
 

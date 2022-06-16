@@ -19,6 +19,7 @@ module.exports.clust = async function first(urls,criteres_selected){
         puppeteerOptions:{
             devtools: true,
             headless: true,
+            executablePath:'./chromium/chrome-win/chrome.exe'
         },
     });
 

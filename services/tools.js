@@ -1,6 +1,7 @@
 const fs = require('fs');
 const vm = require('vm'); // Correct syntax error 
 const dns = require('dns'); // Find ip
+const PNG = require('png-js');
 
 standard_font : [
   "Courier New",
@@ -30,10 +31,10 @@ var tools = module.exports = {
     ],
     readPixels : function(name){
       // install png-js
-      var PNG = require('png-js');
       PNG.decode(name, function(pixels) {
         // pixels is a 1d array (in rgba order) of decoded pixel data
-    });
+        console.log("array :",pixels);
+      });
     },
     getIp : function(domain){
       return new Promise((resolve, reject)=>{
