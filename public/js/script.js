@@ -147,27 +147,6 @@ function display_data(data) {
                 let txt;
                 var list_urls;
                 if (typeof data[i][key][val] === 'object' && !Array.isArray(data[i][key][val]) && data[i][key][val] !== null) {
-                    txt = document.createElement('details');
-                    txt.innerText = 'more'
-                    list_urls = data[i][key][val].liste;
-                    let ul = document.createElement('ul');
-                    for (let element in list_urls) {
-                        const li = document.createElement('li')
-                        if(!["FontsNb"].includes(val)){ // Don't need balise 'a' for download fonts
-                            let a_b = document.createElement('a');
-                            a_b.setAttribute('href',list_urls[element]);
-                            a_b.textContent = list_urls[element] + " \n ";
-                            ul.append(a_b);
-                        }else{
-                            li.textContent = list_urls[element] + "\n"
-                            ul.appendChild(li);
-                        }
-                    }
-                    ul.style.background = 'white';
-                    txt.appendChild(ul);
-                    cell.appendChild(document.createTextNode('Nb : '+ data[i][key][val].nb));
-
-                } else {
                     // In case of the green host data
                     if (val === 'host') {
                         // Création d'une nouvelle ligne pour séparer les groupes (voir structure d'un tableau)
@@ -185,9 +164,29 @@ function display_data(data) {
                     } else if(val === "isMobileFriendly"){
                         txt = document.createTextNode(`${data[i][key][val] ? "1":"0"}`);
                     }else{
-                        let v = data[i][key][val];
-                        txt = document.createTextNode(isNaN(v)  ? '0' : v);
+                        txt = document.createElement('details');
+                        txt.innerText = 'more'
+                        list_urls = data[i][key][val].liste;
+                        let ul = document.createElement('ul');
+                        for (let element in list_urls) {
+                            const li = document.createElement('li')
+                            if(!["FontsNb"].includes(val)){ // Don't need balise 'a' for download fonts
+                                let a_b = document.createElement('a');
+                                a_b.setAttribute('href',list_urls[element]);
+                                a_b.textContent = list_urls[element] + " \n ";
+                                ul.append(a_b);
+                            }else{
+                                li.textContent = list_urls[element] + "\n"
+                                ul.appendChild(li);
+                            }
+                        }
+                        ul.style.background = 'white';
+                        txt.appendChild(ul);
+                        cell.appendChild(document.createTextNode('Nb : '+ data[i][key][val].nb));
                     }
+                } else {
+                    let v = data[i][key][val];
+                    txt = document.createTextNode(isNaN(v)  ? '0' : v);
                 }
 
                 cell.appendChild(txt);
@@ -199,13 +198,12 @@ function display_data(data) {
             tbl.appendChild(row)
         }
     }
-
     depot.appendChild(tbl);
 }
 function display_fuzzy(data){
 
     console.log("fuzzy data : ",data);
-    
+
     let depot = document.getElementById('fuzzyData');
     depot.innerHTML="";
     const title = document.createElement('h3');
@@ -218,7 +216,8 @@ function display_fuzzy(data){
 
     for(let i = 0 ; i < criteres.length-1;i++){
         const li = document.createElement('li')
-        li.textContent = `${criteres[i]}` + `=> min : ${ data[criteres[i]]['other'].min } ; max : ${ data[criteres[i]]['other'].max } ; average : ${ data[criteres[i]]['other'].moyenne } ; median : ${data[criteres[i]]['other'].median }`;
+        li.textContent = `${criteres[i]}` + `=> min : ${ data[criteres[i]]['other'].min } ; max : ${ data[criteres[i]]['other'].max } ; average : ${ data[criteres[i]]['other'].moyenne } ; median : ${data[criteres[i]]['other'].median }
+         ====> ${data[criteres[i]]['fuzzification']}`;
         ul.appendChild(li);
     }
     depot.appendChild(ul);

@@ -1,6 +1,8 @@
-const fuzzylogic = require('fuzzylogic');
+const fuzzylogic = require('fuzzylogic'); // A supprimer x)
 const common = require('./common');
 const FuzzyModule = require('fuzzymodule');
+const Logic = require('es6-fuzz');
+const Triangle = require('es6-fuzz/lib/curve/triangle');
 
 function average(array){
     let sum = 0 ;
@@ -27,9 +29,6 @@ function getMedian(arr){
     nums = [...arr].sort((a, b) => a - b);
     return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2.0;
 }
-
-
-
 
 /*
     Linguistic output for now : excellant, medium, bad. 
@@ -87,7 +86,7 @@ class fuzzyVariable{
         // règles basique
 
         this.fzmod.addRule(veryGood_critere1.fzAndWith(veryGood_critere2), veryGood_sustainability);
-        this.fzmod.addRule(veryGood_critere2.fzOrWith(good_critere2), veryGood_sustainability);
+        this.fzmod.addRule(veryGood_critere1.fzAndWith(good_critere2), veryGood_sustainability);
         this.fzmod.addRule(veryGood_critere1.fzAndWith(veryBad_critere2), good_sustainability);
 
         this.fzmod.addRule(good_critere1.fzAndWith(veryGood_critere2), veryGood_sustainability);
@@ -111,14 +110,15 @@ class fuzzyVariable{
 
 // todo : refaire cette fonction pour inclure directement les données du critère
 function getSpecificData(data,critere){
-
     let valuesData = []
     data.map((obj)=>{
-        Object.values(obj).forEach(e=>{
-            if(typeof e[critere] === 'object' && !Array.isArray(e[critere]) && e[critere] !== null){
-                valuesData.push(e[critere].nb); 
+        Object.values(obj).forEach(url=>{
+            
+            if(typeof url[critere] === 'object' && !Array.isArray(url[critere]) && url[critere] !== null){
+                console.log("crits : ",critere, " données : ",url[critere]);
+                valuesData.push(url[critere].nb); 
             }else{
-                valuesData.push(e[critere]); 
+                valuesData.push(url[critere]); 
             }
         })
     })
@@ -147,20 +147,32 @@ function getSpecificData(data,critere){
     let median = getMedian(valuesData);
 
     return {
-        "values":valuesData,
-        "min": minMax[0],
-        "max":minMax[1],
-        "average":moyenne,
-        "ecart":ecart,
-        "median": median
+        "values":valuesData || [],
+        "min": minMax[0] || 0,
+        "max":minMax[1] || 0,
+        "average":moyenne || 0,
+        "ecart":ecart || 0,
+        "median": median || 0
     }
 
 }
 
+function getUndefinedData(){
+    return {
+        "values":[],
+        "min":  0,
+        "max":0,
+        "average":0,
+        "ecart": 0,
+        "median": 0
+    }
+}
+
 module.exports.launch = async function launch(data=[common.otherExempleOfScrapperData],data2=[common.exampleScrapperData]){
-    // test critères : 
-    let crit_less = ["PageSize(Ko)","RequestsNb","DOMsize(nb elem)","imgResize","cssFiles","Http1.1/Http2requests","JSMinification","CSSMinification","imagesWithoutLazyLoading","FontsNb","lazyLoadRatio","socialButtons","etagsRatio","etagsNb"]; // Plus la valeur est bas, plus on est dans l'excellence // critère retiré pour l'instant : "Http2requests"
-    let crit_more = ["etagsNb"];
+
+    // todo => Utiliser le tableau critère envoyé par l'utilisateur à la place de less ... 
+    let crit_less = ["PageSize(Ko)","RequestsNb","DOMsize(nb elem)","imgResize","cssFiles","Http1.1/Http2requests","JSMinification","CSSMinification","imagesWithoutLazyLoading","FontsNb","etagsRatio","etagsNb","lazyLoadRatio","host"]; // Plus la valeur est bas, plus on est dans l'excellence
+    let crit_more = ["etagsNb","etagsRatio","lazyLoadRatio"]; // todo : modifier les fonctions d'appartenance pour ce genre de critère  
     var fuzzyLogic_values = {};
     let url_data = Object.values(data2[0])[0]; // Récupère les valeurs de l'url scanner
 
@@ -186,17 +198,14 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
     var s_list = []
     for(let i = 0 ; i < crit_less.length;i+=2){
 
-        let result_act = getSpecificData(data,crit_less[i]); // résultat actuelle
-        let result_ap = getSpecificData(data,crit_less[i+1]); // résultat du critère suivant
+        let result_act = getSpecificData(data,crit_less[i]) || getUndefinedData(); // résultat actuelle
+        let result_ap = getSpecificData(data,crit_less[i+1]) || getUndefinedData(); // résultat du critère suivant
 
         console.log("res1 :",result_act);
         console.log("res2 :",result_ap);
 
         console.log("Donné testé c"+(i)+": ",url_data[crit_less[i]]);
         console.log("Donné testé c"+(i+1)+": ",url_data[crit_less[i+1]]);
-
-
-        if(result_act== undefined || result_ap==undefined) continue;
         
         if(result_act.min >= url_data[crit_less[i]]){
             result_act.min_tmp = url_data[crit_less[i]]-1;
@@ -225,8 +234,12 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
         fuzzyLogic_values[crit_less[i]] = {} 
         fuzzyLogic_values[crit_less[i+1]] = {} 
 
-        fuzzyLogic_values[crit_less[i]]["fuzzification"] = fuzzyval1; // todo : obtenir le résultat fuzzy d'un critère 
-        fuzzyLogic_values[crit_less[i+1]]["fuzzification"] = fuzzyval1;
+        fuzzyLogic_values[crit_less[i]]["result_fuzzificaton"]=fuzzyval1;
+        fuzzyLogic_values[crit_less[i+1]]["result_fuzzificaton"]=fuzzyval1;
+
+
+        fuzzyLogic_values[crit_less[i]]["fuzzification"] = getBooleanFuzzy(url_data[crit_less[i]],result_act.min_tmp || result_act.min,result_act.max_tmp || result_act.max,result_act.average,result_act.ecart);
+        fuzzyLogic_values[crit_less[i+1]]["fuzzification"] = getBooleanFuzzy(url_data[crit_less[i+1]],result_ap.min_tmp || result_ap.min, result_ap.max_tmp || result_ap.max,result_ap.average,result_ap.ecart);
 
         fuzzyLogic_values[crit_less[i]]["other"] = {min: result_act.min , max: result_act.max, moyenne : result_act.average, median: result_act.median};
         fuzzyLogic_values[crit_less[i+1]]["other"] = {min: result_ap.min , max: result_ap.max, moyenne : result_ap.average, median: result_ap.median};
@@ -254,6 +267,20 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
 
     // Todo : Implémenter les règles ...
     return fuzzyLogic_values;
+}
+
+function getBooleanFuzzy(value,min,max,average,ecart_type){
+    var logic = new Logic();
+
+    const res = logic
+        .init('excellent', new Triangle(min,min,average))
+        .or('medium', new Triangle(average-ecart_type, ecart_type, average+ecart_type))
+        .or('bad', new Triangle(average,max,max))
+    .defuzzify(value)
+
+    console.log(res)
+
+    return res.defuzzified;
 }
 
 function getFuzzyValue(value) {

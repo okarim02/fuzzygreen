@@ -4,14 +4,14 @@
 module.exports = {
     urls : ["https://seo-elp.fr/#/","https://www.lisi-automotive.com/fr/","http://usainbolt.com/","http://www.iut-bm.univ-fcomte.fr/pages/fr/a-votre-service-13757.html","https://www.angrybirds.com/"],
     lisi_pages : [
-        "https://www.lisi-automotive.com/en/products/clipped-solutions/", // eco index : D / green it : D 
-        "https://www.lisi-automotive.com/en/multi-material-assembly-solutions/", // E / F 
-        "https://www.lisi-automotive.com/en/anti-creep-assembly-solutions/", // E / F 
-        "https://www.lisi-automotive.com/en/lisi-insulating-bolt-for-mhev/", // E / E 
-        "https://www.lisi-automotive.com/en/products/clipped-solutions/fasteners-for-panels/", // F / G
-        "https://www.lisi-automotive.com/en/products/threaded-fasteners/screws-bolts/", // F / F 
-        "https://www.lisi-automotive.com/en/products/threaded-fasteners/nuts/", // F / F 
-        "https://www.lisi-automotive.com/en/innovation-sealing-screws/" // F / E
+        "https://www.lisi-automotive.com/en/products/clipped-solutions/", 
+        "https://www.lisi-automotive.com/en/multi-material-assembly-solutions/", 
+        "https://www.lisi-automotive.com/en/anti-creep-assembly-solutions/",
+        "https://www.lisi-automotive.com/en/lisi-insulating-bolt-for-mhev/", 
+        "https://www.lisi-automotive.com/en/products/clipped-solutions/fasteners-for-panels/", 
+        "https://www.lisi-automotive.com/en/products/threaded-fasteners/screws-bolts/",
+        "https://www.lisi-automotive.com/en/products/threaded-fasteners/nuts/",
+        "https://www.lisi-automotive.com/en/innovation-sealing-screws/" 
     ],
     concurrents : [
         "https://www.ejot.fr/Fixations-Industrielles/Produits/EJOWELD%C2%AE/p/VBT_EJOWELD",

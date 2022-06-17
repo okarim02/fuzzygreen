@@ -218,6 +218,7 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
 
     measures.etagsRatio = measures.etagsNb / measures.RequestsNb;
     measures.etagsRatio = parseFloat(measures.etagsRatio).toFixed(2);
+    measures.etagsRatio = parseFloat(measures.etagsRatio);
 
     measures.lazyLoadRatio = res.ratio;
     measures.lazyLoadRatio = parseFloat(measures.lazyLoadRatio).toFixed(2) ? parseFloat(measures.lazyLoadRatio).toFixed(2) : 0.0 ;
@@ -230,6 +231,8 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
 
     measures['Http1.1/Http2requests'] = await (counter_http1 / measures.RequestsNb) * 100;
     measures['Http1.1/Http2requests'] = parseFloat(measures['Http1.1/Http2requests']).toFixed(2);
+    measures['Http1.1/Http2requests'] = parseFloat(measures['Http1.1/Http2requests']) || 0 ;
+
 
     measures['DOMsize(nb elem)'] = await page.$$eval('*', array => array.length);
 

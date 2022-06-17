@@ -31,7 +31,7 @@ module.exports.start = async function main(url,page,criteres_selected){
         }; // Took so long, fix this !
         
         if(criteres_selected.includes("host")){
-            let resultGreen = await api.isGreen(domainName).then((resultGreen)=>{
+            await api.isGreen(domainName).then((resultGreen)=>{
                 for(let i of Object.keys(resultGreen.moreData)){
                     resultGreen[i] = resultGreen[i] || '0';
                 }
@@ -41,10 +41,17 @@ module.exports.start = async function main(url,page,criteres_selected){
                     "country": resultGreen.moreData['co2 from greenfound'].country_code,
                     "co2_info_greenfoundation": resultGreen.moreData['co2 from greenfound']['cO2 info'] || "None",
                     "co2_info_elec_map": resultGreen.moreData['co2 from electricity map'] || "",
+                    "nb":0
                 };
+
+                if(result.host["co2_info_elec_map"]["carbonIntensity"]!= "None" || result.host["co2_info_elec_map"]!="API rate limit exceeded" && 1==2){
+                    result.host["nb"] = parseFloat(result.host["co2_info_elec_map"]["carbonIntensity"].split(" ")[0]);
+                }else{
+                    result.host["nb"] = parseFloat(result.host["co2_info_greenfoundation"]["carbon_intensity"]);
+                }
             })
             .catch((err)=>{
-                console.error("Something wrong with isGreen API, check your url : ",domainName);
+                console.error("Something wrong with isGreen API, check your url : ",domainName, "\n \n err : ", err);
             });
         } 
     }).catch(async e=>{ // todo , gérer l'erreur : faux url.

@@ -38,7 +38,7 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.engine('html',require('ejs').renderFile);
 app.set('view engine','html');
 
-app.set('views', __dirname+'/views'); // <== c'est cette ligne qu'il faut rajouter
+app.set('views', __dirname+'/views');
 
 // MIddleware
 app.post("/api",async(request,response,next)=>{
@@ -81,6 +81,7 @@ app.post("/getResult/analyse",async (req,res,next)=>{
 
     // Appel fuzzy logic
     // todo : récuperer le résultat
+    
     const fuzzyResult  = await fuzzylogic.launch(computed_data,url_data);
 
     res.json({
