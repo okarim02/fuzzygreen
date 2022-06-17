@@ -4,8 +4,11 @@
     <article>
         <div id="choice">
             <label> Is it green ?</label>
-            <input id="url_toAnalyse" type="search" placeholder="Entrer ici l'url à analyser" size="60">
-            <button id="submit2" onclick="analyse()"> Submit </button>
+            <from onsubmit="return formvalidation()">
+                <input id="url_toAnalyse" type="input" placeholder="Entrer ici l'url à analyser" size="60">
+                <button id="submit2" onclick="analyse()"> Submit </button>
+            </from>
+            
         </div>
         <div id="loading"></div>
         <a href="/" > Revenir en arrière </a>
@@ -18,6 +21,16 @@
     <%- include('partials/footer') %>
 </footer>
 </footer>
+
+<script>
+    var input = document.getElementById("url_toAnalyse");
+
+    input.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        document.getElementById("submit2").click();
+    }
+    });
+</script>
 
 </body>
 </html>
