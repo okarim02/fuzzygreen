@@ -8,5 +8,5 @@ npm install ejs
 npm i puppeteer-cluster
 npm install body-parser
 npm i node-sessionstorage
-npm i png-js
+npm install pngjs  --save
 npm install fuzzymodule
