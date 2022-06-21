@@ -1,0 +1,110 @@
+<%- include('partials/headers.ejs') %>
+<main>
+<section>
+    <article>
+       <h3> Modifier </h3>
+    
+
+       <canvas id="root"></canvas>
+
+       <% test = [
+            {
+                figure : "triangle",
+                x0 : 0,
+                x1 : 2,
+                x2 : 10,
+            },
+            {
+                figure : "triangle",
+                x0 : 2,
+                x1 : 10,
+                x2 : 25,
+            },
+            {
+                figure : "triangle",
+                x0 : 10,
+                x1 : 25,
+                x2 : 35,
+            },
+
+       ] %>
+       <% for(let i = 0 ; i < test.length ;i++){ %>
+       <div>
+            <label>Figure f <%= i %> : </label>
+                <select id="fig_<%= i %>">
+                    <option value="">--Choose function--</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="trapezoid">Trapezoid</option>
+                </select>
+
+            </label>
+            <label>x0 : 
+                <input type="input" id="x0_id<%i%>" value='<%= test[i].x0 %>'>
+            </label>
+            <label>x1 : 
+                <input type="input" id="x1_id<%i%>" value='<%= test[i].x1 %>'>
+            </label>
+            <label>x2 : 
+                <input type="input" id="x2_id<%i%>" value='<%= test[i].x2 %>'>
+            </label>
+            <label>x3 : 
+                <input type="input" id="x3_id<%i%>" value='<%= test[i].x3 %>' disabled>
+            </label>
+
+        </div>
+
+        <% } %>
+
+        <div>
+            <button onclick="draw()">Draw</button>
+        </div>
+
+
+    </article>
+
+    <div>
+        <button onclick="confirm()">Confirm</button>
+    </div>
+    
+
+    <a href="/result" > Revenir en arrière </a>
+</section>
+    
+</main>
+
+<footer>
+    <%- include('partials/footer') %>
+</footer>
+
+<script type="text/javascript">
+    window.onload = function() {
+        draw()
+    };
+
+    function draw(){
+        let left = document.getElementById("root")
+        let ctx = left.getContext("2d");
+        ctx.fillStyle = "red";
+        ctx.lineWidth = 4;
+
+
+        triangle(ctx,x0,x1,x2)
+       
+    }
+    
+    function triangle(ctx){
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(100, 0);
+        ctx.lineTo(0, 100);
+        ctx.lineTo(0, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+        
+</script>
+
+
+</body>
+</html>

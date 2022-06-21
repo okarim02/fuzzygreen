@@ -167,6 +167,19 @@ function getUndefinedData(){
         "median": 0
     }
 }
+/**
+ * 
+ * @param {*} crit : critère  
+ * @param {*} obj : Objet de la forme :
+ * {
+ *  'excellent' : {forme : triangle , x0: 10 , x1 : 2 , x3:10}
+ *  'medium' : {forme : triangle , x0: 10 , x1 : 2 , x3:10}
+ *  'bad' : {forme : trapezoid , x0: 5 , x1 : 2 , x3:150, x4 : 169}
+ * }
+ */
+async function change(crit,obj){
+    
+}
 
 module.exports.launch = async function launch(data=[common.otherExempleOfScrapperData],data2=[common.exampleScrapperData]){
 

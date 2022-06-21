@@ -9,12 +9,6 @@ const tools = require('./tools');
  * also https://www.checklyhq.com/learn/headless/request-interception/
 */
 
-function test(){
-    tools.readPixels('../page.png')
-}
-
-var measures = {};
-
 function Measures(){
     return {
         'PageSize(Ko)': 0, // Serveur
@@ -90,6 +84,9 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
     
     // GO TO THE PAGE 
     await page.goto(url, { waitUntil: ('networkidle0') });
+
+    // critère x : privilégier les pixels noir
+    await tools.readPixels('./page.png')
 
     // Take screenshot 
     await page.screenshot({ path: `page.png`, fullPage:true});

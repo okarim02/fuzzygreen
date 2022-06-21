@@ -82,7 +82,7 @@ app.post("/getResult/analyse",async (req,res,next)=>{
     // Appel fuzzy logic
     // todo : récuperer le résultat
     
-    const fuzzyResult  = await fuzzylogic.launch(computed_data,url_data);
+    const fuzzyResult = await fuzzylogic.launch(computed_data,url_data);
 
     res.json({
         status:'success',
@@ -99,6 +99,33 @@ app.get('/result',(req,res,next)=>{
     res.render("result.ejs");
 })
 
+app.get("/result/modifyFuzzyRules/:id/",async(req,res,next)=>{
+    res.render("editfuzzy.ejs",{  
+        // data test : 
+        fuzzData : [
+            {
+                figure : "triangle",
+                x0 : 0,
+                x1 : 2,
+                x3 : 10,
+            },
+            {
+                figure : "triangle",
+                x0 : 2,
+                x1 : 10,
+                x3 : 25,
+            },
+            {
+                figure : "triangle",
+                x0 : 10,
+                x1 : 25,
+                x3 : 35,
+            },
+        ]
+    })
+})
+
 app.listen(PORT, async () => { 
     console.log(`Listening at ${PORT} (go to 'localhost:3000')`)
 });
+

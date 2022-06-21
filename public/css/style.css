@@ -9,6 +9,11 @@ body{
     justify-content: center;
 }
 
+
+h3 {
+    color:rgb(120, 30, 176)
+}
+
 #url-enter{
     height:200px;
     font-size:14pt;
@@ -56,3 +61,9 @@ table,th,td{
     border: 1px solid black;
     border-collapse: collapse;
 }
+
+canvas {
+    width: 1000px;
+    height: 400px;
+    border: 1px solid black;
+  }

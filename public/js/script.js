@@ -216,14 +216,13 @@ function display_fuzzy(data){
 
     for(let i = 0 ; i < criteres.length-1;i++){
         const li = document.createElement('li')
-        li.textContent = `${criteres[i]}` + `=> min : ${ data[criteres[i]]['other'].min } ; max : ${ data[criteres[i]]['other'].max } ; average : ${ data[criteres[i]]['other'].moyenne } ; median : ${data[criteres[i]]['other'].median }
-         ====> ${data[criteres[i]]['fuzzification']}`;
+        li.textContent = `${criteres[i]}` + `=> min : ${ data[criteres[i]]['other'].min } ; max : ${ data[criteres[i]]['other'].max } ; average : ${ data[criteres[i]]['other'].moyenne } ; median : ${data[criteres[i]]['other'].median }`;
         ul.appendChild(li);
     }
     depot.appendChild(ul);
 
     // Affichage defuzzification
-    const subtitle = document.createElement('h4');
+    let subtitle = document.createElement('h4');
     subtitle.innerText = `Defuzzification`;
     
     ul = document.createElement('ul');
@@ -240,13 +239,31 @@ function display_fuzzy(data){
     `
     depot.appendChild(subtitle);
     depot.appendChild(ul);
+
+    
+    subtitle = document.createElement('h5');
+    subtitle.innerText = `Defuzzification (detail)`;
+
+    ul = document.createElement('ul');
+
+    console.log(" huh ? ",criteres[0])
+    // defuzzification de chaque variable linguistic
+    for(let j = 0 ; j < criteres.length-1;j++){
+        ul.innerHTML += `
+            <li>
+                ${criteres[j]} ====> ${data[criteres[j]]['fuzzification']}
+                <button class="edit_fuzzy" type="button" onclick="location.href='result/modifyFuzzyRules/${0}/'">
+                    edit
+                </button>
+            </li>
+            `  
+    }
+    depot.appendChild(subtitle);
+    depot.appendChild(ul);
 }
-
-
 
 // Voir http://jsfiddle.net/hybrid13i/JXrwM/;
 function generate_save_button(data){
-    console.log("generet ! ", data);
     let depot = document.getElementById('result');
     const button = document.createElement('button')
     button.innerText = 'Télécharger résultat'
@@ -274,21 +291,18 @@ function generateExcel(data){
         let row = []; // Création de la ligne excel
         row.push(Object.keys(i)); // insertion url 
 
-        for(let j of Object.values(i[Object.keys(i)])){
-            if(Array.isArray(j)){
-                if(j.length<3){
-                    row.push(j.length == 0 ? "0" : j.toString()); // Si l'élément est un tableau alors on affiche sa taille 
-                }else{
-                    // Afin de ne pas dépasser la limite de caractères pour une cellule excel, on n'affichera pas le contenu des tableaux mais leur taille.
-                    row.push(j.length);
+        for(let j of Object.values(i[Object.keys(i)])){ // Parcours des critères d'un url
+            if(typeof j === 'object'){
+                if(j.liste != undefined){
+                    if(j.liste.length<3){
+                        row.push(j.nb == 0 ? "0" : j.liste.toString()); // Si l'élément est un tableau alors on affiche sa taille 
+                    }else{
+                        // Afin de ne pas dépasser la limite de caractères pour une cellule excel, on n'affichera pas le contenu des tableaux mais leur taille.
+                        row.push(j.nb);
+                    }
                 }
-                
             }else{
-                if(typeof j === 'object'){
-                    row.push(JSON.stringify(j));
-                }else{
-                    row.push(j.toString());
-                }
+                row.push(j.toString());
             }
         }
         wsData.push(row);
@@ -306,15 +320,31 @@ function generateExcel(data){
 
     wsData.push(['Criteria',...entete_fuzzy])
     
-    for(let i of criteres){
-        let row = []
-        row.push(i); // critère analyse
-        row.push(data['fuzzy_data'][i]['other'].min)
-        row.push(data['fuzzy_data'][i]['other'].max)
-        row.push(data['fuzzy_data'][i]['other'].moyenne)
-        row.push(data['fuzzy_data'][i]['other'].median)
-        wsData.push(row);
+    /*
+    for(let i = 0 ; i < criteres.length-1;i++){
+        li.textContent = `${criteres[i]}` + `=> min : ${ data[criteres[i]]['other'].min } ; max : ${ data[criteres[i]]['other'].max } ; average : ${ data[criteres[i]]['other'].moyenne } ; median : ${data[criteres[i]]['other'].median }
+         ====> ${data[criteres[i]]['fuzzification']}`;
+        ul.appendChild(li);
     }
+    depot.appendChild(ul);
+
+    // Affichage defuzzification
+    const subtitle = document.createElement('h4');
+    subtitle.innerText = `Defuzzification`;
+    
+    ul = document.createElement('ul');
+    ul.innerHTML= `
+        <li>
+            excellent: ${data[criteres[criteres.length-1]][0]}
+        </li>
+        <li>
+            Medium: ${data[criteres[criteres.length-1]][1]}
+        </li>
+        <li>
+            Bad: ${data[criteres[criteres.length-1]][2]}
+        </li>
+    `
+    */
 
 
     let ws = XLSX.utils.aoa_to_sheet(wsData);

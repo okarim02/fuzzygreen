@@ -1,7 +1,8 @@
-const fs = require('fs');
 const vm = require('vm'); // Correct syntax error 
 const dns = require('dns'); // Find ip
-const PNG = require('png-js');
+
+const fs = require('fs'),
+PNG = require('pngjs').PNG
 
 standard_font : [
   "Courier New",
@@ -29,11 +30,58 @@ var tools = module.exports = {
       {"Drupal":"" },
       {"Blogger":""}
     ],
+    // @link https://stackoverflow.com/questions/11247790/reading-a-png-image-in-node-js
+    // Inspiré de ... 
     readPixels : function(name){
-      // install png-js
-      PNG.decode(name, function(pixels) { //https://stackoverflow.com/questions/71059341/how-can-i-get-the-pixel-color-value-of-an-image-in-javascript
-        // pixels is a 1d array (in rgba order) of decoded pixel data
-        console.log("array :",pixels);
+      fs.createReadStream(name)
+      .pipe(new PNG())
+      .on('parsed', function() {
+
+        this.red = 0;
+        this.green = 0;
+        this.blue = 0;
+        
+        for (var y = 0; y < this.height; y++) {
+            for (var x = 0; x < this.width; x++) {
+                var idx = (this.width * y + x) << 2;
+
+                // this.data[idx] = R,this.data[idx+1] = G, this.data[idx+2] = B, this.data[idx+3] = opacity 
+
+                this.red += this.data[idx]/255;
+                this.green += this.data[idx+1]/255;
+                this.blue += this.data[idx+2]/255
+
+            }
+        }
+
+        this.pixelNb = this.height * this.width;
+
+        this.red = this.red / this.pixelNb;
+        this.green = this.green / this.pixelNb;
+        this.blue = this.blue / this.pixelNb;
+
+        let rgb = [
+          this.red,this.green,this.blue
+        ]
+        
+        // Calcule de la luminosité : 
+        // source : https://donatbalipapp.medium.com/colours-maths-90346fb5abda#:~:text=The%20formula%20for%20Saturation%20uses,(RGB)%20values%20and%20Luminosity.&text=We%20have%20calculated%20the%20Luminosity,Min(RGB)%20%3D%200%2C212.
+        this.luminance =0.5*(Math.max(...rgb)+Math.min(...rgb));
+
+        // Calcule de la saturation
+        // if(this.luminance < 1){
+        //   this.saturation = (Math.max(...rgb)-Math.min(...rgb)) / (1-Math.abs(2*this.luminance-1));
+        // }else if (this.luminance==1){
+        //   this.saturation=0;
+        // }
+
+        this.luminance*=100;
+        this.luminance= this.luminance.toFixed(2);
+        // this.saturation*=100;
+        // this.saturation = this.saturation.toFixed(2);
+
+        // this.result = (this.luminance * this.saturation);
+        console.log("Luminance : ",this.luminance, " %");
       });
     },
     getIp : function(domain){
