@@ -216,14 +216,13 @@ function display_fuzzy(data){
 
     for(let i = 0 ; i < criteres.length-1;i++){
         const li = document.createElement('li')
-        li.textContent = `${criteres[i]}` + `=> min : ${ data[criteres[i]]['other'].min } ; max : ${ data[criteres[i]]['other'].max } ; average : ${ data[criteres[i]]['other'].moyenne } ; median : ${data[criteres[i]]['other'].median }
-         ====> ${data[criteres[i]]['fuzzification']}`;
+        li.textContent = `${criteres[i]}` + `=> min : ${ data[criteres[i]]['other'].min } ; max : ${ data[criteres[i]]['other'].max } ; average : ${ data[criteres[i]]['other'].moyenne } ; median : ${data[criteres[i]]['other'].median }`;
         ul.appendChild(li);
     }
     depot.appendChild(ul);
 
     // Affichage defuzzification
-    const subtitle = document.createElement('h4');
+    let subtitle = document.createElement('h4');
     subtitle.innerText = `Defuzzification`;
     
     ul = document.createElement('ul');
@@ -240,13 +239,31 @@ function display_fuzzy(data){
     `
     depot.appendChild(subtitle);
     depot.appendChild(ul);
+
+    
+    subtitle = document.createElement('h5');
+    subtitle.innerText = `Defuzzification (detail)`;
+
+    ul = document.createElement('ul');
+
+    console.log(" huh ? ",criteres[0])
+    // defuzzification de chaque variable linguistic
+    for(let j = 0 ; j < criteres.length-1;j++){
+        ul.innerHTML += `
+            <li>
+                ${criteres[j]} ====> ${data[criteres[j]]['fuzzification']}
+                <button class="edit_fuzzy" type="button" onclick="location.href='result/modifyFuzzyRules/${0}/'">
+                    edit
+                </button>
+            </li>
+            `  
+    }
+    depot.appendChild(subtitle);
+    depot.appendChild(ul);
 }
-
-
 
 // Voir http://jsfiddle.net/hybrid13i/JXrwM/;
 function generate_save_button(data){
-    console.log("generet ! ", data);
     let depot = document.getElementById('result');
     const button = document.createElement('button')
     button.innerText = 'Télécharger résultat'
