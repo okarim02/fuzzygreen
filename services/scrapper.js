@@ -13,6 +13,8 @@ function test(){
     tools.readPixels('../page.png')
 }
 
+var measures = {};
+
 function Measures(){
     return {
         'PageSize(Ko)': 0, // Serveur
@@ -57,7 +59,6 @@ function Measures(){
             liste : [],
             nb : 0,
         },
-        //'loadTime(ms)': 0, // A supprimer
         'imgResize': 0,
         'isMobileFriendly':false,
         "imgSrcEmpty":0,
@@ -73,123 +74,29 @@ function setMeasurestoDo(criteres_selected){
             delete m[i];
         }
     }
-    return m;
+    measures= m;
 }
 
 module.exports.getPageMetrics = async (url, page,criteres_selected, callback) => {
-    var measures = setMeasurestoDo(criteres_selected);
+
+    setMeasurestoDo(criteres_selected);
     //'use strict';
     acceptCookies(page); // Accepte les cookies 
-    const gitMetrics = await page.metrics();
 
     // Use to do more things with the requests made by the website (check the doc)
     await page.setRequestInterception(true);
 
-    // var & const
-    var counter_http1 = 0;
-
-    page.on('request', (request) => {
-        request.continue();
-    });
-    // listen for the server's responses
-    page.on('response', async (response) => {
-        measures.RequestsNb += 1
-
-        if (response.url().startsWith("http:")) {
-            counter_http1 += 1;
-        }
-
-        if (!response.ok) response.continue();
-
-        if (response.url() == url) { // Its the html document
-            let poweredBy = response.headers()['x-powered-by'];
-            if (poweredBy != undefined) {
-                poweredBy = poweredBy.split('\n');
-            }
-        }
-
-        // We only want non-data requests 
-        if (!response.url().startsWith('data:')) {
-            // fonts
-            if (response.request().resourceType() == "font") {
-                measures.FontsNb.liste.push(response.url());
-            }
-            
-            const btSocial = await tools.checkIfSocialButton(response.url())
-            if (btSocial != "") {
-                //measures.socialButtonsFind.liste.push(response.url());
-            }
-            response.buffer().then(
-                buffer => {
-                    measures['PageSize(Ko)'] += buffer.length
-                },
-                error => {
-                    console.error(`${response.status()} ${response.url()} Erreur: ${error}`);
-                }
-            );
-
-            if (response.headers().hasOwnProperty('etag')) {
-                measures.etagsNb += 1
-            }
-
-            // https://stackoverflow.com/questions/43617227/check-size-of-uploaded-file-in-mb
-            if (response.request().resourceType() === 'image') {
-                const poidImage = response.headers()['content-length']
-                //console.log(`IMAGE ${response.url()} , poid : ${ poidImage }`)
-                //if ((poidImage / 1048576.0) > 10) {
-
-                if ((poidImage) > 10) {
-                    //console.log("l'Image ci-dessus est trop grande ! ")
-                }
-            }
-
-            // For more info : https://stackoverflow.com/questions/57524945/how-to-intercept-a-download-request-on-puppeteer-and-read-the-file-being-interce
-            if (response.request().resourceType() == "script" || response.request().resourceType() == "stylesheet") {
-                const content = await response.text();
-                const totalSize = await content.length;
-                const isMin = await tools.isMinified(content);
-                const poid = await (await response.buffer()).length;
-
-                if (await response.request().resourceType() == "script") {
-                    // check syntax
-                    const resultCheck = await tools.checkSyntax(content);
-                    if (resultCheck != "") {
-                        measures.filesWithError.liste.push(response.url());
-                    }
-                    // Check if there is sql inside a loop
-                    // todo 
-                    // const result = await tools.hasLoopInsideSql(content);
-                }
-
-                if (!isMin) {
-                    if(response.request().resourceType()=="script"){
-                        if(!measures.JSMinification.liste.includes(response.url()) && response.url() != ""){
-                            measures.JSMinification.liste.push(response.url());
-                        }
-                    }else{
-                        if(!measures.CSSMinification.liste.includes(response.url)){
-                            measures.CSSMinification.liste.push(response.url());
-                        }
-                    }
-                }
-            }
-        
-        }
-
-        
-    })
-
-    const url_object = new URL(url);
-
+    let counter_http1 = listen_request(page,url);
+    
     // GO TO THE PAGE 
     await page.goto(url, { waitUntil: ('networkidle0') });
 
     // Take screenshot 
     await page.screenshot({ path: `page.png`, fullPage:true});
     /*
-
     measures.ratioWhitePixels = tools.readPixels('page.png')
     */
+
     measures.CMS.liste = await getCMS(page, browser = undefined).then(e => e ? e : []);
     measures.CMS.nb = measures.CMS.liste.length;
 
@@ -225,14 +132,12 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
 
     measures.imagesWithoutLazyLoading.liste = res.imagesNoLazy;
     measures.imagesWithoutLazyLoading.nb = res.imagesNoLazy.length;
-    
 
     measures.imgResize = await getImagesResized(page).then(e => e.imagesResized.length);
 
     measures['Http1.1/Http2requests'] = await (counter_http1 / measures.RequestsNb) * 100;
     measures['Http1.1/Http2requests'] = parseFloat(measures['Http1.1/Http2requests']).toFixed(2);
     measures['Http1.1/Http2requests'] = parseFloat(measures['Http1.1/Http2requests']) || 0 ;
-
 
     measures['DOMsize(nb elem)'] = await page.$$eval('*', array => array.length);
 
@@ -252,18 +157,113 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
      }
      */
 
+
     measures.JSMinification.nb = measures.JSMinification.liste.length;
     measures.CSSMinification.nb = measures.CSSMinification.liste.length;
     measures.filesWithError.nb = measures.filesWithError.liste.length;
     measures.FontsNb.nb = measures.FontsNb.liste.length;
     //measures.socialButtonsFind.nb = measures.socialButtonsFind.liste.length;
 
-
-
     await page.close();
     //await browser.close();
 
     callback(measures, true);
+
+    
+}
+
+function listen_request(page,url) {
+
+    // var & const
+    var counter_http1 = 0;
+
+    page.on('request', (request) => { // Requêtes émit par la page
+        request.continue();
+    });
+    // listen for the server's responses
+    page.on('response', async (response) => { // Requêtes reçu 
+        measures.RequestsNb += 1;
+
+        if (response.url().startsWith("http:")) {
+            counter_http1 += 1;
+        }
+
+        if (!response.ok)
+            response.continue();
+
+        if (response.url() == url) { // Its the html document
+            let poweredBy = response.headers()['x-powered-by'];
+            if (poweredBy != undefined) {
+                poweredBy = poweredBy.split('\n');
+            }
+        }
+
+        // We only want non-data requests 
+        if (!response.url().startsWith('data:')) {
+            // fonts
+            if (response.request().resourceType() == "font") {
+                measures.FontsNb.liste.push(response.url());
+            }
+
+            const btSocial = await tools.checkIfSocialButton(response.url());
+            if (btSocial != "") {
+                //measures.socialButtonsFind.liste.push(response.url());
+            }
+            response.buffer().then(
+                buffer => {
+                    measures['PageSize(Ko)'] += buffer.length;
+                },
+                error => {
+                    console.error(`${response.status()} ${response.url()} Erreur: ${error}`);
+                }
+            );
+
+            if (response.headers().hasOwnProperty('etag')) {
+                measures.etagsNb += 1;
+            }
+
+            // https://stackoverflow.com/questions/43617227/check-size-of-uploaded-file-in-mb
+            if (response.request().resourceType() === 'image') {
+                const poidImage = response.headers()['content-length'];
+                //console.log(`IMAGE ${response.url()} , poid : ${ poidImage }`)
+                //if ((poidImage / 1048576.0) > 10) {
+                if ((poidImage) > 10) {
+                    //console.log("l'Image ci-dessus est trop grande ! ")
+                }
+            }
+
+            // For more info : https://stackoverflow.com/questions/57524945/how-to-intercept-a-download-request-on-puppeteer-and-read-the-file-being-interce
+            if (response.request().resourceType() == "script" || response.request().resourceType() == "stylesheet") {
+                const content = await response.text();
+                const totalSize = await content.length;
+                const isMin = await tools.isMinified(content);
+                const poid = await (await response.buffer()).length;
+
+                if (await response.request().resourceType() == "script") {
+                    // check syntax
+                    const resultCheck = await tools.checkSyntax(content);
+                    if (resultCheck != "") {
+                        measures.filesWithError.liste.push(response.url());
+                    }
+                }
+
+                if (!isMin) {
+                    if (response.request().resourceType() == "script") {
+                        if (!measures.JSMinification.liste.includes(response.url()) && response.url() != "") {
+                            measures.JSMinification.liste.push(response.url());
+                        }
+                    } else {
+                        if (!measures.CSSMinification.liste.includes(response.url)) {
+                            measures.CSSMinification.liste.push(response.url());
+                        }
+                    }
+                }
+            }
+
+        }
+    });
+
+    return counter_http1;
 }
 
 //************************** UTILS ***************************/
@@ -347,11 +347,11 @@ async function isStatic(page,measures) {
     * @see {@link https://serpstat.com/blog/how-to-detect-which-cms-a-website-is-using-8-easy-ways/#:~:text=The%20name%20of%20the%20CMS,source%20code%20of%20the%20page&text=Go%20to%20the%20website%20you%20want%20to%20examine.&text=Press%20Ctrl%20%2B%20U%20to%20display%20the%20page%20code.&text=Find%20the%20tag%20with%20the,content%3D%20on%20the%20html%20page.}
     todo : A continuer
 */
-async function getCMS(page, browser) {
-    const cms_library = {
-        "wordpress": "wp"
-    }
-    let cms = await page.evaluate(() => {
+async function getCMS(page) {
+    const cms_list = Object.entries(tools.CMS_LIST);
+
+    
+    let cms = await page.evaluate(function(cms_list) {
         var cms = [];
 
         const meta = document.head.querySelector('head > meta[name="generator"]');
@@ -364,11 +364,13 @@ async function getCMS(page, browser) {
         if (srcs.length > 0) {
             for (let i of srcs) {
                 const s = i.src;
-                if (s.includes("wp-includes") || s.includes("wp-content") || s.includes("wp-emoji")) {
-                    if (!cms.includes("wordpress")) {
-                        cms.push("wordpress");
+                for(let j = 0 ; j < cms_list.length ;j++){
+                    if (s.includes(cms_list[j][1])) {
+                        if (!cms.includes(cms_list[j][0])) {
+                            cms.push(cms_list[j][0]);
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
@@ -377,18 +379,21 @@ async function getCMS(page, browser) {
         if (refs.length > 0) {
             for (let i of refs) {
                 const s = i.href;
-                if (s.includes("wp-includes") || s.includes("wp-content") || s.includes("wp-emoji")) {
-                    if (!cms.includes("wordpress")) {
-                        cms.push("wordpress");
+
+                for(let j = 0 ; j < cms_list.length ;j++){
+                    if (s.includes(cms_list[j][1])) {
+                        if (!cms.includes(cms_list[j][0])) {
+                            cms.push(cms_list[j][0]);
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
 
 
         return cms;
-    })
+    },cms_list);
     /*
     // fix this
     const txt = await getRobot(browser,page.url());
@@ -414,7 +419,7 @@ async function getAllpdf(page) {
     }
     return pdfs;
 }
-// If a html stylesheet doesn't have a href that mean he was not written in a specific file but directly in the html 
+// Si une balise 'stylesheet' ne possède pas d'attribut 'href' => Alors le contenu a été écrit directement le fichier html.
 async function countNumberOfInlineStyleSheet(page) {
     const result = await page.evaluate(() => {
         let stylesheets = document.styleSheets;
@@ -448,7 +453,7 @@ async function getImagesResized(page) {
         for (let i = 0; i < imgs.length; i++) {
             const img = imgs[i];
             if (img.clientWidth < img.naturalWidth || img.clientHeight < img.naturalHeight) {
-                // Images of one pixel are some times used ... , we exclude them
+                // Exclure les images de taille == 1px.
                 const isVisible = (img.clientWidth != 0);
                 const isASvg = img.src.includes(".svg?") || img.src.endsWith(".svg");
                 if (isVisible && img.naturalWidth > 1 && !isASvg) {

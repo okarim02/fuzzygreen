@@ -10,3 +10,5 @@ npm install body-parser
 npm i node-sessionstorage
 npm i png-js
 npm install fuzzymodule
+npm i es6-fuzz
+npm install compression

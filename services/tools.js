@@ -18,20 +18,20 @@ standard_font : [
 
 var tools = module.exports = {
     CMS_LIST : [
-      "WordPress",
-      "Wix" ,
-      "Squarespace" ,
-      "Joomla!",
-      "Shopify",
-      "Progress",
-      "GoDaddy Website Builder",
-      "Weebly" ,
-      "Drupal" ,
-      "Blogger"
+      {"WordPress":"wp"},
+      {"Wix":""} ,
+      {"Squarespace":""} ,
+      {"Joomla!":""},
+      {"Shopify":""},
+      {"Progress":""},
+      {"GoDaddy Website Builder":""},
+      {"Weebly":"" },
+      {"Drupal":"" },
+      {"Blogger":""}
     ],
     readPixels : function(name){
       // install png-js
-      PNG.decode(name, function(pixels) {
+      PNG.decode(name, function(pixels) { //https://stackoverflow.com/questions/71059341/how-can-i-get-the-pixel-color-value-of-an-image-in-javascript
         // pixels is a 1d array (in rgba order) of decoded pixel data
         console.log("array :",pixels);
       });
