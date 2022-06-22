@@ -19,16 +19,16 @@ standard_font : [
 
 var tools = module.exports = {
     CMS_LIST : [
-      "WordPress",
-      "Wix" ,
-      "Squarespace" ,
-      "Joomla!",
-      "Shopify",
-      "Progress",
-      "GoDaddy Website Builder",
-      "Weebly" ,
-      "Drupal" ,
-      "Blogger"
+      {"WordPress":"wp"},
+      {"Wix":""} ,
+      {"Squarespace":""} ,
+      {"Joomla!":""},
+      {"Shopify":""},
+      {"Progress":""},
+      {"GoDaddy Website Builder":""},
+      {"Weebly":"" },
+      {"Drupal":"" },
+      {"Blogger":""}
     ],
     // @link https://stackoverflow.com/questions/11247790/reading-a-png-image-in-node-js
     // Inspiré de ... 
