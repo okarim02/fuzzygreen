@@ -37,36 +37,47 @@ function getMedian(arr){
 class fuzzyVariable{
     constructor(var1,var2){
         this.fzmod = new FuzzyModule(); // Objet qui contient toutes les fonctions utiles:  création variables linguistics, création des fonctions d'apparteance, règles, fuzzification ...  
-        this.var1 = var1;
-        this.var2 = var2;
-        this.var1_linguistic_var;
-        this.var2_linguistic_var;
 
+        this.var1_linguistic_var = this.fzmod.createFLV(var1);
+        this.var2_linguistic_var = this.fzmod.createFLV(var2);
+        
         this.init();
     }
     
     init(){
         // Result
+        
         this.sustainabilityFLV = this.fzmod.createFLV("sustainability");
     
         this.bad_sustainability = this.sustainabilityFLV.addTriangleSet("bad", 0, 30, 50);
         this.medium_sustainability = this.sustainabilityFLV.addTriangleSet("medium", 30, 50, 70);
         this.excellent_sustainability = this.sustainabilityFLV.addTriangleSet("excellent", 50, 70, 100);
     }
-    
-    critere_module(critere,min,max,average,ecart_type) {
-    
-        //this.fzmod = new FuzzyModule();
+
+    critere_module(figure,cords) { // ancien parametres : figure,critere,min,max,average,ecart_type
         if(this.var1 == critere){
-            this.var1_linguistic_var = this.fzmod.createFLV(critere);
-            this.excellent_critere1 = this.var1_linguistic_var.addTriangleSet("excellent", min,min,average);
-            this.medium_critere1 = this.var1_linguistic_var.addTriangleSet("medium", average-ecart_type, ecart_type, average+ecart_type);
-            this.bad_critere1 = this.var1_linguistic_var.addTriangleSet("bad", average,max,max);
+            if(figure=="triangle"){
+                this.excellent_critere1 = this.var1_linguistic_var.addTriangleSet("excellent", cords.excellant.x0,cords.excellant.x1,cords.excellant.x2);
+                this.medium_critere1 = this.var1_linguistic_var.addTriangleSet("medium", cords.medium.x0,cords.medium.x1,cords.medium.x2);
+                this.bad_critere1 = this.var1_linguistic_var.addTriangleSet("bad", cords.bad.x0,cords.bad.x1,cords.bad.x2);
+            }else{
+                // figure : trapezoid
+                this.excellent_critere1 = this.var1_linguistic_var.addTrapezoidSet("excellent", cords.excellant.x0,cords.excellant.x1,cords.excellant.x2,cords.excellant.x3);
+                this.medium_critere1 = this.var1_linguistic_var.addTrapezoidSet("medium", cords.medium.x0,cords.medium.x1,cords.medium.x2,cords.medium.x3);
+                this.bad_critere1 = this.var1_linguistic_var.addTrapezoidSet("bad", cords.bad.x0,cords.bad.x1,cords.bad.x2,cords.medium.x3);
+            }
+            
         }else{ 
-            this.var2_linguistic_var = this.fzmod.createFLV(critere);
-            this.excellent_critere2 = this.var2_linguistic_var.addTriangleSet("excellent", min,min,average);
-            this.medium_critere2 = this.var2_linguistic_var.addTriangleSet("medium", average-ecart_type, ecart_type, average+ecart_type);
-            this.bad_critere2 = this.var2_linguistic_var.addTriangleSet("bad", average,max,max);
+            if(figure=="triangle"){
+                this.excellent_critere2 = this.var2_linguistic_var.addTriangleSet("excellent", cords.excellant.x0,cords.excellant.x1,cords.excellant.x2);
+                this.medium_critere2 = this.var2_linguistic_var.addTriangleSet("medium", cords.medium.x0,cords.medium.x1,cords.medium.x2);
+                this.bad_critere2 = this.var2_linguistic_var.addTriangleSet("bad", cords.bad.x0,cords.bad.x1,cords.bad.x2);
+            }else{
+                // figure : trapezoid
+                this.excellent_critere2 = this.var2_linguistic_var.addTrapezoidSet("excellent", cords.excellant.x0,cords.excellant.x1,cords.excellant.x2,cords.excellant.x3);
+                this.medium_critere2 = this.var2_linguistic_var.addTrapezoidSet("medium", cords.medium.x0,cords.medium.x1,cords.medium.x2,cords.medium.x3);
+                this.bad_critere2 = this.var2_linguistic_var.addTrapezoidSet("bad", cords.bad.x0,cords.bad.x1,cords.bad.x2,cords.medium.x3);
+            }
         }
     }
 
@@ -172,13 +183,18 @@ function getUndefinedData(){
  * @param {*} crit : critère  
  * @param {*} obj : Objet de la forme :
  * {
- *  'excellent' : {forme : triangle , x0: 10 , x1 : 2 , x3:10}
- *  'medium' : {forme : triangle , x0: 10 , x1 : 2 , x3:10}
- *  'bad' : {forme : trapezoid , x0: 5 , x1 : 2 , x3:150, x4 : 169}
+ *  'excellent' : {forme : 'triangle' , x0: 10 , x1 : 2 , x3:10}
+ *  'medium' : {forme : 'triangle' , x0: 10 , x1 : 2 , x3:10}
+ *  'bad' : {forme : 'trapezoid' , x0: 5 , x1 : 2 , x3:150, x4 : 169}
  * }
  */
-async function change(crit,obj){
-    
+async function change(crit,fuzzy_data){
+
+    let a = new fuzzyVariable(crit,fuzzy_data[crit]['pair']);
+
+    a.critere_module(fuzzy_data[crit].membership_function);
+    a.critere_module(fuzzy_data[fuzzy_data[crit].pair].membership_function);
+
 }
 
 module.exports.launch = async function launch(data=[common.otherExempleOfScrapperData],data2=[common.exampleScrapperData]){
@@ -235,8 +251,57 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
 
         let a = new fuzzyVariable(crit_less[i],crit_less[i+1]);
 
-        a.critere_module(crit_less[i],result_act.min_tmp || result_act.min,result_act.max_tmp || result_act.max,result_act.average,result_act.ecart);
-        a.critere_module(crit_less[i+1],result_ap.min_tmp || result_ap.min, result_ap.max_tmp || result_ap.max,result_ap.average,result_ap.ecart);
+        // Automatique
+        let cords = {
+            "excellent": {
+                figure: "triangle",
+                x0 : result_act.min_tmp || result_act.min,
+                x1 : x0,
+                x2 : result_act.average
+            },
+            "medium" : {
+                figure: "triangle",
+                x0 : result_act.average-result_act.ecart,
+                x1 : result_act.ecart,
+                x2 : result_act.average+result_act.ecart
+            },
+            "bad": {
+                figure: "triangle",
+                x0 : result_act.average,
+                x1 : result_act.max,
+                x2 : x1,
+            }
+        }
+
+
+        fuzzyLogic_values[crit_less[i]]["membership_function"] = cords;
+
+        a.critere_module("triangle",cords);
+
+        cords = {
+            "excellent": {
+                figure: "triangle",
+                x0 : result_ap.min_tmp || result_ap.min,
+                x1 : x0,
+                x2 : result_ap.average
+            },
+            "medium" : {
+                figure: "triangle",
+                x0 : result_ap.average-result_ap.ecart,
+                x1 : result_ap.ecart,
+                x2 : result_ap.average+result_ap.ecart
+            },
+            "bad": {
+                figure: "triangle",
+                x0 : result_ap.average,
+                x1 : result_ap.max,
+                x2 : x1,
+            }
+        }
+
+        fuzzyLogic_values[crit_less[i+1]]["membership_function"] = cords
+
+        a.critere_module("triangle",cords);
 
         let fuzzyval1 = a.getCrispValue(url_data[crit_less[i]], url_data[crit_less[i+1]]);
 
@@ -244,11 +309,14 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
         
         s_list.push(fuzzyval1);
 
-        fuzzyLogic_values[crit_less[i]] = {} 
-        fuzzyLogic_values[crit_less[i+1]] = {} 
+        fuzzyLogic_values[crit_less[i]] = {};
+        fuzzyLogic_values[crit_less[i+1]] = {};
 
         fuzzyLogic_values[crit_less[i]]["result_fuzzificaton"]=fuzzyval1;
         fuzzyLogic_values[crit_less[i+1]]["result_fuzzificaton"]=fuzzyval1;
+
+        fuzzyLogic_values[crit_less[i]]['pair'] = crit_less[i+1];
+        fuzzyLogic_values[crit_less[i+1]]['pair'] = crit_less[i+1-1];
 
 
         fuzzyLogic_values[crit_less[i]]["fuzzification"] = getBooleanFuzzy(url_data[crit_less[i]],result_act.min_tmp || result_act.min,result_act.max_tmp || result_act.max,result_act.average,result_act.ecart);
