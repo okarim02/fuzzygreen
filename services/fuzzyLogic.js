@@ -353,7 +353,6 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
         fuzzyLogic_values[crit_less[i]]["crisp_value"]=url_data[crit_less[i]];
         fuzzyLogic_values[crit_less[i+1]]["crisp_value"]=url_data[crit_less[i+1]];
 
-
         fuzzyLogic_values[crit_less[i]]["result_fuzzificaton"]=fuzzyval1;
         fuzzyLogic_values[crit_less[i+1]]["result_fuzzificaton"]=fuzzyval1;
 
@@ -376,8 +375,6 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
     fuzzyLogic_values["sustainable"]=getFuzzyValue(max);
 
 
-    console.log("echelle : ",fuzzyLogic_values["sustainable"]);
-
     console.log("fuzzy data : ",fuzzyLogic_values);
 
     // Todo : Implémenter les règles ...
@@ -386,10 +383,12 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
 
 function getResult(s_list) {
     let max = 0;
+    console.log("Debug s_list : ");
     /*
     Sustainability = Math.max(s0,s1,...)
     */
     for (let i of s_list) {
+        console.log("ox : ",i);
         if (i > max) {
             max = i;
         }
@@ -447,6 +446,8 @@ function getBooleanFuzzy(value,cords){
 
 function getFuzzyValue(value) {
     
+    console.log("Debug getFuzzyValue : ",value);
+
     let excellent = fuzzylogic.triangle(value, 50,70,100);
     let medium = fuzzylogic.triangle(value, 30, 50, 70);
     let bad = fuzzylogic.triangle(value, 0,30,50);

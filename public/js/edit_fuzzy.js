@@ -1,18 +1,15 @@
 var fuzzyData = JSON.parse(sessionStorage.getItem('fuzzyData')); 
-var membership = Object.keys(fuzzyData['PageSize(Ko)'].membership_function)
 
+const url = window.location.href.split('/');
+var critere = url[url.length-2];
+var membership = Object.keys(fuzzyData[critere].membership_function)
 
 function init_fuzzy(){
-    
-    const url = window.location.href.split('/');
-    const id = url[url.length-2];
-
-    console.log("id:",id);
-    
+    console.log("critère : ",critere);
     for(let i = 1 ; i<=3 ;i++){
         let liste = document.getElementById('fig_'+i);
         let options = liste.options;
-        let fig = fuzzyData['PageSize(Ko)'].membership_function[membership[i-1]]['figure']
+        let fig = fuzzyData[critere].membership_function[membership[i-1]]['figure']
         if(options[0].value == fig){
             options[0].selected = true;
         }else{
@@ -28,7 +25,7 @@ function init_fuzzy(){
         })
         for(let j = 0 ; j <= 3 ;j++){
             let x = document.getElementById(`x${j}_id${i}`);
-            x.value = fuzzyData['PageSize(Ko)'].membership_function[membership[i-1]][`x${j}`];
+            x.value = fuzzyData[critere].membership_function[membership[i-1]][`x${j}`];
         }
     }
 }

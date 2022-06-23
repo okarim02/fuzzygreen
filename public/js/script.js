@@ -246,13 +246,12 @@ function display_fuzzy(data){
 
     ul = document.createElement('ul');
 
-    console.log(" huh ? ",criteres[0])
     // defuzzification de chaque variable linguistic
     for(let j = 0 ; j < criteres.length-1;j++){
         ul.innerHTML += `
             <li>
                 ${criteres[j]} ====> ${data[criteres[j]]['fuzzification']}
-                <button class="edit_fuzzy" type="button" onclick="location.href='result/modifyFuzzyRules/${0}/'">
+                <button class="edit_fuzzy" type="button" onclick="location.href='result/modifyFuzzyRules/${criteres[j]}/'">
                     edit
                 </button>
             </li>

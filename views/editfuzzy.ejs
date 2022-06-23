@@ -101,15 +101,19 @@
         init_fuzzy();
     };
 
+    var ctx = document.getElementById("root").getContext("2d");
+    ctx.clearRect(0,0,1000,400) ;
+
     window.setInterval(function(){
         draw();
     }, 1500);
-
     function draw(){
         let left = document.getElementById("root")
-        let ctx = left.getContext("2d");
+        
         ctx.fillStyle = "red";
         ctx.lineWidth = 4;
+
+        DrawAxes();
 
         let x0 =fuzzyData['PageSize(Ko)'].membership_function[membership[0]][`x${0}`]
         let x1 =fuzzyData['PageSize(Ko)'].membership_function[membership[0]][`x${1}`]
@@ -128,6 +132,71 @@
         ctx.fill();
         ctx.stroke();
     }
+
+
+     // DrawAxes draws the X ad Y axes, with tick marks.
+   function DrawAxes() {
+    ctx.save() ;
+    ctx.lineWidth = 2 ;
+    // +Y axis
+    ctx.beginPath() ;
+    ctx.moveTo(XC(0),YC(0)) ;
+    ctx.lineTo(XC(0),YC(MaxY())) ;
+    ctx.stroke() ;
+   
+    // -Y axis
+    ctx.beginPath() ;
+    ctx.moveTo(XC(0),YC(0)) ;
+    ctx.lineTo(XC(0),YC(MinY())) ;
+    ctx.stroke() ;
+   
+    // Y axis tick marks
+    var delta = YTickDelta() ;
+    for (var i = 1; (i * delta) < MaxY() ; ++i) {
+     ctx.beginPath() ;
+     ctx.moveTo(XC(0) - 5,YC(i * delta)) ;
+     ctx.lineTo(XC(0) + 5,YC(i * delta)) ;
+     ctx.stroke() ;  
+    }
+   
+    var delta = YTickDelta() ;
+    for (var i = 1; (i * delta) > MinY() ; --i) {
+     ctx.beginPath() ;
+     ctx.moveTo(XC(0) - 5,YC(i * delta)) ;
+     ctx.lineTo(XC(0) + 5,YC(i * delta)) ;
+     ctx.stroke() ;  
+    }  
+   
+    // +X axis
+    ctx.beginPath() ;
+    ctx.moveTo(XC(0),YC(0)) ;
+    ctx.lineTo(XC(MaxX()),YC(0)) ;
+    ctx.stroke() ;
+   
+    // -X axis
+    ctx.beginPath() ;
+    ctx.moveTo(XC(0),YC(0)) ;
+    ctx.lineTo(XC(MinX()),YC(0)) ;
+    ctx.stroke() ;
+   
+    // X tick marks
+    var delta = XTickDelta() ;
+    for (var i = 1; (i * delta) < MaxX() ; ++i) {
+     ctx.beginPath() ;
+     ctx.moveTo(XC(i * delta),YC(0)-5) ;
+     ctx.lineTo(XC(i * delta),YC(0)+5) ;
+     ctx.stroke() ;  
+    }
+   
+    var delta = XTickDelta() ;
+    for (var i = 1; (i * delta) > MinX() ; --i) {
+     ctx.beginPath() ;
+     ctx.moveTo(XC(i * delta),YC(0)-5) ;
+     ctx.lineTo(XC(i * delta),YC(0)+5) ;
+     ctx.stroke() ;  
+    }
+    ctx.restore() ;
+   }
         
 </script>
 
