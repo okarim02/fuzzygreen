@@ -86,7 +86,7 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
     await page.goto(url, { waitUntil: ('networkidle0') });
 
     // critère x : privilégier les pixels noir
-    await tools.readPixels('./page.png')
+    //await tools.readPixels('./page.png')
 
     // Take screenshot 
     await page.screenshot({ path: `page.png`, fullPage:true});

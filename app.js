@@ -13,10 +13,6 @@ const common = require('./services/common');
 const fuzzylogic = require('./services/fuzzyLogic');
 const main = require('./services/main');
 
-// Sauvegarde les données dans la session de l'utilisateur
-var sessionStorage = require('node-sessionstorage');
-
-
 const fs = require('fs');
 
 var requestTime = Date.now();
@@ -99,30 +95,23 @@ app.get('/result',(req,res,next)=>{
     res.render("result.ejs");
 })
 
-app.get("/result/modifyFuzzyRules/:id/",async(req,res,next)=>{
-    res.render("editfuzzy.ejs",{  
-        // data test : 
-        fuzzData : [
-            {
-                figure : "triangle",
-                x0 : 0,
-                x1 : 2,
-                x3 : 10,
-            },
-            {
-                figure : "triangle",
-                x0 : 2,
-                x1 : 10,
-                x3 : 25,
-            },
-            {
-                figure : "triangle",
-                x0 : 10,
-                x1 : 25,
-                x3 : 35,
-            },
-        ]
-    })
+app.get("/result/modifyFuzzyRules/:criteria_id/",async(req,res,next)=>{
+    res.render("editfuzzy.ejs")
+})
+
+app.post("/result/modifyFuzzyRules/",async(req,res,next)=>{
+    const cordToModify = req.body.membership_functions_result;
+    const fuzzy_data = req.body.fuzzyData;
+    
+    const fuzzyResult = await fuzzylogic.edit(fuzzy_data,cordToModify.criteria,cordToModify);
+    res.json({
+        status:'success',
+        message: `Traitement terminé`,
+        redirected: '/result',
+        data : JSON.stringify({
+            "fuzzyResult": fuzzyResult,
+        })
+    });
 })
 
 app.listen(PORT, async () => { 

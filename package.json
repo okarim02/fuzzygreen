@@ -27,7 +27,6 @@
     "fuzzymodule": "^1.0.1",
     "lighthouse": "^9.5.0",
     "node-fetch": "^2.6.7",
-    "node-sessionstorage": "^1.0.0",
     "node-whois": "^2.1.3",
     "pngjs": "^6.0.0",
     "puppeteer": "^13.7.0",

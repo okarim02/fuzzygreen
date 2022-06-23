@@ -3,7 +3,6 @@
 <section>
     <article>
         <h2>RESULTS: </h2>
-        <button id="fetch_result" onclick="resultats()">Afficher</button>
         
         <div id="result">
         </div>
@@ -19,6 +18,13 @@
 <footer>
     <%- include('partials/footer') %>
 </footer>
+
+<script>
+    window.onload = function() {
+        resultats();
+    };
+    console.log("Fuzzy data : ", JSON.parse(sessionStorage.getItem('fuzzyData')));
+</script>
 
 </body>
 </html>
