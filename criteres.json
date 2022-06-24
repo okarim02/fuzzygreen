@@ -3,29 +3,29 @@
         "id" : 0,
         "critere" : "Size",
         "header": "PageSize(Ko)", 
-        "description": "Poids de la page, Représente ce que l'utilisateur télécharge en Ko",
-        "conseil": "Votre page est trop lourd, vérifier le contenu de votre site web par exemple: si les images sont optimisées"
+        "description": "Poids de la page, représente ce que l'utilisateur télécharge en Ko",
+        "conseil": "Votre page est trop lourde, vérifier le contenu de votre site web, images sont-elles optimisées ?"
     },
     {
         "id" : 1,
         "critere" : "Nombre de requêtes",
         "header": "RequestsNb", 
-        "description": "Le site web échange avec divers acteurs (clients, api, base de données ...) et donc émet des requêtes.",
-        "conseil": "Ce critère peut être diminué dans un premier temps en limitant le nombre de fichiers à télécharger du côté client pour ce faire, combiner les fichiers statiques (css,js) est une solution mais la plus importante est d'utiliser au maximum le cache du navigateur."
+        "description": "Le site web échange avec divers éléments (clients, API, base de données ...) et donc émet des requêtes HTTP",
+        "conseil": "Ce critère peut être réduit dans un premier temps en limitant le nombre de fichiers à télécharger du côté client, pour ce faire il faut combiner les fichiers statiques (CSS,JS) et utiliser au maximum le cache du navigateur."
     },
     {
         "id": 2,
         "critere":"Taille du DOM",
         "header": "DOMsize(nb elem)", 
-        "description":"Le dom représente la compléxité d'une page, plus la taille du dom est grand, plus la page possède un très grand nombre d'élément (balises div, images etc...).",
-        "conseil": "Adopter l'approche mobile first, privilégier un site web simple"
+        "description":"Le DOM (Document Object Model) représente la compléxité d'une page, plus la taille du DOM est grande, plus la page est complexe et possède un très grand nombre d'éléments (balises div, images etc...).",
+        "conseil": "Adopter l'approche mobile first et privilégier un site web simple"
     },
     {
         "id":3,
         "critere" : "Utilisation d'etags",
         "header":"etagsNb",
         "header_comp":"etagsRatio",
-        "description":"Permet d'éviter au serveur de faire deux fois la même requêtes, ainsi le but est de mettre en cache les résultats",
+        "description":"Permet d'éviter au serveur de faire deux fois la même requêtes et il met en cache les résultats",
         "conseil": ""
     },
     {
@@ -33,15 +33,15 @@
         "critere":"lazy load",
         "header":"lazyLoadRatio",
         "header_comp":"imagesWithoutLazyLoading",
-        "description":"Si la page est scrollable, l'idée est de charger seulement les élémets observable par l'utilisateur",
-        "conseil" : "Il existe le lazy loading natif déjà intégré aux navigateurs, il suffit juste d'ajouter l'attribut <loading> aux balise IMG"
+        "description":"Si la page est scrollable, l'idée est de charger seulement les éléments observables par l'utilisateur",
+        "conseil" : "Il existe le lazy loading natif déjà intégré aux navigateurs, il suffit juste d'ajouter l'attribut <loading> aux balise <img>"
     },
     {
         "id":5,
         "critere":"Page statique",
         "header":"isStatic",
-        "description":"Cela dépend du site web, si le site ne propose quasiment aucune interaction avec les utilisateurs alors il est envisagé de la rendre statique.Une page dynamique propose plusieurs logiciels qui tourne fournissant à l'utilisateur des services ce qui nécessite des échanges or une page statique est directement charger dans le navigateur car les fichiers statique utilise seulement HTTP du serveur contrairement au contenu dynamique avec Java,Ruby,Python et des bases de données ... ",
-        "conseil":"Il existe des générateur de page statique en ligne et également proposé par wordpress"
+        "description":"Cela dépend du site web, si le site ne propose quasiment aucune interaction avec les utilisateurs alors il peut être envisagé de la rendre statique. Une page dynamique propose plusieurs services qui tournent pour fournir à l'utilisateur des services ce qui nécessite des échanges. Une page statique, au contraire,  est directement chargée dans le navigateur car les fichiers statiques utilisent seulement les requêtes HTTP du serveur contrairement au contenu dynamique avqui utilisent Java, Ruby, Python et des bases de données... ",
+        "conseil":"Il existe des générateurs de page statique en ligne, Wordpress intègre aussi cette fonctionnalité"
     },
     {
         "id":6,
@@ -52,59 +52,59 @@
     },
     {
         "id":7,
-        "_comment":"Sous critères de 'Utilisation d'une template ou de plugins' ",
+        "_comment":"Détection du CMS via l'analyse du template ou des plugins' ",
         "critere":"CMS utilisé",
-        "description":"Utilisé des templates comme wordpress est utile et est déjà suffisament optimiser",
-        "conseil":"Malgré que wordpress est optimisé il reste lourd a utilisé surtout si on utilise pas 100% de ses fonctionnalité, éviter également d'importer beaucoup de plugins"
+        "description":"Utiliser des templates comme Wordpress est utile car ils sont déjà suffisament optimisés",
+        "conseil":"Wordpress reste lourd a utiliser pour le serveur surtout si on n'utilise pas 100% de ses fonctionnalités, il faut éviter également d'importer beaucoup de plugins"
     },
     {
         "id": 8,
-        "critere":"Taille des images modifier depuis le navigateur",
+        "critere":"Taille des images modifiées depuis le navigateur",
         "header":"imgResize",
-        "description":"Redimensionner une image avec les propriétés width et height de la balise <img> est du dégaspillage car il charge quand même l'image originale dans le navigateur et donc consomme pour rien.",
-        "conseil" : "Changer la taille d'une image depuis un logiciel du style photoshop"
+        "description":"Redimensionner une image avec les propriétés Width et Height de la balise <img> est mauvais car il charge quand même l'image originale dans le navigateur et donc consomme des ressources pour rien.",
+        "conseil" : "Changer plutôt la taille d'une image diretement depuis un logiciel de retouche photo"
     },
     {
         "id":9,
         "_comment":"Critère bizzare, à revoir",
         "critere":"ratio http1",
         "header":"Http1.1/Http2requests",
-        "description":"HTTP2 est rapide et sécurisé, propose la compréssion des headers et donc réduit la bande passante"
+        "description":"HTTP2 est rapide et sécurisé, il propose la compression des headers et donc réduit la bande passante"
     },
     {
         "id":10,
         "critere":"Hébergeur vert",
         "header":"host",
-        "description":"Des hébergeur fournissent des services en utilisant l'énérgie vert et donc compense ses émissions de gaz à effet de serre",
-        "conseil":"Opter pour un hébergeur inclus dans la liste fournit par greenIT"
+        "description":"Des hébergeurs utilisant de l'énérgie verte (éolien, solaire, etc.) compensent leurs émissions de gaz à effet de serre",
+        "conseil":"Opter pour un hébergeur vert issus d'une zone à faible émissions CO2 (ElectricityMap)"
     },
     {
         "id":11,
         "critere":"minification des fichiers JS",
         "header":"JSMinification",
-        "description":"On peut diminuer le poid de fichier JS en supprimant des lignes vide ou des espaces inutile",
-        "conseil": "Adopter des outils comme YUI compressor."
+        "description":"On peut diminuer le poid d'un fichier JS en supprimant des lignes vides ou les espaces inutiles",
+        "conseil": "Adopter un outil comme YUI compressor."
     },
     {
         "id":12,
         "critere":"minification des fichiers CSS",
         "header":"CSSMinification",
-        "description":"On peut diminuer le poid de fichier CSS en supprimant des lignes vide ou des espaces inutile",
-        "conseil": "Adopter des outils comme YUI compressor."
+        "description":"On peut diminuer le poid de fichier CSS en supprimant des lignes vides ou les espaces inutiles",
+        "conseil": "Adopter un outil comme YUI compressor."
     },
     {
         "id":13,
         "critere":"Images avec src vide",
         "header":"imgSrcEmpty",
-        "description":"La page génére des requêtes http pour trouver l'image",
-        "conseil":"Eviter de laissé des balises IMG avec un src vide"
+        "description":"La page génére des requêtes HTTP pour trouver l'image",
+        "conseil":"Eviter de laisser des balises <IMG> avec une balise SRC= vide"
     },
     {
         "id":14,
         "critere":"JS interne(inline)",
         "_comment":"Nom différent du côté site web",
         "header":"JSNotExt",
-        "description":"Il est fortément déconseiller de mettre du js dans des balises car à chaque chargement le contenu sera rechargé",
+        "description":"Il est fortement déconseillé de mettre du JS dans des balises car à chaque chargement de la page le contenu sera rechargé entièrement",
         "conseil":""
     },
     {
@@ -112,45 +112,45 @@
         "critere":"CSS interne(inline)",
         "header":"CSSNotExt",
         "_comment":"Nom différent du côté site web",
-        "description":"Il est fortément déconseiller de mettre du css dans des balises car à chaque chargement le contenu sera rechargé",
+        "description":"Il est fortement déconseillé de mettre du CSS dans des balises car à chaque chargement le contenu sera rechargé entièrement",
         "conseil":""
     },
     {
         "id":16,
-        "critere":"valider le code JS",
+        "critere":"Valider le code JS",
         "header":"filesWithError",
         "description":"Si le code respecte les règles de syntaxe alors cela allègera le travail de l'interpréteur et donc du CPU.",
         "conseil":"Adopter des outils comme JSLint"
     },
     {
         "id":17,
-        "critere":"Eviter les boutons réseaux sociaux",
+        "critere":"Eviter les boutons de réseaux sociaux",
         "header":"socialButtons",
-        "description":"Le click sur ces boutons génère des requêtes inutile comme par exemple le nombre de likes (Facebook)",
+        "description":"Les boutons de réseaux sociaux génèrent des requêtes inutiles, comme par exemple un compteur de likes Facebook",
         "conseil":""
     },
     {
         "id": 18,
-        "critere":"Adaptation de la page en mobile",
-        "description":"Sachant que 50,1 % du temps passé sur internet se fait depuis des appareil mobile, une page compatible avec ce format avantagera votre site web",
-        "conseil" : "Si votre page n'est pas mobile friendly, veuillez revoir la structure de votre page : Par exemple prévoir l'utilisateur d'une template, changer la taille et l'emplacement des boutons ou encore revoir le choix de la police utilisé ..."
+        "critere":"Adaptation de la page au support mobile",
+        "description":"50,1 % du temps passé sur Internet se fait depuis des appareils mobiles, ainsi une page compatible avec ce format sera donc un avantage",
+        "conseil" : "Si votre page n'est pas mobile friendly, il faut alors revoir la structure de la page. Il faut par exemple prévoir l'utilisation d'une template, changer la taille et l'emplacement des boutons ou encore revoir le choix de la police utilisée ..."
     },
     {
         "id":19,
-        "critere":"police standards",
+        "critere":"Polices d'écriture standards",
         "header":"FontsNb",
-        "description":"Adopter les polices par défault économise de la bande passant car on importe aucunes polices.",
-        "conseil":"Si ce n'est pas possible, limiter vous à 3 polices"
+        "description":"Adopter des polices d'écriture par défault économise de la bande passante car on importe ainsi aucune police",
+        "conseil":"Si ce n'est pas possible, il faut se limiter à 3 polices standards : Arial, Times New Roman, Tahoma"
     },
     {
         "id":20,
-        "critere":"Optimiser les fichiers pdf",
-        "description":"Optimiser la taille des fichiers pdf va alléger le poid de la requêtes associé",
+        "critere":"Optimiser les fichiers PDF",
+        "description":"Optimiser la taille des fichiers PDF va alléger le poids de la requête associée",
         "conseil":""
     },
     {
         "id":21,
-        "critere":"Nombres de fichiers css",
+        "critere":"Nombres de fichiers CSS",
         "_comment":"Critère dans le tableau ?",
         "header":"cssFiles",
         "description":"Nombre de fichiers CSS"
@@ -160,7 +160,7 @@
         "id":22,
         "critere":"Pixels blanc",
         "header":"ratioWhitePixels",
-        "description":"Toutes les couleurs ne se valent pas en terme de consommation électrique et donc d’impact carbone in fine, par exemple : La couleur noir ne consomme pas d'éléctriciter contrairement à la couleur blanche.",
-        "conseil":"Envisager d'implémenter l'option :'dark mode' pour votre site web"
+        "description":"Toutes les couleurs ne se valent pas en terme de consommation énergétique. Par exemple : un pixel de couleur noire consomme ainsi moins d'électricité qu'un pixel de couleur blanc.",
+        "conseil":"Envisager d'implémenter l'option 'dark mode' pour votre site web"
     }
 ]
