@@ -44,6 +44,7 @@ function deleteItem(array,item){
     }
 }
 // todo : Do a table (flou, non flou (boolean))
+// Marche pas ... 
 function create_checkbox() {
     const container = document.getElementById('checkbox_area');
     for (let i = 0; i < criteres.length; i++) {
@@ -268,8 +269,16 @@ function display_fuzzy(data){
                 <button class="edit_fuzzy" type="button" onclick="location.href='result/modifyFuzzyRules/${criteres[j]}/'">
                     edit
                 </button>
-            </li>
-            `  
+            `
+             
+        if(data[criteres[j]]['fuzzification'] == 'bad'){
+            for(let i = 0 ; i < more.length;i++){
+                if(more[i].header == criteres[j]){ // Chaque critère affiché est identifiable par son header
+                    ul.innerHTML += ` <div style = "color:red"> Aide : ${more[i].conseil} </div>`;
+                }
+            }
+        }
+        ul.innerHTML += `</li>` 
     }
     depot.appendChild(subtitle);
     depot.appendChild(ul);

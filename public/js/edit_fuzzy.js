@@ -1,10 +1,15 @@
 var fuzzyData = JSON.parse(sessionStorage.getItem('fuzzyData')); 
+var critere = "";
+var membership = [];
 
-const url = window.location.href.split('/');
-var critere = url[url.length-2];
-var membership = Object.keys(fuzzyData[critere].membership_function)
+function init(){
+    const url = window.location.href.split('/');
+    critere = url[url.length-2];
+    membership = Object.keys(fuzzyData[critere].membership_function);
+}
 
 function init_fuzzy(){
+    init()
     console.log("critère : ",critere);
     for(let i = 1 ; i<=3 ;i++){
         let liste = document.getElementById('fig_'+i);
