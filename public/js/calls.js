@@ -43,6 +43,7 @@ async function analyse(){
 
         sessionStorage.setItem('url_data', JSON.stringify(data.url_data));
         sessionStorage.setItem('fuzzyData',JSON.stringify(data.fuzzyResult));
+        sessionStorage.setItem('more',JSON.stringify(data.more));
 
         if (x.redirected) {
             window.location.href = x.redirected;

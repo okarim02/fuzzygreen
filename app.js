@@ -14,6 +14,7 @@ const fuzzylogic = require('./services/fuzzyLogic');
 const main = require('./services/main');
 
 const fs = require('fs');
+const { parse } = require('path');
 
 var requestTime = Date.now();
 
@@ -80,13 +81,16 @@ app.post("/getResult/analyse",async (req,res,next)=>{
     
     const fuzzyResult = await fuzzylogic.launch(computed_data,url_data);
 
+    const more = await require("./criteres.json");
+    
     res.json({
         status:'success',
         message: `Traitement terminé`,
         redirected: '/result',
         data : JSON.stringify({
             "fuzzyResult": fuzzyResult,
-            "url_data":url_data 
+            "url_data":url_data,
+            "more" : more
         })
     });
 })

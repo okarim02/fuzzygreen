@@ -1,6 +1,4 @@
 function begin() {
-    console.log("Hello this is the function test !");
-
     create_checkbox();
 }
 // Catégorie: design, serveur, hébergement
@@ -358,6 +356,10 @@ async function resultats(){
     const computedData = JSON.parse(sessionStorage.getItem('computedData'));
     const url_data = JSON.parse(sessionStorage.getItem('url_data'));
     const fuzzyData = JSON.parse(sessionStorage.getItem('fuzzyData'));
+    const more = JSON.parse(sessionStorage.getItem('more'));
+
+    console.log("MORE : ",more);
+
 
     // Modif pour faciliter la conversion json en csv
     computedData.push(url_data[0]);
