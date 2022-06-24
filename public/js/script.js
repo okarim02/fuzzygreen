@@ -1,6 +1,8 @@
 function begin() {
     create_checkbox();
 }
+var more = JSON.parse(sessionStorage.getItem('more'));
+
 // Catégorie: design, serveur, hébergement
 // todo : recupérer les critères depuis le serveur à la place
 var criteres = [
@@ -118,24 +120,39 @@ function display_data(data) {
     headers.forEach(text => {
         let header = document.createElement('th');
         let txt = document.createTextNode(text);
+        header.setAttribute("class", "info");
+
+        header.addEventListener('mouseover',()=>{
+            // Parcours le tableau des critères 
+            for(let i = 0 ; i < more.length;i++){
+                if(more[i].header == text){ // Chaque critère affiché est identifiable par son header
+                    header.setAttribute('data-content',more[i].description);
+                }
+            }
+        })
+
         header.appendChild(txt);
         headersRow.appendChild(header);
     });
 
+    const headersStyle = document.querySelectorAll('.info');
+
     thead.appendChild(headersRow);
     tbl.appendChild(thead);
 
-    for (let i = 0; i < data.length; i++) {
-        for (let key in data[i]) {
+    for (let i = 0; i < data.length; i++) { // Pour chaque site web 
+        for (let key in data[i]) { // Pour chaque critère d'un site web
             let row = document.createElement('tr');
 
             // Cell for the url analyzed
             let cell = document.createElement('td');
-            cell.style.border = '3px solid black';
 
+            // URL
             let a = document.createElement('a');
             a.innerText = key;
+            
             cell.appendChild(a);
+
             row.appendChild(cell);
 
             // Loop for each values link to the url
@@ -144,6 +161,7 @@ function display_data(data) {
                 cell.style.border = '1px solid black';
                 let txt;
                 var list_urls;
+                
                 if (typeof data[i][key][val] === 'object' && !Array.isArray(data[i][key][val]) && data[i][key][val] !== null) {
                     // In case of the green host data
                     if (val === 'host') {
@@ -161,7 +179,7 @@ function display_data(data) {
                         ;
                     } else if(val === "isMobileFriendly"){
                         txt = document.createTextNode(`${data[i][key][val] ? "1":"0"}`);
-                    }else{
+                    }else{ // Affichage des autres éléments comme la liste des fichiers javascript minimisé 
                         txt = document.createElement('details');
                         txt.innerText = 'more'
                         list_urls = data[i][key][val].liste;
@@ -186,9 +204,7 @@ function display_data(data) {
                     let v = data[i][key][val];
                     txt = document.createTextNode(isNaN(v)  ? '0' : v);
                 }
-
                 cell.appendChild(txt);
-
                 
                 row.appendChild(cell);
             }
@@ -356,10 +372,6 @@ async function resultats(){
     const computedData = JSON.parse(sessionStorage.getItem('computedData'));
     const url_data = JSON.parse(sessionStorage.getItem('url_data'));
     const fuzzyData = JSON.parse(sessionStorage.getItem('fuzzyData'));
-    const more = JSON.parse(sessionStorage.getItem('more'));
-
-    console.log("MORE : ",more);
-
 
     // Modif pour faciliter la conversion json en csv
     computedData.push(url_data[0]);

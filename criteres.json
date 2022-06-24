@@ -151,6 +151,8 @@
         "id":21,
         "critere":"Nombres de fichiers css",
         "_comment":"Critère dans le tableau ?",
-        "header":"cssFiles"
+        "header":"cssFiles",
+        "description":"Nombre de fichiers CSS"
+
     }
 ]

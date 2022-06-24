@@ -66,4 +66,39 @@ canvas {
     width: 1000px;
     height: 400px;
     border: 1px solid black;
-  }
+}
+
+/*https://forum.alsacreations.com/topic-4-87631-1-Infobulle-et-div.html*/
+th.info 
+{
+	padding:1em;
+	position:relative;
+	background-color:#ddd;
+}
+
+th.info:hover
+{
+	background-color:
+#ff0
+}
+
+th.info:after
+{
+	content:attr(data-content);
+	display:none;
+}
+
+th.info:hover:after
+{
+	display:block;
+	position:absolute;
+	bottom:-9em;
+	left:1em;
+	width:10em;
+	border:1px solid 
+#0cf;
+	background-color:
+#555;
+	color:
+#fff;
+}
