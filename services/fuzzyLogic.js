@@ -5,7 +5,7 @@ const Logic = require('es6-fuzz');
 const Triangle = require('es6-fuzz/lib/curve/triangle');
 const Trapezoid = require('es6-fuzz/lib/curve/trapezoid');
 
-var crit_less = ["PageSize(Ko)","RequestsNb","DOMsize(nb elem)","imgResize","cssFiles","Http1.1/Http2requests","JSMinification","CSSMinification","imagesWithoutLazyLoading","FontsNb","etagsRatio","etagsNb","lazyLoadRatio","host"]; // Plus la valeur est bas, plus on est dans l'excellence
+var crit_less = ["PageSize(Ko)","RequestsNb","DOMsize(nb elem)","imgResize","cssFiles","Http1.1/Http2requests","JSMinification","CSSMinification","imagesWithoutLazyLoading","FontsNb","etagsRatio","etagsNb","host","ratioWhitePixels"]; // Plus la valeur est bas, plus on est dans l'excellence
 var crit_more = ["etagsNb","etagsRatio","lazyLoadRatio"]; // todo : modifier les fonctions d'appartenance pour ce genre de critère  
 
 

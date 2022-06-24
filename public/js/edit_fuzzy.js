@@ -38,7 +38,7 @@ function init_fuzzy(){
 async function confirm(){
     // Prélévement des nouvelles données.
     let membership_functions_result = {
-        "criteria":"PageSize(Ko)",
+        "criteria":critere,
         "excellent":{},
         "medium":{},
         "bad":{},

@@ -74,6 +74,7 @@
     {
         "id":10,
         "critere":"Hébergeur vert",
+        "header":"host",
         "description":"Des hébergeur fournissent des services en utilisant l'énérgie vert et donc compense ses émissions de gaz à effet de serre",
         "conseil":"Opter pour un hébergeur inclus dans la liste fournit par greenIT"
     },
@@ -154,5 +155,12 @@
         "header":"cssFiles",
         "description":"Nombre de fichiers CSS"
 
+    },
+    {
+        "id":22,
+        "critere":"Pixels blanc",
+        "header":"ratioWhitePixels",
+        "description":"Toutes les couleurs ne se valent pas en terme de consommation électrique et donc d’impact carbone in fine, par exemple : La couleur noir ne consomme pas d'éléctriciter contrairement à la couleur blanche.",
+        "conseil":"Envisager d'implémenter l'option :'dark mode' pour votre site web"
     }
 ]

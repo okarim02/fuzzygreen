@@ -28,7 +28,8 @@ var criteres = [
     'imgResize',
     'isMobileFriendly',
     'imgSrcEmpty',
-    'host'// hébergement
+    'host',// hébergement
+    'ratioWhitePixels'
 ]
 
 var criteres_selected = [...criteres];
@@ -102,7 +103,7 @@ function getHeaders(data) {
 // Affichage du tableau 
 function display_data(data) {
 
-    console.log("DATA : ",data);
+    console.log("DATA use : ",data);
 
     let depot = document.getElementById('result');
 
@@ -135,8 +136,6 @@ function display_data(data) {
         header.appendChild(txt);
         headersRow.appendChild(header);
     });
-
-    const headersStyle = document.querySelectorAll('.info');
 
     thead.appendChild(headersRow);
     tbl.appendChild(thead);

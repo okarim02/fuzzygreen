@@ -56,7 +56,8 @@ function Measures(){
         'imgResize': 0,
         'isMobileFriendly':false,
         "imgSrcEmpty":0,
-        "host":{} // hosting
+        "host":{} ,// hosting
+        "ratioWhitePixels":0.0,
     }
 }
 
@@ -90,9 +91,8 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
 
     // Take screenshot 
     await page.screenshot({ path: `page.png`, fullPage:true});
-    /*
-    measures.ratioWhitePixels = tools.readPixels('page.png')
-    */
+    
+    measures.ratioWhitePixels = await tools.readPixels('page.png');
 
     measures.CMS.liste = await getCMS(page, browser = undefined).then(e => e ? e : []);
     measures.CMS.nb = measures.CMS.liste.length;
