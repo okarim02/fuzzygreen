@@ -1,10 +1,11 @@
 function begin() {
     create_checkbox();
 }
+
 var more = JSON.parse(sessionStorage.getItem('more'));
 
-// Catégorie: design, serveur, hébergement
-// todo : recupérer les critères depuis le serveur à la place
+// Catégorie: design, serveur, hébergement à faire
+// Critères envoyé au serveur afin qu'ils les prennent en comptent.
 var criteres = [
     'PageSize(Ko)', // Serveur
     'RequestsNb',
@@ -44,10 +45,10 @@ function deleteItem(array,item){
         array[index] = "None";
     }
 }
-// todo : Do a table (flou, non flou (boolean))
-// Marche pas ... 
+
 function create_checkbox() {
     const container = document.getElementById('checkbox_area');
+    container.style = "background-color"
     for (let i = 0; i < criteres.length; i++) {
         let checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
@@ -73,7 +74,6 @@ function create_checkbox() {
 
     container.onclick = function (ev) {
         if (ev.target.value) {
-            // criteres_selected.slice()
             var index = criteres.indexOf(ev.target.value);// Obtient l'index du critère 
             let index2 = criteres_selected.indexOf(ev.target.value); 
             if (index2 !== -1) { // Vérifie si le critère n'est pas séléctionner, sinon il est ajouté 
@@ -86,24 +86,12 @@ function create_checkbox() {
 
 }
 
-function isUrl(string) {
-    let url_string;
-    try {
-        url_string = new URL(string);
-    } catch (_) {
-        return false;
-    }
-    return url_string.protocol === "http:" || url_string.protocol === "https:";
-}
-
 function getHeaders(data) {
     return ["url", ...Object.keys(data[Object.keys(data)[0]])];// Loop pour chaque clé de la première données scanner.
 }
 
 // Affichage du tableau 
 function display_data(data) {
-
-    console.log("DATA use : ",data);
 
     let depot = document.getElementById('result');
 
@@ -124,11 +112,12 @@ function display_data(data) {
         let txt = document.createTextNode(text);
         header.setAttribute("class", "info");
 
+        // Info-bulle
         header.addEventListener('mouseover',()=>{
-            // Parcours le tableau des critères 
+            // Parcours le fichier criteres.json
             for(let i = 0 ; i < more.length;i++){
                 if(more[i].header == text){ // Chaque critère affiché est identifiable par son header
-                    header.setAttribute('data-content',more[i].description);
+                    header.setAttribute('data-content',`${more[i].critere} : ${more[i].description}`);
                 }
             }
         })
@@ -155,13 +144,16 @@ function display_data(data) {
 
             row.appendChild(cell);
 
-            // Loop for each values link to the url
-            for (let val in data[i][key]) {
+            // i: index du site web
+            // key : Critère du site i
+            for (let val in data[i][key]) { // Pour chaque valeur des critères.
                 let cell = document.createElement('td');
                 cell.style.border = '1px solid black';
                 let txt;
                 var list_urls;
                 
+                if(data[i][key] == null) continue;
+
                 if (typeof data[i][key][val] === 'object' && !Array.isArray(data[i][key][val]) && data[i][key][val] !== null) {
                     // In case of the green host data
                     if (val === 'host') {
@@ -179,7 +171,7 @@ function display_data(data) {
                         ;
                     } else if(val === "isMobileFriendly"){
                         txt = document.createTextNode(`${data[i][key][val] ? "1":"0"}`);
-                    }else{ // Affichage des autres éléments comme la liste des fichiers javascript minimisé 
+                    }else{ // Affichage des autres éléments comme la liste des fichiers javascript minimisé ou pixels blanc
                         txt = document.createElement('details');
                         txt.innerText = 'more'
                         list_urls = data[i][key][val].liste;
@@ -214,6 +206,7 @@ function display_data(data) {
     }
     depot.appendChild(tbl);
 }
+// Affiche des informations relative à la logique floue 
 function display_fuzzy(data){
 
     console.log("fuzzy data : ",data);
@@ -269,7 +262,6 @@ function display_fuzzy(data){
                     edit
                 </button>
             `
-             
         if(data[criteres[j]]['fuzzification'] == 'bad'){
             for(let i = 0 ; i < more.length;i++){
                 if(more[i].header == criteres[j]){ // Chaque critère affiché est identifiable par son header
@@ -333,40 +325,26 @@ function generateExcel(data){
     // en-tête
     
     wsData.push([''])
-    wsData.push(['Fuzzy logic'])
     wsData.push([''])
+
     let criteres = Object.keys(data['fuzzy_data'])
 
     let entete_fuzzy = Object.keys(data['fuzzy_data'][criteres[0]]['other']);
 
-    wsData.push(['Criteria',...entete_fuzzy])
+    wsData.push(['Criteria',...entete_fuzzy,'result_fuzzy'])
     
-    /*
     for(let i = 0 ; i < criteres.length-1;i++){
-        li.textContent = `${criteres[i]}` + `=> min : ${ data[criteres[i]]['other'].min } ; max : ${ data[criteres[i]]['other'].max } ; average : ${ data[criteres[i]]['other'].moyenne } ; median : ${data[criteres[i]]['other'].median }
-         ====> ${data[criteres[i]]['fuzzification']}`;
-        ul.appendChild(li);
+        let row = []; // Création de la ligne excel
+        // insertion critere
+        row.push(criteres[i]); 
+        // Autres données : min,max, ecart ... 
+        for (let j of Object.keys(data['fuzzy_data'][criteres[i]]['other'])){
+            row.push(data['fuzzy_data'][criteres[i]]['other'][j]); 
+        } 
+        // Résultat fuzzy
+        row.push(data['fuzzy_data'][criteres[i]]['fuzzification']); 
+        wsData.push(row);
     }
-    depot.appendChild(ul);
-
-    // Affichage defuzzification
-    const subtitle = document.createElement('h4');
-    subtitle.innerText = `Defuzzification`;
-    
-    ul = document.createElement('ul');
-    ul.innerHTML= `
-        <li>
-            excellent: ${data[criteres[criteres.length-1]][0]}
-        </li>
-        <li>
-            Medium: ${data[criteres[criteres.length-1]][1]}
-        </li>
-        <li>
-            Bad: ${data[criteres[criteres.length-1]][2]}
-        </li>
-    `
-    */
-
 
     let ws = XLSX.utils.aoa_to_sheet(wsData);
     XLSX.utils.book_append_sheet(wb, ws, wsName);

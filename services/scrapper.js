@@ -74,6 +74,9 @@ function setMeasurestoDo(criteres_selected){
 
 module.exports.getPageMetrics = async (url, page,criteres_selected, callback) => {
 
+
+    await page.setDefaultNavigationTimeout(0); 
+
     setMeasurestoDo(criteres_selected);
     //'use strict';
     acceptCookies(page); // Accepte les cookies 
@@ -86,61 +89,71 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
     // GO TO THE PAGE 
     await page.goto(url, { waitUntil: ('networkidle0') });
 
-    // critère x : privilégier les pixels noir
-    //await tools.readPixels('./page.png')
-
     // Take screenshot 
     await page.screenshot({ path: `page.png`, fullPage:true});
     
-    measures.ratioWhitePixels = await tools.readPixels('page.png');
 
-    measures.CMS.liste = await getCMS(page, browser = undefined).then(e => e ? e : []);
-    measures.CMS.nb = measures.CMS.liste.length;
+    measures.ratioWhitePixels = criteres_selected.includes('ratioWhitePixels') ? await tools.readPixels('page.png') : undefined;
 
+    if(criteres_selected.includes('CMS')){
+        measures.CMS.liste = await getCMS(page, browser = undefined).then(e => e ? e : []);
+        measures.CMS.nb = measures.CMS.liste.length;
+    }
+    if(criteres_selected.includes('isStatic')){
+        measures.isStatic = await isStatic(page,measures) ? 1 : 0;
+    }
 
-    measures.isStatic = await isStatic(page,measures) ? 1 : 0;
-    //measures['loadTime(ms)'] = await getLoadTime(page);
-
-    /* Todo : utiliser la méthode ci-dessous pour trouver le protocole utilisé.
-    * Goal : Get the protocol using for each request/response
-    * @see {@link https://jsoverson.medium.com/using-chrome-devtools-protocol-with-puppeteer-737a1300bac0}
-    * Create a cdp session, for chrome devtool 
-    */
     const client = await page.target().createCDPSession();
 
     // Critères id: 15 et 16 .
     await countNumberOfInlineStyleSheet(page).then((jsNotExt,cssNotExt)=>{
-        measures.JSNotExt = jsNotExt;
-        measures.CSSNotExt = cssNotExt;
+        if(criteres_selected.includes('JSNotExt')) measures.JSNotExt = jsNotExt;
+        if(criteres_selected.includes('CSSNotExt')) measures.CSSNotExt = cssNotExt;
     });
 
     const res = await getRatioLazyImages(page);
 
-    measures.cssFiles = await page.evaluate(() => {
-        return document.styleSheets.length;
-    });
+    if(criteres_selected.includes('cssFiles')){
+        measures.cssFiles = await page.evaluate(() => {
+            return document.styleSheets.length;
+        });
+    }
 
-    measures.etagsRatio = measures.etagsNb / measures.RequestsNb;
-    measures.etagsRatio = parseFloat(measures.etagsRatio).toFixed(2);
-    measures.etagsRatio = parseFloat(measures.etagsRatio);
+    if(criteres_selected.includes('etagsRatio')){
+        measures.etagsRatio = measures.etagsNb / measures.RequestsNb;
+        measures.etagsRatio = parseFloat(measures.etagsRatio).toFixed(2);
+        measures.etagsRatio = parseFloat(measures.etagsRatio);
+    }
 
-    measures.lazyLoadRatio = res.ratio;
-    measures.lazyLoadRatio = parseFloat(measures.lazyLoadRatio).toFixed(2) ? parseFloat(measures.lazyLoadRatio).toFixed(2) : 0.0 ;
+    if(criteres_selected.includes('lazyLoadRatio')){
+        measures.lazyLoadRatio = res.ratio;
+        measures.lazyLoadRatio = parseFloat(measures.lazyLoadRatio).toFixed(2) ? parseFloat     (measures.lazyLoadRatio).toFixed(2) : 0.0 ;
+    }
 
-    measures.imagesWithoutLazyLoading.liste = res.imagesNoLazy;
-    measures.imagesWithoutLazyLoading.nb = res.imagesNoLazy.length;
+    if(criteres_selected.includes('imagesWithoutLazyLoading')){
+        measures.imagesWithoutLazyLoading.liste = res.imagesNoLazy;
+        measures.imagesWithoutLazyLoading.nb = res.imagesNoLazy.length;
+    }
+    
+    if(criteres_selected.includes('imgResize')){
+        measures.imgResize = await getImagesResized(page).then(e => e.imagesResized.length);
+    }
 
-    measures.imgResize = await getImagesResized(page).then(e => e.imagesResized.length);
+    if(criteres_selected.includes('Http1.1/Http2requests')){
+        measures['Http1.1/Http2requests'] = await (counter_http1 / measures.RequestsNb) * 100;
+        measures['Http1.1/Http2requests'] = parseFloat(measures['Http1.1/Http2requests']).toFixed(2);
+        measures['Http1.1/Http2requests'] = parseFloat(measures['Http1.1/Http2requests']) || 0 ;
+    }
 
-    measures['Http1.1/Http2requests'] = await (counter_http1 / measures.RequestsNb) * 100;
-    measures['Http1.1/Http2requests'] = parseFloat(measures['Http1.1/Http2requests']).toFixed(2);
-    measures['Http1.1/Http2requests'] = parseFloat(measures['Http1.1/Http2requests']) || 0 ;
+    if(criteres_selected.includes('DOMsize(nb elem)')){
+        measures['DOMsize(nb elem)'] = await page.$$eval('*', array => array.length);
+    }
+    
 
-    measures['DOMsize(nb elem)'] = await page.$$eval('*', array => array.length);
+    measures.pluginsNb = criteres_selected.includes('pluginsNb') ? await getPlugins(page).then(e => e ? e.length : 0) : undefined;
 
-    measures.pluginsNb = await getPlugins(page).then(e => e ? e.length : 0);
-
-    measures.imgSrcEmpty = await getImagesSrcEmpty(page);
+    measures.imgSrcEmpty = criteres_selected.includes('imgSrcEmpty') ? await getImagesSrcEmpty(page) : undefined;
+   
     /*
      const pdfs = await getAllpdf(page);
      // check if a pdf's size is higher than normal
@@ -154,11 +167,20 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
      }
      */
 
-
-    measures.JSMinification.nb = measures.JSMinification.liste.length;
-    measures.CSSMinification.nb = measures.CSSMinification.liste.length;
-    measures.filesWithError.nb = measures.filesWithError.liste.length;
-    measures.FontsNb.nb = measures.FontsNb.liste.length;
+    
+    if(measures.JSMinification){
+        measures.JSMinification.nb = criteres_selected.includes('JSMinification') ? measures.JSMinification.liste.length : undefined;
+    }
+    if(measures.CSSMinification){
+        measures.CSSMinification.nb = criteres_selected.includes('CSSMinification') ? measures.CSSMinification.liste.length : undefined;
+    }
+    if(measures.filesWithError){
+        measures.filesWithError.nb = criteres_selected.includes('filesWithError') ? measures.filesWithError.liste.length : undefined;
+    }
+    if(measures.FontsNb){
+        measures.FontsNb.nb = criteres_selected.includes('FontsNb') ? measures.FontsNb.liste.length : undefined;
+    }
+    
     //measures.socialButtonsFind.nb = measures.socialButtonsFind.liste.length;
 
     await page.close();
@@ -416,7 +438,7 @@ async function getAllpdf(page) {
     }
     return pdfs;
 }
-// Si une balise 'stylesheet' ne possède pas d'attribut 'href' => Alors le contenu a été écrit directement le fichier html.
+// Si une balise 'stylesheet' ne possède pas d'attribut 'href' => Alors le contenu a été écrit directement sur le fichier html.
 async function countNumberOfInlineStyleSheet(page) {
     const result = await page.evaluate(() => {
         let stylesheets = document.styleSheets;
