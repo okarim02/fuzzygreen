@@ -84,7 +84,7 @@ var tools = module.exports = {
           // this.result = (this.luminance * this.saturation);
           console.log("Luminance : ",this.luminance, " %");
           resolve(this.luminance)
-        });
+        },error=>{ reject(error) });
       })
 
     },

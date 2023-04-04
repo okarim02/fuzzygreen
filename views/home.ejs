@@ -6,11 +6,17 @@
         </div>
         <div class="center">
             <textarea  id="url-enter" rows="2" cols="50" placeholder="Entrer une liste d'url"></textarea>
-            <div>
-                <button id="submit" onclick="compute()"> Scan </button>
-            </div>
         </div>
-        <div id="loading"></div>
+       
+        <div>
+            <div id="loading"></div>
+            <div id="message"></div>
+        </div>
+        
+        <div>
+            <button id="submit" onclick="compute()"> Launch analyse </button>
+        </div>
+
         </div>
     </article>
 </section>
@@ -20,7 +26,11 @@
 <footer>
     <%- include('partials/footer') %>
 </footer>
-</footer>
+<script>
+    window.onload = function() {
+        begin(); 
+    };
+</script>
 
 </body>
 </html>

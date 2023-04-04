@@ -153,7 +153,8 @@
         "critere":"Nombres de fichiers CSS",
         "_comment":"Critère dans le tableau ?",
         "header":"cssFiles",
-        "description":"Nombre de fichiers CSS"
+        "description":"Nombre de fichiers CSS",
+        "conseil":"Limiter le nombre de fichier CSS"
 
     },
     {

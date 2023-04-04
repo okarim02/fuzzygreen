@@ -167,7 +167,6 @@ module.exports.getPageMetrics = async (url, page,criteres_selected, callback) =>
      }
      */
 
-    
     if(measures.JSMinification){
         measures.JSMinification.nb = criteres_selected.includes('JSMinification') ? measures.JSMinification.liste.length : undefined;
     }

@@ -4,7 +4,10 @@ var membership = ['excellent','medium','bad']; // Liste de la forme :
 
 function init(){
     const url = window.location.href.split('/');
+
     critere = url[url.length-2];
+
+    critere = critere.split('%20').join(' ');
 }
 
 function init_fuzzy(){

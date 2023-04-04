@@ -1,3 +1,4 @@
+const controller = new AbortController()
 
 async function edit_fuzzy_call(data){
     // Redirection + envoie des nouvelles données au serveur.
@@ -129,13 +130,20 @@ async function compute() {
 
     const data = { urls, criteres_selected };
     // pour plus d'info : https://developer.mozilla.org/fr/docs/Web/API/Fetch_API/Using_Fetch
+
+
+    // 60 second timeout:
+    const timeoutId = setTimeout(() => controller.abort(), 60000*urls.length);
+
     const options = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
+        signal:controller.signal
     }
+
     // endpoint
     // fetch() timeouts at 300 seconds in Chrome
     // todo : faire ca : https://dmitripavlutin.com/timeout-fetch-request/
@@ -146,16 +154,15 @@ async function compute() {
             show_error(res.message);
             return;
         }
-        
-        let x = await res.json();
 
-        console.log("Data reçu : ",x.data)
+        let x = await res.json();
 
         if(typeof x.data != 'undefined'){
             // Sauvegarde des données dans le cache de l'utilisateur => Pas besoin de BDD comme ça :)
             sessionStorage.setItem('computedData', x.data);
         }else{
             show_error("Le serveur n'a envoyé aucune donnée ... ");
+            console.log("err aucune donnée : ",x);
         }
 
        // Redirection

@@ -1,6 +1,7 @@
 var main = require("./main");
 const { Cluster } = require('puppeteer-cluster'); 
 const common = require("./common")
+const tools = require("./tools");
 
 function Result(tmp){
     let obj = {};
@@ -14,7 +15,7 @@ module.exports.clust = async function first(urls,criteres_selected){
     // init concurrency
     const cluster = await Cluster.launch({
         concurrency : Cluster.CONCURRENCY_PAGE,
-        maxConcurrency:200, // Max pages
+        maxConcurrency:1, // todo : revoir  
         timeout:60000, // 60s per page
         puppeteerOptions:{
             devtools: true,
@@ -30,11 +31,12 @@ module.exports.clust = async function first(urls,criteres_selected){
     });
 
     await cluster.task(async ({page,data: url})=>{
-        const res = await main.start(url,page,criteres_selected);
+        const res = await main.start(url,page,criteres_selected)
         return res;
     });
 
     for(let i = 0 ; i < urls.length;i++) {
+        console.log("Analyse URL : ",urls[i]);
         const tmp = await cluster.execute(urls[i]);
         let r = Result(tmp);
         let obj = {};

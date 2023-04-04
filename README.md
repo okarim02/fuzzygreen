@@ -3,15 +3,17 @@
 sustainable tool for websites, use fuzzy logic to test if your website is sustainable or not.
 
 ---
+
 ## Requirements
 
 For development, you will only need Node.js and a node global package, Yarn, installed in your environement.
 
 ### Node
+
 - #### Node installation on Windows
 
   Just go on [official Node.js website](https://nodejs.org/) and download the installer.
-Also, be sure to have `git` available in your PATH, `npm` might need it (You can find git [here](https://git-scm.com/)).
+  Also, be sure to have `git` available in your PATH, `npm` might need it (You can find git [here](https://git-scm.com/)).
 
 - #### Node installation on Ubuntu
 
@@ -36,8 +38,10 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
     $ npm install npm -g
 
 ###
+
 ### Yarn installation
-  After installing node, this project will need yarn too, so just run the following command.
+
+After installing node, this project will need yarn too, so just run the following command.
 
       $ npm install -g yarn
 
@@ -45,18 +49,6 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
 
 ## Install
 
-    $ git clone https://github.com/YOUR_USERNAME/PROJECT_TITLE
-    $ cd PROJECT_TITLE
+    $ git clone https://github.com/okarim02/fuzzygreen
+    $ cd fuzzygreen
     $ yarn install
-
-## Configure app
-
-Open `a/nice/path/to/a.file` then edit it with your settings. You will need:
-
-- A setting;
-- Another setting;
-- One more setting;
-
-## Running the project
-
-    $ node app.js

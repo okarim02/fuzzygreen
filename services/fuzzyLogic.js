@@ -1,4 +1,4 @@
-const fuzzylogic = require('fuzzylogic'); // A supprimer x)
+const fuzzylogic = require('fuzzylogic'); // A supprimer
 const common = require('./common');
 const FuzzyModule = require('fuzzymodule');
 const Logic = require('es6-fuzz');
@@ -128,7 +128,6 @@ class fuzzyVariable{
     }
 }
 
-// todo : refaire cette fonction pour inclure directement les données du critère
 function getSpecificData(data,critere){
     let valuesData = []
     data.map((obj)=>{
@@ -158,7 +157,6 @@ function getSpecificData(data,critere){
 
     console.log(`Moyenne ${critere} data : `, moyenne);
 
-    // todo : Prendre l'écart type ? 
     //let ecart = minMax[1] - moyenne;
     let ecart = getEcart(valuesData,moyenne);
 
@@ -189,8 +187,9 @@ function getUndefinedData(){
 }
 /**
  * 
- * @param {*} crit : critère  
- * @param {*} obj : Objet de la forme :
+ * @param {*} crit : critère
+ * @param {*} fuzzy_data : données calculés
+ * @param {*} new_membershipFunction : Objet de la forme :
  * {
  *  'excellent' : {forme : 'triangle' , x0: 10 , x1 : 2 , x3:10}
  *  'medium' : {forme : 'triangle' , x0: 10 , x1 : 2 , x3:10}
@@ -200,22 +199,15 @@ function getUndefinedData(){
 
  module.exports.edit = async function edit(fuzzy_data,crit,new_membershipFunction){
 
-    console.log("DEBUG 1: ",fuzzy_data);
-    console.log("DEBUG 2: ",crit);
-    console.log("DEBUG 3: ",new_membershipFunction);
-
     let a = new fuzzyVariable(crit,fuzzy_data[crit]['pair']);
 
-    fuzzy_data[crit].membership_function = new_membershipFunction;
+    fuzzy_data[crit]["membership_function"] = new_membershipFunction;
 
     a.critere_module(crit,new_membershipFunction);
-    console.log("DEBUG 3.2: ",fuzzy_data[fuzzy_data[crit].pair].membership_function);
 
     a.critere_module(fuzzy_data[crit].pair,fuzzy_data[fuzzy_data[crit].pair].membership_function);
 
     const fuzzyval = a.getCrispValue(fuzzy_data[crit].crisp_value, fuzzy_data[fuzzy_data[crit].pair].crisp_value);
-
-    console.log("DEBUG 4: ",fuzzyval);
 
     fuzzy_data[crit]["result_fuzzificaton"]=fuzzyval;
     fuzzy_data[crit]["fuzzification"]= getBooleanFuzzy(fuzzy_data[crit].crisp_value,fuzzy_data[crit].membership_function);
@@ -224,13 +216,9 @@ function getUndefinedData(){
 
     let s_list = []
     for(let i = 0 ; i < crit_less.length;i+=2){
-        console.log(`DEBUG ${i-2}: `,crit_less[i]);
-
         s_list.push(fuzzy_data[crit_less[i]]["result_fuzzificaton"])
     }
     let new_result = getResult(s_list);
-
-    console.log(`DEBUG ${9}: `,new_result);
 
     fuzzy_data["sustainable"]=getFuzzyValue(new_result);
 
@@ -239,7 +227,6 @@ function getUndefinedData(){
 
 module.exports.launch = async function launch(data=[common.otherExempleOfScrapperData],data2=[common.exampleScrapperData]){
 
-    // todo => Utiliser le tableau critère envoyé par l'utilisateur à la place de less ... 
     var fuzzyLogic_values = {};
     let url_data = Object.values(data2[0])[0]; // Récupère les valeurs de l'url scanner
 
@@ -264,6 +251,7 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
     */
     var s_list = []
     for(let i = 0 ; i < crit_less.length;i+=2){
+
 
         let result_act = getSpecificData(data,crit_less[i]) || getUndefinedData(); // résultat actuelle
         let result_ap = getSpecificData(data,crit_less[i+1]) || getUndefinedData(); // résultat du critère suivant
@@ -366,7 +354,6 @@ module.exports.launch = async function launch(data=[common.otherExempleOfScrappe
         fuzzyLogic_values[crit_less[i+1]]["other"] = {min: result_ap.min , max: result_ap.max, moyenne : result_ap.average, median: result_ap.median};
 
     }
-
 
     let max = getResult(s_list);
 

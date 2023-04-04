@@ -19,6 +19,7 @@
   "homepage": "https://github.com/okarim02/eco-outil#readme",
   "dependencies": {
     "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "ejs": "^3.1.8",
     "es6-fuzz": "^3.0.7",

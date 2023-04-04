@@ -44,7 +44,7 @@ module.exports.start = async function main(url,page,criteres_selected){
                     "nb":0
                 };
 
-                if(result.host["co2_info_elec_map"]["carbonIntensity"]!= "None" || result.host["co2_info_elec_map"]!="API rate limit exceeded" && 1==2){
+                if(result.host["co2_info_elec_map"]["carbonIntensity"]!= "None" || result.host["co2_info_elec_map"]!="API rate limit exceeded"){
                     result.host["nb"] = parseFloat(result.host["co2_info_elec_map"]["carbonIntensity"].split(" ")[0]);
                 }else{
                     result.host["nb"] = parseFloat(result.host["co2_info_greenfoundation"]["carbon_intensity"]);
